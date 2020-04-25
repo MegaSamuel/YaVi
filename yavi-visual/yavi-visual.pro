@@ -32,10 +32,12 @@ LIBS += -L$$PWD/../target/lib -lyaml-cpp
 
 SOURCES += \
         main.cpp \
-        mainwindow.cpp
+        mainwindow.cpp \
+    work.cpp
 
 HEADERS += \
-        mainwindow.h
+        mainwindow.h \
+    work.h
 
 win32: RC_ICONS = $$PWD/favicon.ico
 

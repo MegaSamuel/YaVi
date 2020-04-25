@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "work.h"
 
 QWidget* MainWindow::createStuff( QWidget  *parent )
 {
@@ -72,6 +73,8 @@ void 	MainWindow::onBtnOpen()
 
     // формиреум путь и имя файла через диалог
     QString filename = QFileDialog::getOpenFileName( this, "Open file", dir, "YAML (*.yml)" );
+
+    m_pWork = new Work( filename );
 
     qDebug() << "Open file" << filename;
 }

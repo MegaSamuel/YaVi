@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QtWidgets>
 
+#include "work.h"
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -21,6 +23,8 @@ private:
 
     QPushButton    *m_ptBtnOpen;
     QPushButton    *m_ptBtnSave;
+
+    Work  *m_pWork;
 };
 
 #endif // MAINWINDOW_H
