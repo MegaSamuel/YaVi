@@ -5,7 +5,7 @@
 
 #include <yaml-cpp/yaml.h>
 
-class Work
+class Work : public QObject
 {
     Q_OBJECT
 
