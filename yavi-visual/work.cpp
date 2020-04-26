@@ -32,7 +32,7 @@ bool  Work::init( const QString&  filename )
         qDebug() << "Cannot open file " << filename;
         return false;
     }
-    QTextStream 	in( &fp );
+    QTextStream  in( &fp );
 
     // read yaml-file
     try {
