@@ -17,6 +17,12 @@ QWidget* MainWindow::createStuff( QWidget  *parent )
     connect( m_ptBtnSave, SIGNAL(clicked()), this, SLOT(onBtnSave()) );
     hlayout->addWidget( m_ptBtnSave, 0, Qt::AlignLeft );
 
+    // лэйбл
+    m_ptLblNotice = new QLabel( this, Q_NULLPTR );
+    m_ptLblNotice->setAlignment( Qt::AlignLeft );
+    m_ptLblNotice->setFrameStyle( QFrame::NoFrame );
+    hlayout->addWidget( m_ptLblNotice, 0, Qt::AlignLeft );
+
     // пружинка
     hlayout->addStretch( 0 );
 
@@ -51,6 +57,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     // центральный элеиент
     setCentralWidget( wgtCentral );
+
+//    m_pWork = Q_NULLPTR;
+    m_pWork = new Work();
 }
 
 MainWindow::~MainWindow()
@@ -61,6 +70,9 @@ MainWindow::~MainWindow()
 void 	MainWindow::onBtnOpen()
 {
     qDebug() << "Open button";
+
+    // очищаем лэйбл с описанием ошибки
+    m_ptLblNotice->clear();
 
     // собственно файл
     QFile file;
@@ -74,9 +86,25 @@ void 	MainWindow::onBtnOpen()
     // формиреум путь и имя файла через диалог
     QString filename = QFileDialog::getOpenFileName( this, "Open file", dir, "YAML (*.yml)" );
 
-    m_pWork = new Work( filename );
+    if( !filename.isEmpty() )
+    {
+        if( false == m_pWork->init( filename ) )
+        {
+            qDebug() << "Cannot open file" << filename << m_pWork->zFailReason;
 
-    qDebug() << "Open file" << filename;
+            m_ptLblNotice->setText( m_pWork->zFailReason );
+        }
+        else
+        {
+            qDebug() << "Open file" << filename;
+        }
+    }
+    else
+    {
+        // долбоящер не ввел имя файла
+
+        qDebug() << "no filename";
+    }
 }
 
 void 	MainWindow::onBtnSave()

@@ -10,10 +10,14 @@ class Work : public QObject
     Q_OBJECT
 
 public:
-    Work( const QString &filename, QObject  *parent = Q_NULLPTR );
+//    Work( const QString &filename, QObject  *parent = Q_NULLPTR );
+    Work();
     ~Work();
 
-    bool    init( const QString&  filename );
+    bool    bInit;       // результат загрузки ямла
+    QString zFailReason; // причина ошибки загрузки ямла
+
+    bool    init( const QString&  filename ); // загружаем ямл из файла
 };
 
 #endif // WORK_H

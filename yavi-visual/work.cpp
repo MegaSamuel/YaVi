@@ -5,9 +5,10 @@
 
 #include "work.h"
 
-Work::Work( const QString &filename, QObject  *parent )
+//Work::Work( const QString &filename, QObject  *parent )
+Work::Work()
 {
-    init( filename );
+//    bInit = init( filename );
 }
 
 Work::~Work()
@@ -17,8 +18,8 @@ Work::~Work()
 
 bool  Work::init( const QString&  filename )
 {
-    YAML::Node 		config;
-    QFile 			fp( filename );
+    YAML::Node 	config;
+    QFile 		fp( filename );
 
     if( ! fp.exists() )
     {
@@ -37,7 +38,8 @@ bool  Work::init( const QString&  filename )
     try {
         config = YAML::Load( in.readAll().toStdString() );
     } catch ( const YAML::Exception&  e ) {
-        qDebug() << "Exception of parse file" << filename << ":" << e.what();
+//        qDebug() << "Exception of parse file" << filename << ":" << e.what();
+        zFailReason = QString::fromStdString( e.what() );
         return false;
     }
 

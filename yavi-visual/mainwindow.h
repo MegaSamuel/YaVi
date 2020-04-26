@@ -21,8 +21,9 @@ protected Q_SLOTS :
 private:
     QWidget    *createStuff(QWidget *parent);
 
-    QPushButton    *m_ptBtnOpen;
-    QPushButton    *m_ptBtnSave;
+    QPushButton  *m_ptBtnOpen;
+    QPushButton  *m_ptBtnSave;
+    QLabel       *m_ptLblNotice;
 
     Work  *m_pWork;
 };
