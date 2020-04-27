@@ -48,7 +48,6 @@ bool  Work::init( const QString&  filename )
         config = YAML::Load( in.readAll().toStdString() );
     } catch ( const YAML::Exception&  e ) {
         // что-то пошло не так, а что смотрим в e.what()
-//        qDebug() << "Exception of parse file" << filename << ":" << e.what();
         zFailReason = QString::fromStdString( e.what() );
         return false;
     }
@@ -58,7 +57,10 @@ bool  Work::init( const QString&  filename )
 
     // возможно ямл пустой
     if( m_tGoods.empty() )
+    {
+        zFailReason = "file is empty";
         return false;
+    }
 
     return true;
 }
