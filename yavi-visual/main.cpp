@@ -2,6 +2,10 @@
 #include <QApplication>
 #include <QScreen>
 
+using namespace cobu;
+
+//------------------------------------------------------------------------------
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -18,12 +22,16 @@ int main(int argc, char *argv[])
     int y = (screenGeometry.height() - w.height()) / 2;
     w.move(x, y);
 
+/*
     // определяем шрифт
     QFont newFont( "Tahoma", 8, QFont::Thin, false );
     // применяем ко всему приложению
     QApplication::setFont(newFont);
+*/
 
     w.show();
 
     return a.exec();
 }
+
+//------------------------------------------------------------------------------

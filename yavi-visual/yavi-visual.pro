@@ -31,13 +31,15 @@ INCLUDEPATH += $$PWD/../include
 LIBS += -L$$PWD/../target/lib -lyaml-cpp
 
 SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
-    work.cpp
+    main.cpp \
+    mainwindow.cpp \
+    work.cpp \
+    goods.cpp
 
 HEADERS += \
-        mainwindow.h \
-    work.h
+    mainwindow.h \
+    work.h \
+    goods.h
 
 win32: RC_ICONS = $$PWD/favicon.ico
 

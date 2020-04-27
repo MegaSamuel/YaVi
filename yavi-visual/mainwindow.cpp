@@ -1,6 +1,10 @@
 #include "mainwindow.h"
 #include "work.h"
 
+using namespace cobu;
+
+//------------------------------------------------------------------------------
+
 QWidget* MainWindow::createStuff( QWidget  *parent )
 {
     QFrame  *frmBase = new QFrame( parent );
@@ -19,7 +23,8 @@ QWidget* MainWindow::createStuff( QWidget  *parent )
 
     // лэйбл
     m_ptLblNotice = new QLabel( this, Q_NULLPTR );
-    m_ptLblNotice->setAlignment( Qt::AlignLeft );
+    //By default, the contents of the label are left-aligned and vertically-centered.
+    //m_ptLblNotice->setAlignment( Qt::AlignLeft );
     m_ptLblNotice->setFrameStyle( QFrame::NoFrame );
     hlayout->addWidget( m_ptLblNotice, 0, Qt::AlignLeft );
 
@@ -42,6 +47,8 @@ QWidget* MainWindow::createStuff( QWidget  *parent )
 
     return frmBase;
 }
+
+//------------------------------------------------------------------------------
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -67,12 +74,15 @@ MainWindow::~MainWindow()
 
 }
 
+//------------------------------------------------------------------------------
+
 void 	MainWindow::onBtnOpen()
 {
     qDebug() << "Open button";
 
     // очищаем лэйбл с описанием ошибки
     m_ptLblNotice->clear();
+//    m_ptLblNotice->setStyleSheet( "QLabel {background-color: transparent;}" );
 
     // собственно файл
     QFile file;
@@ -90,9 +100,13 @@ void 	MainWindow::onBtnOpen()
     {
         if( false == m_pWork->init( filename ) )
         {
-            qDebug() << "Cannot open file" << filename << m_pWork->zFailReason;
+            QString  zReport;
+            zReport = "Cannot open " + filename + " with result -> " + m_pWork->zFailReason;
 
-            m_ptLblNotice->setText( m_pWork->zFailReason );
+            qDebug() << zReport;
+
+            m_ptLblNotice->setText( zReport );
+//            m_ptLblNotice->setStyleSheet( "QLabel {background-color: red;}" );
         }
         else
         {
@@ -103,7 +117,7 @@ void 	MainWindow::onBtnOpen()
     {
         // долбоящер не ввел имя файла
 
-        qDebug() << "no filename";
+        qDebug() << "Cannot open: no filename";
     }
 }
 
@@ -155,3 +169,6 @@ void 	MainWindow::onBtnSave()
         qDebug() << "no filename";
     }
 }
+
+//------------------------------------------------------------------------------
+

@@ -6,6 +6,11 @@
 
 #include "work.h"
 
+namespace cobu
+{
+
+//------------------------------------------------------------------------------
+
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -27,5 +32,9 @@ private:
 
     Work  *m_pWork;
 };
+
+//------------------------------------------------------------------------------
+
+} // namespace cobu
 
 #endif // MAINWINDOW_H
