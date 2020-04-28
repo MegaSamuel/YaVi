@@ -14,57 +14,55 @@
 #include "yaml-cpp/node/ptr.h"
 
 namespace YAML {
-    namespace detail {
-        class node;
-    } // namespace detail
-} // namespace YAML
+namespace detail {
+class node;
+}  // namespace detail
+}  // namespace YAML
 
 namespace YAML {
-    class EventHandler;
-    class Node;
+class EventHandler;
+class Node;
 
-    class NodeEvents {
-    public:
-        explicit NodeEvents(const Node& node);
+class NodeEvents {
+ public:
+  explicit NodeEvents(const Node& node);
+  NodeEvents(const NodeEvents&) = delete;
+  NodeEvents(NodeEvents&&) = delete;
+  NodeEvents& operator=(const NodeEvents&) = delete;
+  NodeEvents& operator=(NodeEvents&&) = delete;
 
-        void Emit(EventHandler& handler);
+  void Emit(EventHandler& handler);
 
-    private:
+ private:
+  class AliasManager {
+   public:
+    AliasManager() : m_anchorByIdentity{}, m_curAnchor(0) {}
 
-        class AliasManager {
-        public:
+    void RegisterReference(const detail::node& node);
+    anchor_t LookupAnchor(const detail::node& node) const;
 
-            AliasManager() : m_curAnchor(0) {
-            }
+   private:
+    anchor_t _CreateNewAnchor() { return ++m_curAnchor; }
 
-            void RegisterReference(const detail::node& node);
-            anchor_t LookupAnchor(const detail::node& node) const;
+   private:
+    using AnchorByIdentity = std::map<const detail::node_ref*, anchor_t>;
+    AnchorByIdentity m_anchorByIdentity;
 
-        private:
+    anchor_t m_curAnchor;
+  };
 
-            anchor_t _CreateNewAnchor() {
-                return ++m_curAnchor;
-            }
+  void Setup(const detail::node& node);
+  void Emit(const detail::node& node, EventHandler& handler,
+            AliasManager& am) const;
+  bool IsAliased(const detail::node& node) const;
 
-        private:
-            typedef std::map<const detail::node_ref*, anchor_t> AnchorByIdentity;
-            AnchorByIdentity m_anchorByIdentity;
+ private:
+  detail::shared_memory_holder m_pMemory;
+  detail::node* m_root;
 
-            anchor_t m_curAnchor;
-        };
-
-        void Setup(const detail::node& node);
-        void Emit(const detail::node& node, EventHandler& handler,
-                AliasManager& am) const;
-        bool IsAliased(const detail::node& node) const;
-
-    private:
-        detail::shared_memory_holder m_pMemory;
-        detail::node* m_root;
-
-        typedef std::map<const detail::node_ref*, int> RefCount;
-        RefCount m_refCount;
-    };
-}
+  using RefCount = std::map<const detail::node_ref*, int>;
+  RefCount m_refCount;
+};
+}  // namespace YAML
 
 #endif  // NODE_NODEEVENTS_H_62B23520_7C8E_11DE_8A39_0800200C9A66

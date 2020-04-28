@@ -8,157 +8,141 @@
 #endif
 
 #include <stdexcept>
+#include <string>
 
 #include "yaml-cpp/dll.h"
 #include "yaml-cpp/emitterstyle.h"
 #include "yaml-cpp/mark.h"
-#include "yaml-cpp/node/detail/bool_type.h"
 #include "yaml-cpp/node/detail/iterator_fwd.h"
 #include "yaml-cpp/node/ptr.h"
 #include "yaml-cpp/node/type.h"
 
 namespace YAML {
-    namespace detail {
-        class node;
-        class node_data;
-        struct iterator_value;
-    } // namespace detail
-} // namespace YAML
+namespace detail {
+class node;
+class node_data;
+struct iterator_value;
+}  // namespace detail
+}  // namespace YAML
 
 namespace YAML {
+class YAML_CPP_API Node {
+ public:
+  friend class NodeBuilder;
+  friend class NodeEvents;
+  friend struct detail::iterator_value;
+  friend class detail::node;
+  friend class detail::node_data;
+  template <typename>
+  friend class detail::iterator_base;
+  template <typename T, typename S>
+  friend struct as_if;
 
-    class YAML_CPP_API Node {
-    public:
-        friend class NodeBuilder;
-        friend class NodeEvents;
-        friend struct detail::iterator_value;
-        friend class detail::node;
-        friend class detail::node_data;
-        template <typename>
-        friend class detail::iterator_base;
-        template <typename T, typename S>
-        friend struct as_if;
+  using iterator = YAML::iterator;
+  using const_iterator = YAML::const_iterator;
 
-        typedef YAML::iterator iterator;
-        typedef YAML::const_iterator const_iterator;
+  Node();
+  explicit Node(NodeType::value type);
+  template <typename T>
+  explicit Node(const T& rhs);
+  explicit Node(const detail::iterator_value& rhs);
+  Node(const Node& rhs);
+  ~Node();
 
-        Node();
-        explicit Node(NodeType::value type);
-        template <typename T>
-        explicit Node(const T& rhs);
-        explicit Node(const detail::iterator_value& rhs);
-        Node(const Node& rhs);
-        ~Node();
+  YAML::Mark Mark() const;
+  NodeType::value Type() const;
+  bool IsDefined() const;
+  bool IsNull() const { return Type() == NodeType::Null; }
+  bool IsScalar() const { return Type() == NodeType::Scalar; }
+  bool IsSequence() const { return Type() == NodeType::Sequence; }
+  bool IsMap() const { return Type() == NodeType::Map; }
 
-        YAML::Mark Mark() const;
-        NodeType::value Type() const;
-        bool IsDefined() const;
+  // bool conversions
+  explicit operator bool() const { return IsDefined(); }
+  bool operator!() const { return !IsDefined(); }
 
-        bool IsNull() const {
-            return Type() == NodeType::Null;
-        }
+  // access
+  template <typename T>
+  T as() const;
+  template <typename T, typename S>
+  T as(const S& fallback) const;
+  const std::string& Scalar() const;
 
-        bool IsScalar() const {
-            return Type() == NodeType::Scalar;
-        }
+  const std::string& Tag() const;
+  void SetTag(const std::string& tag);
 
-        bool IsSequence() const {
-            return Type() == NodeType::Sequence;
-        }
+  // style
+  // WARNING: This API might change in future releases.
+  EmitterStyle::value Style() const;
+  void SetStyle(EmitterStyle::value style);
 
-        bool IsMap() const {
-            return Type() == NodeType::Map;
-        }
+  // assignment
+  bool is(const Node& rhs) const;
+  template <typename T>
+  Node& operator=(const T& rhs);
+  Node& operator=(const Node& rhs);
+  void reset(const Node& rhs = Node());
 
-        // bool conversions
+  // size/iterator
+  std::size_t size() const;
 
-        YAML_CPP_OPERATOR_BOOL()
-        bool operator!() const {
-            return !IsDefined();
-        }
+  const_iterator begin() const;
+  iterator begin();
 
-        // access
-        template <typename T>
-        T as() const;
-        template <typename T, typename S>
-        T as(const S& fallback) const;
-        const std::string& Scalar() const;
+  const_iterator end() const;
+  iterator end();
 
-        const std::string& Tag() const;
-        void SetTag(const std::string& tag);
+  // sequence
+  template <typename T>
+  void push_back(const T& rhs);
+  void push_back(const Node& rhs);
 
-        // style
-        // WARNING: This API might change in future releases.
-        EmitterStyle::value Style() const;
-        void SetStyle(EmitterStyle::value style);
+  // indexing
+  template <typename Key>
+  const Node operator[](const Key& key) const;
+  template <typename Key>
+  Node operator[](const Key& key);
+  template <typename Key>
+  bool remove(const Key& key);
 
-        // assignment
-        bool is(const Node& rhs) const;
-        template <typename T>
-        Node& operator=(const T& rhs);
-        Node& operator=(const Node& rhs);
-        void reset(const Node& rhs = Node());
+  const Node operator[](const Node& key) const;
+  Node operator[](const Node& key);
+  bool remove(const Node& key);
 
-        // size/iterator
-        std::size_t size() const;
+  // map
+  template <typename Key, typename Value>
+  void force_insert(const Key& key, const Value& value);
 
-        const_iterator begin() const;
-        iterator begin();
+ private:
+  enum Zombie { ZombieNode };
+  explicit Node(Zombie);
+  explicit Node(Zombie, const std::string&);
+  explicit Node(detail::node& node, detail::shared_memory_holder pMemory);
 
-        const_iterator end() const;
-        iterator end();
+  void EnsureNodeExists() const;
 
-        // sequence
-        template <typename T>
-        void push_back(const T& rhs);
-        void push_back(const Node& rhs);
+  template <typename T>
+  void Assign(const T& rhs);
+  void Assign(const char* rhs);
+  void Assign(char* rhs);
 
-        // indexing
-        template <typename Key>
-        const Node operator[](const Key& key) const;
-        template <typename Key>
-        Node operator[](const Key& key);
-        template <typename Key>
-        bool remove(const Key& key);
+  void AssignData(const Node& rhs);
+  void AssignNode(const Node& rhs);
 
-        const Node operator[](const Node& key) const;
-        Node operator[](const Node& key);
-        bool remove(const Node& key);
+ private:
+  bool m_isValid;
+  // String representation of invalid key, if the node is invalid.
+  std::string m_invalidKey;
+  mutable detail::shared_memory_holder m_pMemory;
+  mutable detail::node* m_pNode;
+};
 
-        // map
-        template <typename Key, typename Value>
-        void force_insert(const Key& key, const Value& value);
+YAML_CPP_API bool operator==(const Node& lhs, const Node& rhs);
 
-    private:
+YAML_CPP_API Node Clone(const Node& node);
 
-        enum Zombie {
-            ZombieNode
-        };
-        explicit Node(Zombie);
-        explicit Node(detail::node& node, detail::shared_memory_holder pMemory);
-
-        void EnsureNodeExists() const;
-
-        template <typename T>
-        void Assign(const T& rhs);
-        void Assign(const char* rhs);
-        void Assign(char* rhs);
-
-        void AssignData(const Node& rhs);
-        void AssignNode(const Node& rhs);
-
-    private:
-        bool m_isValid;
-        mutable detail::shared_memory_holder m_pMemory;
-        mutable detail::node* m_pNode;
-    };
-
-    YAML_CPP_API bool operator==(const Node& lhs, const Node& rhs);
-
-    YAML_CPP_API Node Clone(const Node& node);
-
-    template <typename T>
-    struct convert;
+template <typename T>
+struct convert;
 }
 
 #endif  // NODE_NODE_H_62B23520_7C8E_11DE_8A39_0800200C9A66

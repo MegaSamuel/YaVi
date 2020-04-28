@@ -38,6 +38,7 @@ yaml_sources =  \
     src/contrib/graphbuilderadapter.cpp \
     src/binary.cpp \
     src/convert.cpp \
+    src/depthguard.cpp \
     src/directives.cpp \
     src/emit.cpp \
     src/emitfromevents.cpp \
@@ -92,7 +93,6 @@ yaml_headers = \
 yaml_include = \
     include/yaml-cpp/contrib/anchordict.h \
     include/yaml-cpp/contrib/graphbuilder.h \
-    include/yaml-cpp/node/detail/bool_type.h \
     include/yaml-cpp/node/detail/impl.h \
     include/yaml-cpp/node/detail/iterator.h \
     include/yaml-cpp/node/detail/iterator_fwd.h \
@@ -111,6 +111,7 @@ yaml_include = \
     include/yaml-cpp/node/type.h \
     include/yaml-cpp/anchor.h \
     include/yaml-cpp/binary.h \
+    include/yaml-cpp/depthguard.h \
     include/yaml-cpp/dll.h \
     include/yaml-cpp/emitfromevents.h \
     include/yaml-cpp/emitter.h \
@@ -120,13 +121,13 @@ yaml_include = \
     include/yaml-cpp/eventhandler.h \
     include/yaml-cpp/exceptions.h \
     include/yaml-cpp/mark.h \
-    include/yaml-cpp/noncopyable.h \
+    include/yaml-cpp/noexcept.h \
     include/yaml-cpp/null.h \
     include/yaml-cpp/ostream_wrapper.h \
     include/yaml-cpp/parser.h \
     include/yaml-cpp/stlemitter.h \
     include/yaml-cpp/traits.h \
-    include/yaml-cpp/yaml.h \
+    include/yaml-cpp/yaml.h
 
 SOURCES += $$yaml_sources
 

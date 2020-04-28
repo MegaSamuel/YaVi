@@ -16,23 +16,16 @@
 #include <vector>
 
 namespace YAML {
-    namespace detail {
-
-        struct iterator_value : public Node, std::pair<Node, Node> {
-
-            iterator_value() {
-            }
-
-            explicit iterator_value(const Node& rhs)
-            : Node(rhs),
-            std::pair<Node, Node>(Node(Node::ZombieNode), Node(Node::ZombieNode)) {
-            }
-
-            explicit iterator_value(const Node& key, const Node& value)
-            : Node(Node::ZombieNode), std::pair<Node, Node>(key, value) {
-            }
-        };
-    }
+namespace detail {
+struct iterator_value : public Node, std::pair<Node, Node> {
+  iterator_value() = default;
+  explicit iterator_value(const Node& rhs)
+      : Node(rhs),
+        std::pair<Node, Node>(Node(Node::ZombieNode), Node(Node::ZombieNode)) {}
+  explicit iterator_value(const Node& key, const Node& value)
+      : Node(Node::ZombieNode), std::pair<Node, Node>(key, value) {}
+};
+}
 }
 
 #endif  // VALUE_ITERATOR_H_62B23520_7C8E_11DE_8A39_0800200C9A66
