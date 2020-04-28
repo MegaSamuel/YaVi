@@ -17,14 +17,13 @@ class Work : public QObject
     Q_OBJECT
 
 public:
-//    Work( const QString &filename, QObject  *parent = Q_NULLPTR );
     Work();
     ~Work();
 
-    bool    bInit;       // результат загрузки ямла
-    QString zFailReason; // причина ошибки загрузки ямла
+    QString zFailReason; // причина ошибки загрузки/выгрузки ямла
 
     bool    init( const QString&  filename ); // загружаем ямл из файла
+    bool    fini( const QString&  filename ); // выгружаем ямл в файл
 
 protected:
     TGoods 	m_tGoods;    // товары считанные из файла

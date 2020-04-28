@@ -84,9 +84,6 @@ void 	MainWindow::onBtnOpen()
     m_ptLblNotice->clear();
 //    m_ptLblNotice->setStyleSheet( "QLabel {background-color: transparent;}" );
 
-    // собственно файл
-    QFile file;
-
     // каталог где мы находимся
     QDir *pDir = new QDir( QDir::currentPath() );
 
@@ -125,9 +122,6 @@ void 	MainWindow::onBtnSave()
 {
     qDebug() << "Save button";
 
-    // собственно файл
-    QFile file;
-
     // формируем имя файла по умолчанию
 //    QString deffilename = QString( "/pattern%1x%2.yml" ).arg(m_uRow).arg(m_uColumn);
     QString deffilename = QString( "/test.yml" );
@@ -141,32 +135,28 @@ void 	MainWindow::onBtnSave()
     // формиреум путь и имя файла через диалог
     QString filename = QFileDialog::getSaveFileName( this, "Save file", dir, "YAML (*.yaml *.yml)" );
 
-    if( filename != "" )
+    if( !filename.isEmpty() )
     {
-        file.setFileName( filename );
-
-        if( !file.open(QIODevice::WriteOnly) )
+        if( false == m_pWork->fini( filename ) )
         {
-            qDebug() << "cannot open file" << filename;
+            QString  zReport;
+            zReport = "Cannot open " + filename + " with result -> " + m_pWork->zFailReason;
 
-            return;
+            qDebug() << zReport;
+
+            m_ptLblNotice->setText( zReport );
+//            m_ptLblNotice->setStyleSheet( "QLabel {background-color: red;}" );
         }
         else
         {
-            qDebug() << "write to file" << filename;
-
-            file.resize(0);
-
-//            BitMapCreate( &file );
-
-            file.close();
+            qDebug() << "Save file" << filename;
         }
     }
     else
     {
         // долбоящер не ввел имя файла
 
-        qDebug() << "no filename";
+        qDebug() << "Cannot save: no filename";
     }
 }
 

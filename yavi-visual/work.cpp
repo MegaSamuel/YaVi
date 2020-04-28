@@ -9,10 +9,9 @@ using namespace cobu;
 
 //------------------------------------------------------------------------------
 
-//Work::Work( const QString &filename, QObject  *parent )
 Work::Work()
 {
-//    bInit = init( filename );
+
 }
 
 Work::~Work()
@@ -59,6 +58,40 @@ bool  Work::init( const QString&  filename )
     if( m_tGoods.empty() )
     {
         zFailReason = "file is empty";
+        return false;
+    }
+
+#if 1
+    QString filenameout = "D:/test.yml";
+    std::string str;
+    QFile 		fpout( filenameout );
+
+    if( !fpout.open( QIODevice::ReadWrite | QIODevice::Text ) )
+    {
+        qDebug() << "Cannot open file " << filenameout;
+        return false;
+    }
+
+    QTextStream  out( &fpout );
+
+    str = YAML::Dump( config );
+
+//    out << str;
+#endif
+
+    return true;
+}
+
+bool  Work::fini( const QString&  filename )
+{
+    YAML::Node 	config;
+    QFile 		fp( filename );
+
+    // открываем файл на запись
+    if( !fp.open( QIODevice::ReadWrite | QIODevice::Text ) )
+    {
+        qDebug() << "Cannot open file " << filename;
+        zFailReason = "Cannot open file " + filename;
         return false;
     }
 
