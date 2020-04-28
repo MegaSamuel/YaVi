@@ -20,10 +20,13 @@ public:
     Work();
     ~Work();
 
-    QString zFailReason; // причина ошибки загрузки/выгрузки ямла
+    QString zFailReason;  // причина ошибки загрузки/выгрузки ямла
 
     bool    init( const QString&  filename ); // загружаем ямл из файла
     bool    fini( const QString&  filename ); // выгружаем ямл в файл
+
+private:
+    YAML::Node 	m_config; // считанный ямл
 
 protected:
     TGoods 	m_tGoods;    // товары считанные из файла

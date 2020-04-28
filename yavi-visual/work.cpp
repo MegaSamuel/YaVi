@@ -51,6 +51,9 @@ bool  Work::init( const QString&  filename )
         return false;
     }
 
+    // сохраняем ямл
+    m_config = config;
+
     // разбираем ямл
     m_tGoods.parse_yaml( config );
 
@@ -61,39 +64,37 @@ bool  Work::init( const QString&  filename )
         return false;
     }
 
-#if 1
-    QString filenameout = "D:/test.yml";
-    std::string str;
-    QFile 		fpout( filenameout );
-
-    if( !fpout.open( QIODevice::ReadWrite | QIODevice::Text ) )
-    {
-        qDebug() << "Cannot open file " << filenameout;
-        return false;
-    }
-
-    QTextStream  out( &fpout );
-
-    str = YAML::Dump( config );
-
-//    out << str;
-#endif
-
     return true;
 }
 
 bool  Work::fini( const QString&  filename )
 {
-    YAML::Node 	config;
+    std::string str;
     QFile 		fp( filename );
+    QTextStream out( &fp );
 
     // открываем файл на запись
     if( !fp.open( QIODevice::ReadWrite | QIODevice::Text ) )
     {
-        qDebug() << "Cannot open file " << filename;
-        zFailReason = "Cannot open file " + filename;
+        qDebug() << "Cannot create file " << filename;
+        zFailReason = "Cannot create file " + filename;
         return false;
     }
+
+    // пробуем выгрузить ямл в строку
+    try {
+        str = YAML::Dump( m_config );
+    } catch ( const YAML::Exception&  e ) {
+        // что-то пошло не так, а что смотрим в e.what()
+        zFailReason = QString::fromStdString( e.what() );
+        return false;
+    }
+
+    // пишем строку в файл
+    out.setCodec("UTF-8");
+    out << QString::fromStdString( str );
+
+    fp.close();
 
     return true;
 }

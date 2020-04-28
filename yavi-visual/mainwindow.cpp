@@ -133,14 +133,14 @@ void 	MainWindow::onBtnSave()
     QString dir( pDir->path() );
 
     // формиреум путь и имя файла через диалог
-    QString filename = QFileDialog::getSaveFileName( this, "Save file", dir, "YAML (*.yaml *.yml)" );
+    QString filename = QFileDialog::getSaveFileName( this, "Save file", dir, "YAML (*.yml)" );
 
     if( !filename.isEmpty() )
     {
         if( false == m_pWork->fini( filename ) )
         {
             QString  zReport;
-            zReport = "Cannot open " + filename + " with result -> " + m_pWork->zFailReason;
+            zReport = "Cannot write " + filename + " with result -> " + m_pWork->zFailReason;
 
             qDebug() << zReport;
 
