@@ -42,6 +42,8 @@ bool  Work::init( const QString&  filename )
 
     QTextStream  in( &fp );
 
+    in.setCodec("UTF-8");
+
     // пробуем читать ямл
     try {
         config = YAML::Load( in.readAll().toStdString() );
