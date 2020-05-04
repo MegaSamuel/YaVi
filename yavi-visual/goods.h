@@ -71,13 +71,32 @@ public:
 
 //------------------------------------------------------------------------------
 
-class TTable : public QObject
+class TTable : public QWidget
 {
+   Q_OBJECT
+
 public:
-    TTable(QWidget  *parent);
+    TTable(QWidget *parent = Q_NULLPTR);
     ~TTable();
 
-    TValues  m_value;
+    void  setTableName( const std::string&  name );
+
+protected Q_SLOTS :
+    void    onBtnDec();
+    void    onBtnInc();
+
+private:
+    QPushButton  *m_ptBtnDec;
+    QPushButton  *m_ptBtnInc;
+    QLabel       *m_ptLblName;
+
+    std::string  m_zName;
+    std::vector<std::string>  m_vValues;
+
+    inline void  clear() noexcept
+    {
+        m_vValues.clear();
+    }
 };
 
 //------------------------------------------------------------------------------
@@ -85,7 +104,7 @@ public:
 class TGoodsPrivate;
 
 //! класс - протокол взаимодействия, считанный с файла
-class TGoods
+class TGoods : public QWidget
 {
     friend class TGoodsPrivate;
 
@@ -118,9 +137,11 @@ class TGoods
         #define  GoodsMultiSection       "multi"
         #define  GoodsValuesSection      "values"
 
+        #define  GoodsDefName            "noname"
+
         // constructors
-        TGoods();
-        explicit TGoods( const YAML::Node&  config );		//!< создание из ноды yaml
+        TGoods( QWidget *parent = Q_NULLPTR );
+        explicit TGoods( const YAML::Node&  config, QWidget *parent = Q_NULLPTR );  //!< создание из ноды yaml
         ~TGoods();
 
         //! разбор протокола, считанного предварительно в yaml

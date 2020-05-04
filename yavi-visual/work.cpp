@@ -7,19 +7,20 @@
 
 //------------------------------------------------------------------------------
 
-Work::Work()
+TWork::TWork(QWidget *parent)
+    : QWidget(parent)
 {
-    m_ptGoods = new TGoods();
+    m_pGoods = new TGoods;
 }
 
-Work::~Work()
+TWork::~TWork()
 {
 
 }
 
 //------------------------------------------------------------------------------
 
-bool  Work::init( const QString&  filename )
+bool  TWork::init( const QString&  filename )
 {
     YAML::Node 	config;
     QFile 		fp( filename );
@@ -55,10 +56,10 @@ bool  Work::init( const QString&  filename )
     m_config = config;
 
     // разбираем ямл
-    m_ptGoods->parse_yaml( config );
+    m_pGoods->parse_yaml( config );
 
     // возможно ямл пустой
-    if( m_ptGoods->empty() )
+    if( m_pGoods->empty() )
     {
         zFailReason = "file is empty";
         return false;
@@ -67,7 +68,7 @@ bool  Work::init( const QString&  filename )
     return true;
 }
 
-bool  Work::fini( const QString&  filename )
+bool  TWork::fini( const QString&  filename )
 {
     std::string str;
     QFile 		fp( filename );

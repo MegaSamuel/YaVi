@@ -9,13 +9,13 @@
 
 //------------------------------------------------------------------------------
 
-class Work : public QObject
+class TWork : public QWidget
 {
     Q_OBJECT
 
 public:
-    Work();
-    ~Work();
+    TWork(QWidget *parent = Q_NULLPTR);
+    ~TWork();
 
     QString zFailReason;  // причина ошибки загрузки/выгрузки ямла
 
@@ -26,7 +26,7 @@ private:
     YAML::Node 	m_config; // считанный ямл
 
 protected:
-    TGoods 	*m_ptGoods;    // товары считанные из файла
+    TGoods 	*m_pGoods;    // товары считанные из файла
 };
 
 //------------------------------------------------------------------------------

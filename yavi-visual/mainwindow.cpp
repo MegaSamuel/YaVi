@@ -35,7 +35,9 @@ QWidget* MainWindow::createStuff( QWidget  *parent )
     vlayout->addLayout( hlayout );
 
     // добавляем то где будет дерево ямла в вертикальный layout
-//    vlayout->addLayout( hlayout );
+    m_pWork = new TWork();
+    vlayout->addWidget( m_pWork );
+
     // пружинка
     vlayout->addStretch( 0 );
 
@@ -62,9 +64,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     // центральный элеиент
     setCentralWidget( wgtCentral );
-
-//    m_pWork = Q_NULLPTR;
-    m_pWork = new Work();
 }
 
 MainWindow::~MainWindow()

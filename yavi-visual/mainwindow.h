@@ -27,7 +27,7 @@ private:
     QPushButton  *m_ptBtnSave;
     QLabel       *m_ptLblNotice;
 
-    Work  *m_pWork;
+    TWork  *m_pWork;
 };
 
 //------------------------------------------------------------------------------

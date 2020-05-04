@@ -35,6 +35,7 @@ SequenceSequenceT&  split( SequenceSequenceT& result, const std::string& input, 
 // Устраняет необходимость использования <boost/algorithm/string/trim.hpp>
 
 // Удаляет пробелы в начале строки
+/*
 static inline void ltrim( std::string& s ) {
     s.erase( s.begin(), std::find_if( s.begin(), s.end(), []( int ch ) {
         return !std::isspace( ch );
@@ -53,7 +54,7 @@ static inline void trim( std::string& s ) {
     ltrim( s );
     rtrim( s );
 }
-
+*/
 static bool __yaml_IsScalar( const YAML::Node&  node )
 {
 	return ( node.IsDefined() ? ( node.IsScalar() ? true : false ) : false );
@@ -69,11 +70,63 @@ static bool __yaml_IsMap( const YAML::Node&  node )
 	return ( node.IsDefined() ? ( node.IsMap() ? true : false ) : false );
 }
 
-static const std::string __yaml_GetString( const YAML::Node&  node, const std::string&  name, const std::string  def = "" )
+static const std::string __yaml_GetString( const YAML::Node&  node, const std::string&  name, const std::string  def = GoodsDefName )
 {
 	if( __yaml_IsScalar( node[ name ] ) )
 		return node[ name ].as<std::string>();
 	return def;
+}
+
+//------------------------------------------------------------------------------
+
+TTable::TTable(QWidget *parent)
+    : QWidget(parent)
+{
+    QHBoxLayout  *hlayout = new QHBoxLayout;
+
+    // кнопка минус
+    m_ptBtnDec = new QPushButton( "-", this );
+    connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
+    hlayout->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
+
+    // лэйбл
+    m_ptLblName = new QLabel( this, Q_NULLPTR );
+    m_ptLblName->setText( "m_ptLblName" );
+    m_ptLblName->setFrameStyle( QFrame::NoFrame );
+    hlayout->addWidget( m_ptLblName, 0, Qt::AlignLeft );
+
+    // кнопка плюс
+    m_ptBtnInc = new QPushButton( "+", this );
+    connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
+    hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
+
+    // пружинка
+    hlayout->addStretch( 0 );
+
+    this->setLayout( hlayout );
+
+    qDebug() << "TTable construct";
+}
+
+TTable::~TTable()
+{
+
+}
+
+void  TTable::onBtnDec()
+{
+    qDebug() << "Dec button";
+}
+
+void  TTable::onBtnInc()
+{
+    qDebug() << "Inc button";
+}
+
+void  TTable::setTableName( const std::string&  name )
+{
+    m_ptLblName->setText( QString::fromStdString(name) );
+    qDebug() << "Set table name" << QString::fromStdString(name);
 }
 
 //------------------------------------------------------------------------------
@@ -84,37 +137,28 @@ class TGoodsPrivate
 private:
     TGoods 	*ins__;
 
-    std::string 	m_zId;
-    std::string 	m_zName;
-    std::string 	m_zVersion;
-    std::string 	m_zDescription;
-    std::string 	m_zDesignation;
-    unsigned		m_uNetwork;
-    std::vector<std::string> 		m_vDocuments; 	// перечень имен документов
-    std::vector<std::string> 		m_vSuffixes; 	// перечень суффиксов для добавления к имени при установке АРМа
+//    std::vector<std::string> 		m_vDocuments; 	// перечень имен документов
+//    std::vector<std::string> 		m_vSuffixes; 	// перечень суффиксов для добавления к имени при установке АРМа
     // перечень состояний системы (секция states)
-    std::vector<std::string> 		m_vStates;
+//    std::vector<std::string> 		m_vStates;
     // перечень векторов с их размерами
-    std::vector<std::pair<std::string,unsigned>> 	m_vVectors;
+//    std::vector<std::pair<std::string,unsigned>> 	m_vVectors;
+
+    bool  m_bEmpty;
 
     YAML::Node 		config__;
-    bool 		m_bNoModel;
+
+    QList<TTable*>  m_apTableList;
 
     inline 	void clear()
     {
-        m_vStates.clear();
-        m_vVectors.clear();
+        m_bEmpty = true;
 
-        m_zId.clear();
-        m_zName.clear();
-        m_zVersion.clear();
-        m_zDescription.clear();
-        m_zDesignation.clear();
-        m_uNetwork = 0;
-        m_vDocuments.clear();
-        m_vSuffixes.clear();
+//        m_vStates.clear();
+//        m_vVectors.clear();
 
-        m_bNoModel = false;
+//        m_vDocuments.clear();
+//        m_vSuffixes.clear();
     }
 
     inline TGoodsPrivate( TGoods  *ins ) :
@@ -132,76 +176,71 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
     // категория (category)
     if( __yaml_IsMap( config[ GoodsCategorySection ] ) )
     {
+        priv__->m_bEmpty = false;
         qDebug() << GoodsCategorySection << "is a map";
     }
 
     // таблица (tables)
     if( __yaml_IsSequence( config[ GoodsTableSection ] ) )
     {
+        priv__->m_bEmpty = false;
         qDebug() << GoodsTableSection << "is a sequence";
 
         for( auto tab : config[ GoodsTableSection ] )
         {
-            if( __yaml_IsScalar( tab[ GoodsTableId ] ) )
+            TTable  *pTable;
+            pTable = new TTable();
+            priv__->m_apTableList.append(pTable);
+
+            // ищем секцию id
+            std::string  id = __yaml_GetString( tab, GoodsTableId );
+            qDebug() << GoodsTableSection <<  GoodsTableId << "is a" << QString::fromStdString(id);
+//            priv__->m_vVectors.emplace_back( id, s );
+
+            // ищем имя секции id
+            std::string  id_name = __yaml_GetString( tab, GoodsTableName );
+            qDebug() << GoodsTableSection <<  GoodsTableId << "is a" << QString::fromStdString(id) << "name" << QString::fromStdString(id_name) ;
+            pTable->setTableName( id_name );
+
+            // ищем столбцы
+            if( __yaml_IsSequence( tab[GoodsTableColumn] ) )
             {
-                std::string  id = tab[ GoodsTableId ].as<std::string>();
-                qDebug() << GoodsTableSection <<  GoodsTableId << "is a" << QString::fromStdString(id);
-//                priv__->m_vVectors.emplace_back( id, s );
-
-                if( __yaml_IsScalar( tab[GoodsTableName] ) )
+                for( auto col : tab[ GoodsTableColumn ] )
                 {
-                    std::string  name = tab[GoodsTableName].as<std::string>();
-                    qDebug() << GoodsTableSection <<  GoodsTableId << "is a" << QString::fromStdString(id) << "name" << QString::fromStdString(name) ;
-                }
+                    // имя
+                    std::string  col_name = __yaml_GetString( col, GoodsTableName );
+                    qDebug() << GoodsTableColumn << "name" << QString::fromStdString(col_name) ;
 
-                if( __yaml_IsSequence( tab[GoodsTableColumn] ) )
-                {
-                    qDebug() << "column detected";
-                    for( auto col : tab[ GoodsTableColumn ] )
-                    {
-                        if( __yaml_IsScalar( col[ GoodsTableName ] ) )
-                        {
-                            std::string  name = col[GoodsTableName].as<std::string>();
-                            qDebug() << GoodsTableColumn << "name" << QString::fromStdString(name) ;
-
-                            if( __yaml_IsScalar( col[ GoodsTableValue ] ) )
-                            {
-                                const std::string 	val = col[ GoodsTableValue ].as<std::string>();
-                                qDebug() << GoodsTableColumn << GoodsTableValue << QString::fromStdString(val);
-                                //                            split( priv__->m_vValues, val, '\n' );
-                            }
-                        }
-                    }
-                }
-
-                if( __yaml_IsSequence( tab[GoodsTableRow] ) )
-                {
-                    qDebug() << "row detected";
-                    for( auto row : tab[ GoodsTableRow ] )
-                    {
-                        if( __yaml_IsScalar( row[ GoodsTableName ] ) )
-                        {
-                            std::string  name = row[GoodsTableName].as<std::string>();
-                            qDebug() << GoodsTableRow << "name" << QString::fromStdString(name) ;
-
-                            if( __yaml_IsScalar( row[ GoodsTableValue ] ) )
-                            {
-                                const std::string 	val = row[ GoodsTableValue ].as<std::string>();
-                                qDebug() << GoodsTableRow << GoodsTableValue << QString::fromStdString(val);
-                                //                            split( priv__->m_vValues, val, '\n' );
-                            }
-                        }
-                    }
-                }
-
-                if( __yaml_IsScalar( tab[GoodsTableLink] ) )
-                {
-                    std::string  link = tab[GoodsTableLink].as<std::string>();
-                    qDebug() << GoodsTableSection <<  GoodsTableId << "is a" << QString::fromStdString(id) << "link" << QString::fromStdString(link) ;
+                    // значение
+                    const std::string  col_val = __yaml_GetString( col, GoodsTableValue );
+                    qDebug() << GoodsTableColumn << GoodsTableValue << QString::fromStdString(col_val);
+                    //                            split( priv__->m_vValues, val, '\n' );
                 }
             }
+
+            // ищем строки
+            if( __yaml_IsSequence( tab[GoodsTableRow] ) )
+            {
+                for( auto row : tab[ GoodsTableRow ] )
+                {
+                    // имя
+                    std::string  row_name = __yaml_GetString( row, GoodsTableName );
+                    qDebug() << GoodsTableRow << "name" << QString::fromStdString(row_name) ;
+
+                    // значение
+                    const std::string  row_val = __yaml_GetString( row, GoodsTableValue );
+                    qDebug() << GoodsTableRow << GoodsTableValue << QString::fromStdString(row_val);
+                    //                            split( priv__->m_vValues, val, '\n' );
+                }
+            }
+
+            // ищем ссылку
+            std::string  link = __yaml_GetString( tab, GoodsTableLink );
+            qDebug() << GoodsTableSection <<  GoodsTableId << "is a" << QString::fromStdString(id) << "link" << QString::fromStdString(link) ;
         }
     }
+
+    qDebug() << "TableList size" << priv__->m_apTableList.size();
 
     /*
     if( __yaml_IsMap( config[ ProtocolHeaderSectionName ] ) )
@@ -234,13 +273,15 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 	return true;
 }
 
-TGoods::TGoods()
+TGoods::TGoods( QWidget *parent )
+    : QWidget(parent)
 {
     priv__ = std::unique_ptr<TGoodsPrivate>( new TGoodsPrivate( this ) );
     clear();
 }
 
-TGoods::TGoods( const YAML::Node&  config )
+TGoods::TGoods( const YAML::Node&  config,  QWidget *parent )
+    : QWidget(parent)
 {
     priv__ = std::unique_ptr<TGoodsPrivate>( new TGoodsPrivate( this ) );
     clear();
@@ -260,8 +301,7 @@ void TGoods::clear() noexcept
 
 bool TGoods::empty() const noexcept
 {
-    return false;
-//    return priv__->m_zId.empty();
+    return priv__->m_bEmpty;
 }
 
 //------------------------------------------------------------------------------
