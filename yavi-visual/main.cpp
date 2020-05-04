@@ -2,8 +2,6 @@
 #include <QApplication>
 #include <QScreen>
 
-using namespace cobu;
-
 //------------------------------------------------------------------------------
 
 int main(int argc, char *argv[])

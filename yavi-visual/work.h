@@ -7,9 +7,6 @@
 
 #include "goods.h"
 
-namespace cobu
-{
-
 //------------------------------------------------------------------------------
 
 class Work : public QObject
@@ -29,11 +26,9 @@ private:
     YAML::Node 	m_config; // считанный ямл
 
 protected:
-    TGoods 	m_tGoods;    // товары считанные из файла
+    TGoods 	*m_ptGoods;    // товары считанные из файла
 };
 
 //------------------------------------------------------------------------------
-
-} // namespace cobu
 
 #endif // WORK_H

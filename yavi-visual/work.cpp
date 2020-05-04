@@ -5,13 +5,11 @@
 
 #include "work.h"
 
-using namespace cobu;
-
 //------------------------------------------------------------------------------
 
 Work::Work()
 {
-
+    m_ptGoods = new TGoods();
 }
 
 Work::~Work()
@@ -57,10 +55,10 @@ bool  Work::init( const QString&  filename )
     m_config = config;
 
     // разбираем ямл
-    m_tGoods.parse_yaml( config );
+    m_ptGoods->parse_yaml( config );
 
     // возможно ямл пустой
-    if( m_tGoods.empty() )
+    if( m_ptGoods->empty() )
     {
         zFailReason = "file is empty";
         return false;

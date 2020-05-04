@@ -1,8 +1,6 @@
 #include "mainwindow.h"
 #include "work.h"
 
-using namespace cobu;
-
 //------------------------------------------------------------------------------
 
 QWidget* MainWindow::createStuff( QWidget  *parent )
