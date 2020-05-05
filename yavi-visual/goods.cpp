@@ -81,55 +81,150 @@ static const std::string __yaml_GetString( const YAML::Node&  node, const std::s
 
 TTable::TTable()
 {
-    m_hlayout = new QHBoxLayout;
+    m_zId.clear();
+    m_zName.clear();
+    m_zLink.clear();
+
+    resetRow();
+    resetColumn();
+
+    m_grid = new QGridLayout;
 
     // кнопка минус
     m_ptBtnDec = new QPushButton( "-", this );
     connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
-    m_hlayout->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
+    m_grid->addWidget( m_ptBtnDec, m_row, 0, Qt::AlignLeft );
 
     // лэйбл
     m_ptLblName = new QLabel( this, Q_NULLPTR );
     m_ptLblName->setText( "m_ptLblName" );
-    m_ptLblName->setFrameStyle( QFrame::NoFrame );
-    m_hlayout->addWidget( m_ptLblName, 0, Qt::AlignLeft );
+    m_ptLblName->setFrameStyle( QFrame::Panel | QFrame::Raised );
+    m_grid->addWidget( m_ptLblName, m_row, 1, Qt::AlignLeft );
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+", this );
     connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
-    m_hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
+    m_grid->addWidget( m_ptBtnInc, m_row, 2, Qt::AlignLeft );
 
-    // пружинка
-    m_hlayout->addStretch( 0 );
+    // перевод строки и колонки в grid для следующих добавлений
+    nextRow();
+    nextColumn();
 
-    this->setLayout( m_hlayout );
-
-    qDebug() << "TTable construct";
+    this->setLayout( m_grid );
 }
 
 TTable::~TTable()
 {
-    while( QLayoutItem* item = m_hlayout->takeAt(0) )
+    QLayoutItem *child;
+
+    while( ( child = m_grid->takeAt(0) ) != Q_NULLPTR )
     {
-        delete item->widget();
-        delete item;
+        delete child->widget();
+        delete child;
     }
 }
 
 void  TTable::onBtnDec()
 {
-    qDebug() << "Dec button";
+    qDebug() << "Dec button" << getTableId() << getTableName();
 }
 
 void  TTable::onBtnInc()
 {
-    qDebug() << "Inc button";
+    qDebug() << "Inc button" << getTableId() << getTableName();
+}
+
+void  TTable::setTableId( const std::string&  name )
+{
+    m_zId = QString::fromStdString(name);
+}
+
+const QString TTable::getTableId()
+{
+    return m_zId;
 }
 
 void  TTable::setTableName( const std::string&  name )
 {
-    m_ptLblName->setText( QString::fromStdString(name) );
-    qDebug() << "Set table name" << QString::fromStdString(name);
+    m_zName = QString::fromStdString(name);
+    m_ptLblName->setText( m_zName );
+}
+
+const QString TTable::getTableName()
+{
+    return m_zName;
+}
+
+void  TTable::setTableLink( const std::string&  name )
+{
+    m_zLink = QString::fromStdString(name);
+
+    m_ptLblLink = new QLabel( this, Q_NULLPTR );
+    m_ptLblLink->setText( m_zLink );
+    m_ptLblLink->setFrameStyle( QFrame::Panel | QFrame::Raised );
+    m_grid->addWidget( m_ptLblLink, m_row, 1, 1, -1, Qt::AlignLeft );
+
+    nextRow();
+}
+
+const QString TTable::getTableLink()
+{
+    return m_zLink;
+}
+
+void TTable::setTableRow( QStringList& list )
+{
+    int column = 0;
+
+    for( auto& it : list )
+    {
+        QLabel  *label = new QLabel( this, Q_NULLPTR );
+        label->setText( it );
+        label->setFrameStyle( QFrame::Panel | QFrame::Raised );
+        m_grid->addWidget( label, m_row, m_column + column, Qt::AlignLeft );
+
+        column += 1;
+    }
+
+    nextRow();
+}
+
+void TTable::setTableColumn( QStringList& list )
+{
+    int row = 0;
+
+    for( auto& it : list )
+    {
+        QLabel  *label = new QLabel( this, Q_NULLPTR );
+        label->setText( it );
+        label->setFrameStyle( QFrame::Panel | QFrame::Raised );
+        m_grid->addWidget( label, m_row + row, m_column, Qt::AlignLeft );
+
+        row += 1;
+    }
+
+    nextColumn();
+}
+
+void TTable::resetRow()
+{
+    m_row = 0;
+}
+
+void TTable::resetColumn()
+{
+    m_column = 0;
+}
+
+
+void TTable::nextRow()
+{
+    m_row += 1;
+}
+
+void TTable::nextColumn()
+{
+    m_column += 1;
 }
 
 //------------------------------------------------------------------------------
@@ -153,6 +248,9 @@ private:
 
     QList<TTable*>  m_apTableList;
 
+    QStringList     m_vValues;
+//    std::vector<std::string>  m_vValues;
+
     inline 	void clear()
     {
         m_bEmpty = true;
@@ -163,6 +261,8 @@ private:
         }
 
         m_apTableList.clear();
+
+        m_vValues.clear();
 
 //        m_vStates.clear();
 //        m_vVectors.clear();
@@ -200,6 +300,8 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
         for( auto& tab : config[ GoodsTableSection ] )
         {
+            bool  table_fill = false; // признак что таблица не заполнена
+
             TTable  *pTable;
             pTable = new TTable();
             m_vlayout->addWidget( pTable );
@@ -207,53 +309,101 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
             // ищем секцию id
             std::string  id = __yaml_GetString( tab, GoodsTableId );
-            qDebug() << GoodsTableSection <<  GoodsTableId << "is a" << QString::fromStdString(id);
+//            qDebug() << GoodsTableSection <<  GoodsTableId << "is a" << QString::fromStdString(id);
+            pTable->setTableId( id );
 //            priv__->m_vVectors.emplace_back( id, s );
 
             // ищем имя секции id
             std::string  id_name = __yaml_GetString( tab, GoodsTableName );
-            qDebug() << GoodsTableSection <<  GoodsTableId << "is a" << QString::fromStdString(id) << "name" << QString::fromStdString(id_name) ;
+//            qDebug() << GoodsTableSection <<  GoodsTableId << "is a" << QString::fromStdString(id) << "name" << QString::fromStdString(id_name) ;
             pTable->setTableName( id_name );
 
             // ищем столбцы
-            if( __yaml_IsSequence( tab[GoodsTableColumn] ) )
+            if( !table_fill && __yaml_IsSequence( tab[GoodsTableColumn] ) )
             {
                 for( auto& col : tab[ GoodsTableColumn ] )
                 {
+                    QString tmp;
+                    QStringList  col_list;
+                    col_list.clear();
+
                     // имя
                     std::string  col_name = __yaml_GetString( col, GoodsTableName );
-                    qDebug() << GoodsTableColumn << "name" << QString::fromStdString(col_name) ;
+//                    qDebug() << GoodsTableColumn << "name" << QString::fromStdString(col_name) ;
+                    col_list.append( QString::fromStdString(col_name) );
 
                     // значение
                     const std::string  col_val = __yaml_GetString( col, GoodsTableValue );
-                    qDebug() << GoodsTableColumn << GoodsTableValue << QString::fromStdString(col_val);
-                    //                            split( priv__->m_vValues, val, '\n' );
+//                    qDebug() << GoodsTableColumn << GoodsTableValue << QString::fromStdString(col_val);
+                    tmp = QString::fromStdString(col_val);
+                    tmp.remove( QRegExp("\\\\\\|-") );
+                    priv__->m_vValues.clear();
+                    priv__->m_vValues = tmp.split( ' ', QString::SkipEmptyParts );
+
+//                    qDebug() << priv__->m_vValues.size();
+
+                    //split( priv__->m_vValues, col_val, '\n' );
+
+                    for( auto& it : priv__->m_vValues )
+                    {
+                        col_list.append( it );
+                    }
+
+                    pTable->setTableColumn( col_list );
                 }
+
+                pTable->nextRow();
+
+                table_fill = true;
             }
 
             // ищем строки
-            if( __yaml_IsSequence( tab[GoodsTableRow] ) )
+            if( !table_fill && __yaml_IsSequence( tab[GoodsTableRow] ) )
             {
                 for( auto& row : tab[ GoodsTableRow ] )
                 {
+                    QString tmp;
+                    QStringList  row_list;
+                    row_list.clear();
+
                     // имя
                     std::string  row_name = __yaml_GetString( row, GoodsTableName );
-                    qDebug() << GoodsTableRow << "name" << QString::fromStdString(row_name) ;
+//                    qDebug() << GoodsTableRow << "name" << QString::fromStdString(row_name) ;
+                    row_list.append( QString::fromStdString(row_name) );
 
                     // значение
                     const std::string  row_val = __yaml_GetString( row, GoodsTableValue );
-                    qDebug() << GoodsTableRow << GoodsTableValue << QString::fromStdString(row_val);
-                    //                            split( priv__->m_vValues, val, '\n' );
+//                    qDebug() << GoodsTableRow << GoodsTableValue << QString::fromStdString(row_val);
+                    tmp = QString::fromStdString(row_val);
+                    tmp.remove( QRegExp("\\\\\\|-") );
+                    priv__->m_vValues.clear();
+                    priv__->m_vValues = tmp.split( ' ', QString::SkipEmptyParts );
+//                    split( priv__->m_vValues, row_val, '\n' );
+
+//                    qDebug() << priv__->m_vValues.size();
+
+                    for( auto& it : priv__->m_vValues )
+                    {
+                        row_list.append( it );
+                    }
+
+                    pTable->setTableRow( row_list );
                 }
+
+                table_fill = true;
             }
 
             // ищем ссылку
-            std::string  link = __yaml_GetString( tab, GoodsTableLink );
-            qDebug() << GoodsTableSection <<  GoodsTableId << "is a" << QString::fromStdString(id) << "link" << QString::fromStdString(link) ;
+            if( !table_fill )
+            {
+                std::string  link = __yaml_GetString( tab, GoodsTableLink );
+//                qDebug() << GoodsTableSection <<  GoodsTableId << "is a" << QString::fromStdString(id) << "link" << QString::fromStdString(link) ;
+                pTable->setTableLink( link );
+            }
         }
     }
 
-    qDebug() << "TableList size" << priv__->m_apTableList.size();
+//    qDebug() << "TableList size" << priv__->m_apTableList.size();
 
     /*
     if( __yaml_IsMap( config[ ProtocolHeaderSectionName ] ) )

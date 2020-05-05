@@ -67,7 +67,7 @@ void 	MainWindow::onBtnOpen()
 {
     qDebug() << "Open button";
 
-    m_pWork->draw();
+//    m_pWork->draw();
 
     // очищаем лэйбл с описанием ошибки
     m_ptLblNotice->clear();
@@ -111,7 +111,7 @@ void 	MainWindow::onBtnSave()
 {
     qDebug() << "Save button";
 
-    m_pWork->undraw();
+//    m_pWork->undraw();
 
     // формируем имя файла по умолчанию
 //    QString deffilename = QString( "/pattern%1x%2.yml" ).arg(m_uRow).arg(m_uColumn);
