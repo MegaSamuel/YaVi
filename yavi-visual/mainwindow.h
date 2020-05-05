@@ -21,13 +21,11 @@ protected Q_SLOTS :
     void    onBtnSave();
 
 private:
-    QWidget    *createStuff(QWidget *parent);
-
     QPushButton  *m_ptBtnOpen;
     QPushButton  *m_ptBtnSave;
     QLabel       *m_ptLblNotice;
 
-    TWork  *m_pWork;
+    TWork        *m_pWork;
 };
 
 //------------------------------------------------------------------------------

@@ -76,7 +76,7 @@ class TTable : public QWidget
    Q_OBJECT
 
 public:
-    TTable(QWidget *parent = Q_NULLPTR);
+    TTable();
     ~TTable();
 
     void  setTableName( const std::string&  name );
@@ -86,6 +86,7 @@ protected Q_SLOTS :
     void    onBtnInc();
 
 private:
+    QHBoxLayout  *m_hlayout;
     QPushButton  *m_ptBtnDec;
     QPushButton  *m_ptBtnInc;
     QLabel       *m_ptLblName;
@@ -140,17 +141,20 @@ class TGoods : public QWidget
         #define  GoodsDefName            "noname"
 
         // constructors
-        TGoods( QWidget *parent = Q_NULLPTR );
-        explicit TGoods( const YAML::Node&  config, QWidget *parent = Q_NULLPTR );  //!< создание из ноды yaml
+        TGoods();
+        explicit TGoods( const YAML::Node&  config );  //!< создание из ноды yaml
         ~TGoods();
 
         //! разбор протокола, считанного предварительно в yaml
-        bool 		parse_yaml( const YAML::Node&  config );
+        bool    parse_yaml( const YAML::Node&  config );
 
-        void 		clear() noexcept;
-        bool 		empty() const noexcept;
-        size_t 		size() const noexcept;
+        void    clear() noexcept;
+        bool    empty() const noexcept;
+        size_t  size() const noexcept;
 
+        int     get_table_size() noexcept;
+
+        QVBoxLayout *m_vlayout;
     private :
         std::unique_ptr<TGoodsPrivate> 	priv__;
 };

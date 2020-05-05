@@ -3,24 +3,31 @@
 
 //------------------------------------------------------------------------------
 
-QWidget* MainWindow::createStuff( QWidget  *parent )
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
 {
-    QFrame  *frmBase = new QFrame( parent );
+    // заголовок формы
+    this->setWindowTitle("YAML Visualizer");
+
+    // иконка формы
+    this->setWindowIcon( QIcon( ":/favicon.ico" ) );
+
+    QFrame  *frmBase = new QFrame();
 
     QHBoxLayout  *hlayout = new QHBoxLayout;
 
     // кнопка "загрузить yaml из файла"
-    m_ptBtnOpen = new QPushButton( "Open", this );
+    m_ptBtnOpen = new QPushButton( "Open" );
     connect( m_ptBtnOpen, SIGNAL(clicked()), this, SLOT(onBtnOpen()) );
     hlayout->addWidget( m_ptBtnOpen, 0, Qt::AlignLeft );
 
     // кнопка "сохранить все в yaml"
-    m_ptBtnSave = new QPushButton( "Save", this );
+    m_ptBtnSave = new QPushButton( "Save" );
     connect( m_ptBtnSave, SIGNAL(clicked()), this, SLOT(onBtnSave()) );
     hlayout->addWidget( m_ptBtnSave, 0, Qt::AlignLeft );
 
     // лэйбл
-    m_ptLblNotice = new QLabel( this, Q_NULLPTR );
+    m_ptLblNotice = new QLabel( Q_NULLPTR );
     //By default, the contents of the label are left-aligned and vertically-centered.
     //m_ptLblNotice->setAlignment( Qt::AlignLeft );
     m_ptLblNotice->setFrameStyle( QFrame::NoFrame );
@@ -45,25 +52,8 @@ QWidget* MainWindow::createStuff( QWidget  *parent )
     frmBase->setLayout( vlayout );
 //    frmBase->setFrameShape( QFrame::Box );
 
-    return frmBase;
-}
-
-//------------------------------------------------------------------------------
-
-MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent)
-{
-    // заголовок формы
-    this->setWindowTitle("YAML Visualizer");
-
-    // иконка формы
-    this->setWindowIcon( QIcon( ":/favicon.ico" ) );
-
-    // нополнение формы
-    auto wgtCentral = createStuff( this );
-
     // центральный элеиент
-    setCentralWidget( wgtCentral );
+    setCentralWidget( frmBase );
 }
 
 MainWindow::~MainWindow()
@@ -76,6 +66,8 @@ MainWindow::~MainWindow()
 void 	MainWindow::onBtnOpen()
 {
     qDebug() << "Open button";
+
+    m_pWork->draw();
 
     // очищаем лэйбл с описанием ошибки
     m_ptLblNotice->clear();
@@ -118,6 +110,8 @@ void 	MainWindow::onBtnOpen()
 void 	MainWindow::onBtnSave()
 {
     qDebug() << "Save button";
+
+    m_pWork->undraw();
 
     // формируем имя файла по умолчанию
 //    QString deffilename = QString( "/pattern%1x%2.yml" ).arg(m_uRow).arg(m_uColumn);

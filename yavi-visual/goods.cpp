@@ -79,38 +79,41 @@ static const std::string __yaml_GetString( const YAML::Node&  node, const std::s
 
 //------------------------------------------------------------------------------
 
-TTable::TTable(QWidget *parent)
-    : QWidget(parent)
+TTable::TTable()
 {
-    QHBoxLayout  *hlayout = new QHBoxLayout;
+    m_hlayout = new QHBoxLayout;
 
     // кнопка минус
     m_ptBtnDec = new QPushButton( "-", this );
     connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
-    hlayout->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
+    m_hlayout->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
 
     // лэйбл
     m_ptLblName = new QLabel( this, Q_NULLPTR );
     m_ptLblName->setText( "m_ptLblName" );
     m_ptLblName->setFrameStyle( QFrame::NoFrame );
-    hlayout->addWidget( m_ptLblName, 0, Qt::AlignLeft );
+    m_hlayout->addWidget( m_ptLblName, 0, Qt::AlignLeft );
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+", this );
     connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
-    hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
+    m_hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
 
     // пружинка
-    hlayout->addStretch( 0 );
+    m_hlayout->addStretch( 0 );
 
-    this->setLayout( hlayout );
+    this->setLayout( m_hlayout );
 
     qDebug() << "TTable construct";
 }
 
 TTable::~TTable()
 {
-
+    while( QLayoutItem* item = m_hlayout->takeAt(0) )
+    {
+        delete item->widget();
+        delete item;
+    }
 }
 
 void  TTable::onBtnDec()
@@ -154,6 +157,13 @@ private:
     {
         m_bEmpty = true;
 
+        for( auto& it : m_apTableList )
+        {
+            it->~TTable();
+        }
+
+        m_apTableList.clear();
+
 //        m_vStates.clear();
 //        m_vVectors.clear();
 
@@ -168,6 +178,8 @@ private:
         (void)ins__;
     }
 };
+
+//------------------------------------------------------------------------------
 
 bool TGoods::parse_yaml( const YAML::Node&  config )
 {
@@ -186,10 +198,11 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
         priv__->m_bEmpty = false;
         qDebug() << GoodsTableSection << "is a sequence";
 
-        for( auto tab : config[ GoodsTableSection ] )
+        for( auto& tab : config[ GoodsTableSection ] )
         {
             TTable  *pTable;
             pTable = new TTable();
+            m_vlayout->addWidget( pTable );
             priv__->m_apTableList.append(pTable);
 
             // ищем секцию id
@@ -205,7 +218,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             // ищем столбцы
             if( __yaml_IsSequence( tab[GoodsTableColumn] ) )
             {
-                for( auto col : tab[ GoodsTableColumn ] )
+                for( auto& col : tab[ GoodsTableColumn ] )
                 {
                     // имя
                     std::string  col_name = __yaml_GetString( col, GoodsTableName );
@@ -221,7 +234,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             // ищем строки
             if( __yaml_IsSequence( tab[GoodsTableRow] ) )
             {
-                for( auto row : tab[ GoodsTableRow ] )
+                for( auto& row : tab[ GoodsTableRow ] )
                 {
                     // имя
                     std::string  row_name = __yaml_GetString( row, GoodsTableName );
@@ -273,15 +286,16 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 	return true;
 }
 
-TGoods::TGoods( QWidget *parent )
-    : QWidget(parent)
+TGoods::TGoods()
 {
     priv__ = std::unique_ptr<TGoodsPrivate>( new TGoodsPrivate( this ) );
     clear();
+
+    m_vlayout = new QVBoxLayout;
+    this->setLayout( m_vlayout );
 }
 
-TGoods::TGoods( const YAML::Node&  config,  QWidget *parent )
-    : QWidget(parent)
+TGoods::TGoods( const YAML::Node&  config )
 {
     priv__ = std::unique_ptr<TGoodsPrivate>( new TGoodsPrivate( this ) );
     clear();
@@ -302,6 +316,11 @@ void TGoods::clear() noexcept
 bool TGoods::empty() const noexcept
 {
     return priv__->m_bEmpty;
+}
+
+int TGoods::get_table_size() noexcept
+{
+    return priv__->m_apTableList.size();
 }
 
 //------------------------------------------------------------------------------
