@@ -90,6 +90,9 @@ public:
     void  nextRow();
     void  nextColumn();
 
+    int   getTableWidth();
+    int   getTableHeight();
+
     const QString getTableId();
     const QString getTableName();
     const QString getTableLink();
@@ -181,6 +184,11 @@ class TGoods : public QWidget
 
         QVBoxLayout *m_vlayout;
 
+        QWidget     *m_wgt;
+        QScrollArea *m_scroll;
+        QVBoxLayout *m_layout;
+
+        int m_w, m_h;
 private :
         std::unique_ptr<TGoodsPrivate> 	priv__;
 };

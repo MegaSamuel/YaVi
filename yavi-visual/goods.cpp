@@ -230,6 +230,20 @@ void TTable::nextColumn()
     m_column += 1;
 }
 
+int TTable::getTableWidth()
+{
+    QSize size = m_grid->minimumSize();
+
+    return size.width();
+}
+
+int TTable::getTableHeight()
+{
+    QSize size = m_grid->minimumSize();
+
+    return size.height();
+}
+
 //------------------------------------------------------------------------------
 
 class TGoodsPrivate
@@ -403,6 +417,20 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 //                qDebug() << GoodsTableSection <<  GoodsTableId << "is a" << QString::fromStdString(id) << "link" << QString::fromStdString(link) ;
                 pTable->setTableLink( link );
             }
+
+            int w = pTable->getTableWidth();
+            int h = pTable->getTableHeight();
+
+            if( w > m_w )
+                m_w = w;
+
+            m_h += h;
+
+            m_wgt->setMinimumWidth( m_w );
+            m_scroll->setMinimumWidth( m_w );
+
+            m_wgt->setMinimumHeight( m_h );
+            m_scroll->setMinimumHeight( m_h );
         }
     }
 
@@ -446,26 +474,32 @@ TGoods::TGoods()
 
     m_vlayout = new QVBoxLayout;
 
-    QWidget *wgt = new QWidget;
-    QScrollArea *scroll = new QScrollArea;
-    QVBoxLayout *vlayout = new QVBoxLayout;
+    m_wgt = new QWidget;
+    m_scroll = new QScrollArea;
+    m_layout = new QVBoxLayout;
 
-    wgt->resize(1000, 1000);
-    wgt->setLayout(m_vlayout);
+    m_w = 100;
+    m_h = 100;
 
-    scroll->setWidget(wgt);
-//    scroll->setAlignment( Qt::AlignHCenter | Qt::AlignTop );
-//    scroll->setMinimumWidth(500);
-//    scroll->setMinimumHeight(500);
-    scroll->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-    scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-//    scroll->setWidgetResizable(true);
+    m_wgt->resize( m_w, m_h );
+    m_wgt->setLayout(m_vlayout);
 
-    vlayout->addWidget( scroll );
-    vlayout->setAlignment( scroll, Qt::AlignHCenter | Qt::AlignTop );
+    m_scroll->setWidget(m_wgt);
+//    m_scroll->setAlignment( Qt::AlignHCenter | Qt::AlignTop );
+    m_scroll->setMinimumWidth(m_w);
+    m_scroll->setMinimumHeight(m_h);
+    m_scroll->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+//    m_scroll->setWidgetResizable(true);
+//    m_scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+//    m_scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+//    m_scroll->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
+//    m_scroll->setMaximumSize(1920,1080);
+    //    m_scroll->setWidgetResizable(true);
 
-    this->setLayout( vlayout );
+    m_layout->addWidget( m_scroll );
+    m_layout->setAlignment( m_scroll, Qt::AlignHCenter | Qt::AlignTop );
+
+    this->setLayout( m_layout );
 }
 
 TGoods::TGoods( const YAML::Node&  config )

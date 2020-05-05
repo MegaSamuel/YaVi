@@ -41,40 +41,18 @@ MainWindow::MainWindow(QWidget *parent)
     // добавляем горизонтальный layout в вертикальный layout
     vlayout->addLayout( hlayout );
 
-//    QScrollArea *scroll = new QScrollArea;
-//    scroll->setFixedWidth(1004);
-//    scroll->setMinimumHeight(100);
-//    scroll->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-//    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOn);
-
     // добавляем то где будет дерево ямла в вертикальный layout
     m_pWork = new TWork();
     vlayout->addWidget( m_pWork );
 
-//    vlayout->addWidget( m_pWork );
-//    vlayout->addWidget( scroll );
-
     // пружинка
     vlayout->addStretch( 0 );
 
-//    QScrollArea *scroll = new QScrollArea;
-//    scroll->setFixedWidth(1004);
-//    scroll->setMinimumHeight(608);
-//    scroll->setAlignment(Qt::AlignLeft | Qt::AlignTop);
-//    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
-
-//    scroll->setWidget(wgt);
-
-//    vlayout->addWidget( scroll );
-
     // добавляем вертикальный layout в frame
     frmBase->setLayout( vlayout );
-//    wgtBase->setLayout( vlayout );
-    //    frmBase->setFrameShape( QFrame::Box );
 
     // центральный элеиент
     setCentralWidget( frmBase );
-//    setCentralWidget( wgtBase );
 }
 
 MainWindow::~MainWindow()
