@@ -180,7 +180,8 @@ class TGoods : public QWidget
         int     get_table_size() noexcept;
 
         QVBoxLayout *m_vlayout;
-    private :
+
+private :
         std::unique_ptr<TGoodsPrivate> 	priv__;
 };
 

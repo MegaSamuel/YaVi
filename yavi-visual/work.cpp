@@ -42,6 +42,7 @@ TWork::TWork()
 
     m_hlayout = new QHBoxLayout;
     m_hlayout->addWidget( m_pGoods );
+
     this->setLayout( m_hlayout );
 }
 

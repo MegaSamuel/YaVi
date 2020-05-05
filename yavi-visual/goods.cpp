@@ -161,6 +161,7 @@ void  TTable::setTableLink( const std::string&  name )
 
     m_ptLblLink = new QLabel( this, Q_NULLPTR );
     m_ptLblLink->setText( m_zLink );
+    m_ptLblLink->setMinimumSize(95,25);
     m_ptLblLink->setFrameStyle( QFrame::Panel | QFrame::Raised );
     m_grid->addWidget( m_ptLblLink, m_row, 1, 1, -1, Qt::AlignLeft );
 
@@ -180,6 +181,7 @@ void TTable::setTableRow( QStringList& list )
     {
         QLabel  *label = new QLabel( this, Q_NULLPTR );
         label->setText( it );
+        label->setMinimumSize(95,25);
         label->setFrameStyle( QFrame::Panel | QFrame::Raised );
         m_grid->addWidget( label, m_row, m_column + column, Qt::AlignLeft );
 
@@ -197,6 +199,7 @@ void TTable::setTableColumn( QStringList& list )
     {
         QLabel  *label = new QLabel( this, Q_NULLPTR );
         label->setText( it );
+        label->setMinimumSize(95,25);
         label->setFrameStyle( QFrame::Panel | QFrame::Raised );
         m_grid->addWidget( label, m_row + row, m_column, Qt::AlignLeft );
 
@@ -442,7 +445,27 @@ TGoods::TGoods()
     clear();
 
     m_vlayout = new QVBoxLayout;
-    this->setLayout( m_vlayout );
+
+    QWidget *wgt = new QWidget;
+    QScrollArea *scroll = new QScrollArea;
+    QVBoxLayout *vlayout = new QVBoxLayout;
+
+    wgt->resize(1000, 1000);
+    wgt->setLayout(m_vlayout);
+
+    scroll->setWidget(wgt);
+//    scroll->setAlignment( Qt::AlignHCenter | Qt::AlignTop );
+//    scroll->setMinimumWidth(500);
+//    scroll->setMinimumHeight(500);
+    scroll->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+    scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
+//    scroll->setWidgetResizable(true);
+
+    vlayout->addWidget( scroll );
+    vlayout->setAlignment( scroll, Qt::AlignHCenter | Qt::AlignTop );
+
+    this->setLayout( vlayout );
 }
 
 TGoods::TGoods( const YAML::Node&  config )
