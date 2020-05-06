@@ -125,15 +125,11 @@ class TGoods : public QWidget
 
         int     get_table_size() noexcept;
 
-        void     fix_table_size( int w, int h ) noexcept;
+        int      m_w, m_h;  // размеры виджета
+        void     fix_widget_size( int w, int h ) noexcept; // установка размеров виджета
 
         QVBoxLayout *m_vlayout;
 
-        QWidget     *m_wgt;
-        QScrollArea *m_scroll;
-        QVBoxLayout *m_layout;
-
-        int m_w, m_h;
 private :
         std::unique_ptr<TGoodsPrivate> 	priv__;
 };

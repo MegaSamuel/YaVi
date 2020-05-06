@@ -21,6 +21,7 @@
 //------------------------------------------------------------------------------
 
 // Устраняет необходимость использования <boost/algorithm/string.hpp>
+/*
 template<typename SequenceSequenceT, typename CharT>
 SequenceSequenceT&  split( SequenceSequenceT& result, const std::string& input, CharT delim )
 {
@@ -31,7 +32,7 @@ SequenceSequenceT&  split( SequenceSequenceT& result, const std::string& input, 
     }
     return result;
 }
-
+*/
 // Устраняет необходимость использования <boost/algorithm/string/trim.hpp>
 
 // Удаляет пробелы в начале строки
@@ -240,7 +241,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                 pTable->setTableLink( link );
             }
 
-            fix_table_size( pTable->getTableWidth(), pTable->getTableHeight() );
+            fix_widget_size( pTable->getTableWidth(), pTable->getTableHeight() );
         }
     }
 
@@ -249,40 +250,23 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 	return true;
 }
 
+//------------------------------------------------------------------------------
+
 TGoods::TGoods()
 {
     priv__ = std::unique_ptr<TGoodsPrivate>( new TGoodsPrivate( this ) );
     clear();
 
+    // в вертикальный layout будем складывать элементы из ямла
     m_vlayout = new QVBoxLayout;
+    m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
-    m_wgt = new QWidget;
-    m_scroll = new QScrollArea;
-    m_layout = new QVBoxLayout;
-
+    // ставим начальный размер себя
     m_w = 100;
     m_h = 100;
+    fix_widget_size( 0, 0 );
 
-    m_wgt->resize( m_w, m_h );
-    m_wgt->setLayout(m_vlayout);
-
-    m_scroll->setWidget(m_wgt);
-//    m_scroll->setAlignment( Qt::AlignHCenter | Qt::AlignTop );
-    m_scroll->setMinimumWidth(m_w);
-    m_scroll->setMinimumHeight(m_h);
-    m_scroll->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-//    m_scroll->setWidgetResizable(true);
-//    m_scroll->setVerticalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-//    m_scroll->setHorizontalScrollBarPolicy(Qt::ScrollBarAsNeeded);
-//    m_scroll->setSizePolicy(QSizePolicy::Maximum,QSizePolicy::Maximum);
-//    m_scroll->setMaximumSize(1920,1080);
-    //    m_scroll->setWidgetResizable(true);
-
-    m_layout->addWidget( m_scroll );
-    m_layout->setAlignment( m_scroll, Qt::AlignHCenter | Qt::AlignTop );
-
-    this->setLayout( m_layout );
-//    this->setLayout( m_vlayout );
+    this->setLayout( m_vlayout );
 }
 
 TGoods::TGoods( const YAML::Node&  config )
@@ -298,33 +282,35 @@ TGoods::~TGoods()
     clear();
 }
 
-void TGoods::clear() noexcept
+//------------------------------------------------------------------------------
+
+void  TGoods::clear() noexcept
 {
     priv__->clear();
 }
 
-bool TGoods::empty() const noexcept
+bool  TGoods::empty() const noexcept
 {
     return priv__->m_bEmpty;
 }
 
-int TGoods::get_table_size() noexcept
+int  TGoods::get_table_size() noexcept
 {
     return priv__->m_apTableList.size();
 }
 
-void TGoods::fix_table_size( int w, int h ) noexcept
+void  TGoods::fix_widget_size( int w, int h ) noexcept
 {
+    // ширину выбираем максимальную из элементов
     if( w > m_w )
         m_w = w;
 
+    // высоту увеличиваем на каждый элемент
     m_h += h;
 
-    m_wgt->setMinimumWidth( m_w );
-//    m_scroll->setMinimumWidth( m_w );
-
-    m_wgt->setMinimumHeight( m_h );
-//    m_scroll->setMinimumHeight( m_h );
+    // ставим размер самого себя
+    this->setMinimumWidth( m_w );
+    this->setMinimumHeight( m_h );
 }
 
 //------------------------------------------------------------------------------

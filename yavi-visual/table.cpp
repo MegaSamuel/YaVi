@@ -12,6 +12,7 @@ TTable::TTable()
     resetColumn();
 
     m_grid = new QGridLayout;
+    m_grid->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
     // кнопка минус
     m_ptBtnDec = new QPushButton( "-", this );
@@ -86,7 +87,7 @@ void  TTable::setTableLink( const std::string&  name )
 
     m_ptLblLink = new QLabel( this, Q_NULLPTR );
     m_ptLblLink->setText( m_zLink );
-    m_ptLblLink->setMinimumSize(95,25);
+//    m_ptLblLink->setMinimumSize(95,25);
     m_ptLblLink->setFrameStyle( QFrame::Panel | QFrame::Raised );
     m_grid->addWidget( m_ptLblLink, m_row, 1, 1, -1, Qt::AlignLeft );
 
@@ -106,7 +107,7 @@ void TTable::setTableRow( QStringList& list )
     {
         QLabel  *label = new QLabel( this, Q_NULLPTR );
         label->setText( it );
-        label->setMinimumSize(95,25);
+//        label->setMinimumHeight( 25 );
         label->setFrameStyle( QFrame::Panel | QFrame::Raised );
         m_grid->addWidget( label, m_row, m_column + column, Qt::AlignLeft );
 
@@ -124,7 +125,7 @@ void TTable::setTableColumn( QStringList& list )
     {
         QLabel  *label = new QLabel( this, Q_NULLPTR );
         label->setText( it );
-        label->setMinimumSize(95,25);
+//        label->setMinimumHeight( 25 );
         label->setFrameStyle( QFrame::Panel | QFrame::Raised );
         m_grid->addWidget( label, m_row + row, m_column, Qt::AlignLeft );
 

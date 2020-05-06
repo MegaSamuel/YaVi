@@ -1,11 +1,19 @@
 #include "mainwindow.h"
-#include "work.h"
+//#include "work.h"
 
 //------------------------------------------------------------------------------
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    m_fBeginTime = cpu_time();
+
+    // создаем и запускаем основной таймер
+    m_uTimerCounter = 0;
+    m_ptTimer = new QTimer( this );
+    connect( m_ptTimer, SIGNAL(timeout()), this, SLOT(onTimerWork()) );
+    m_ptTimer->start(1000); // 1 Hz
+
     // заголовок формы
     this->setWindowTitle("YAML Visualizer");
 
@@ -16,8 +24,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     QHBoxLayout  *hlayout = new QHBoxLayout;
     hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-//    hlayout->setMargin(10);
-//    hlayout->setSpacing(10);
 
     // кнопка "загрузить yaml из файла"
     m_ptBtnOpen = new QPushButton( "Open" );
@@ -36,13 +42,8 @@ MainWindow::MainWindow(QWidget *parent)
     m_ptLblNotice->setFrameStyle( QFrame::NoFrame );
     hlayout->addWidget( m_ptLblNotice, 0, Qt::AlignLeft );
 
-    // пружинка
-    //hlayout->addStretch( 0 );
-
     QVBoxLayout  *vlayout = new QVBoxLayout;
     vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-//    vlayout->setMargin(10);
-//    vlayout->setSpacing(10);
 
     // добавляем горизонтальный layout в вертикальный layout
     vlayout->addLayout( hlayout );
@@ -50,19 +51,12 @@ MainWindow::MainWindow(QWidget *parent)
     // добавляем то где будет дерево ямла в вертикальный layout
     // ->
     QScrollArea *scroll = new QScrollArea;
-//    scroll->setMinimumWidth(256);
-//    scroll->setMinimumHeight(256);
     scroll->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-    m_pWork = new TWork();
-//    vlayout->addWidget( m_pWork );
-
-    scroll->setWidget( m_pWork );
+    m_pGoods = new TGoods();
+    scroll->setWidget( m_pGoods );
 
     vlayout->addWidget( scroll );
     // <-
-
-    // пружинка
-//    vlayout->addStretch( 0 );
 
     // добавляем вертикальный layout в frame
     frmBase->setLayout( vlayout );
@@ -97,10 +91,10 @@ void 	MainWindow::onBtnOpen()
 
     if( !filename.isEmpty() )
     {
-        if( false == m_pWork->init( filename ) )
+        if( false == init( filename ) )
         {
             QString  zReport;
-            zReport = "Cannot open " + filename + " with result -> " + m_pWork->zFailReason;
+            zReport = "Cannot open " + filename + " with result -> " + zFailReason;
 
             qDebug() << zReport;
 
@@ -138,10 +132,10 @@ void 	MainWindow::onBtnSave()
 
     if( !filename.isEmpty() )
     {
-        if( false == m_pWork->fini( filename ) )
+        if( false == fini( filename ) )
         {
             QString  zReport;
-            zReport = "Cannot write " + filename + " with result -> " + m_pWork->zFailReason;
+            zReport = "Cannot write " + filename + " with result -> " + zFailReason;
 
             qDebug() << zReport;
 
@@ -159,6 +153,109 @@ void 	MainWindow::onBtnSave()
 
         qDebug() << "Cannot save: no filename";
     }
+}
+
+//------------------------------------------------------------------------------
+
+double  MainWindow::cpu_time() const
+{
+    return QTime::currentTime().msecsSinceStartOfDay()/1e3 - 0.0;
+}
+
+double  MainWindow::current_time() const
+{
+    return cpu_time() - m_fBeginTime;
+}
+
+void  MainWindow::onTimerWork()
+{
+    m_uTimerCounter = ( m_uTimerCounter + 1 ) & 3;
+
+//    qDebug() << current_time() << __func__ << __LINE__ << "->" << "counter" << m_uTimerCounter;
+
+//    qDebug() << current_time() << __func__ << __LINE__ << "->" << m_pGoods->get_table_size();
+}
+
+//------------------------------------------------------------------------------
+
+bool  MainWindow::init( const QString&  filename )
+{
+    YAML::Node 	config;
+    QFile 		fp( filename );
+
+    // а есть ли файл?
+    if( !fp.exists() )
+    {
+        qDebug() << "File" << filename << "is not exists";
+        return false;
+    }
+
+    // открываем файл только на чтение
+    if( !fp.open( QIODevice::ReadOnly | QIODevice::Text ) )
+    {
+        qDebug() << "Cannot open file " << filename;
+        return false;
+    }
+
+    QTextStream  in( &fp );
+
+    in.setCodec("UTF-8");
+
+    // пробуем читать ямл
+    try {
+        config = YAML::Load( in.readAll().toStdString() );
+    } catch ( const YAML::Exception&  e ) {
+        // что-то пошло не так, а что смотрим в e.what()
+        zFailReason = QString::fromStdString( e.what() );
+        return false;
+    }
+
+    // сохраняем ямл
+    m_config = config;
+
+    // разбираем ямл
+    m_pGoods->parse_yaml( config );
+
+    // возможно ямл пустой
+    if( m_pGoods->empty() )
+    {
+        zFailReason = "file is empty";
+        return false;
+    }
+
+    return true;
+}
+
+bool  MainWindow::fini( const QString&  filename )
+{
+    std::string str;
+    QFile 		fp( filename );
+    QTextStream out( &fp );
+
+    // открываем файл на запись
+    if( !fp.open( QIODevice::ReadWrite | QIODevice::Text ) )
+    {
+        qDebug() << "Cannot create file " << filename;
+        zFailReason = "Cannot create file " + filename;
+        return false;
+    }
+
+    // пробуем выгрузить ямл в строку
+    try {
+        str = YAML::Dump( m_config );
+    } catch ( const YAML::Exception&  e ) {
+        // что-то пошло не так, а что смотрим в e.what()
+        zFailReason = QString::fromStdString( e.what() );
+        return false;
+    }
+
+    // пишем строку в файл
+    out.setCodec("UTF-8");
+    out << QString::fromStdString( str );
+
+    fp.close();
+
+    return true;
 }
 
 //------------------------------------------------------------------------------

@@ -44,9 +44,6 @@ private:
 
     QLabel       *m_ptLblLink;
 
-//    QList<QVector<QLabel*>>  m_apRowList;
-//    QList<QVector<QLabel*>>  m_apColumnList;
-
     QString       m_zId;    // table Id
     QString       m_zName;  // table Name
     QString       m_zLink;  // table Link

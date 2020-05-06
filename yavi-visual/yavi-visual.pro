@@ -33,13 +33,11 @@ LIBS += -L$$PWD/../target/lib -lyaml-cpp
 SOURCES += \
     main.cpp \
     mainwindow.cpp \
-    work.cpp \
     goods.cpp \
     table.cpp
 
 HEADERS += \
     mainwindow.h \
-    work.h \
     goods.h \
     table.h
 
