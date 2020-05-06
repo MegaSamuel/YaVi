@@ -16,6 +16,7 @@
 #include <QDebug>
 #endif
 
+#include "func.h"
 #include "goods.h"
 
 //------------------------------------------------------------------------------
@@ -56,6 +57,7 @@ static inline void trim( std::string& s ) {
     rtrim( s );
 }
 */
+/*
 static bool __yaml_IsScalar( const YAML::Node&  node )
 {
 	return ( node.IsDefined() ? ( node.IsScalar() ? true : false ) : false );
@@ -77,7 +79,7 @@ static const std::string __yaml_GetString( const YAML::Node&  node, const std::s
 		return node[ name ].as<std::string>();
 	return def;
 }
-
+*/
 //------------------------------------------------------------------------------
 
 class TGoodsPrivate
@@ -168,6 +170,14 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             qDebug() << GoodsCategorySection << GoodsCategoryId << "is a" << QString::fromStdString(id) << "name" << QString::fromStdString(id_name) ;
             pCategory->setCategoryName( id_name );
 
+            if( __yaml_IsSequence( cat[ GoodsParametersSection ] ) )
+            {
+                for( auto& par : cat[ GoodsParametersSection ] )
+                {
+                    pCategory->get_parameters(par);
+                }
+            }
+
             fix_widget_size( pCategory->getCategoryWidth(), pCategory->getCategoryHeight() );
         }
     }
@@ -229,7 +239,6 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             {
                 for( auto& col : tab[ GoodsTableColumn ] )
                 {
-                    QString tmp;
                     QStringList  col_list;
                     col_list.clear();
 
@@ -262,7 +271,6 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             {
                 for( auto& row : tab[ GoodsTableRow ] )
                 {
-                    QString tmp;
                     QStringList  row_list;
                     row_list.clear();
 

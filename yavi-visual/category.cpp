@@ -1,4 +1,8 @@
+#include "func.h"
+#include "goods.h"
 #include "category.h"
+
+//------------------------------------------------------------------------------
 
 TCategory::TCategory()
 {
@@ -54,6 +58,71 @@ void  TCategory::onBtnDec()
 void  TCategory::onBtnInc()
 {
     qDebug() << "Inc button";
+}
+
+//------------------------------------------------------------------------------
+
+void  TCategory::get_parameters( const YAML::Node&  node )
+{
+    unsigned  val;
+    std::string  str;
+
+    // имя
+    str = __yaml_GetString( node, GoodsNameSection );
+    qDebug() << "name" << QString::fromStdString(str);
+
+    // тип
+    if( __yaml_IsScalar( node[ GoodsTypeSection ] ) )
+    {
+        val = node[ GoodsTypeSection ].as<unsigned>();
+        qDebug() << "type" << val;
+    }
+
+    //
+    str = __yaml_GetString( node, GoodsPlaceholderSection );
+    qDebug() << "placeholder" << QString::fromStdString(str);
+
+    //
+    str = __yaml_GetString( node, GoodsNewSection );
+    qDebug() << "new" << QString::fromStdString(str);
+
+    //
+    str = __yaml_GetString( node, GoodsAfterSection );
+    qDebug() << "after" << QString::fromStdString(str);
+
+    //
+    str = __yaml_GetString( node, GoodsBeforeSection );
+    qDebug() << "before" << QString::fromStdString(str);
+
+    //
+    str = __yaml_GetString( node, GoodsUlinkSection );
+    qDebug() << "ulink" << QString::fromStdString(str);
+
+    //
+    str = __yaml_GetString( node, GoodsUnameSection );
+    qDebug() << "umane" << QString::fromStdString(str);
+
+    // мин
+    if( __yaml_IsScalar( node[ GoodsMinSection ] ) )
+    {
+        val = node[ GoodsMinSection ].as<unsigned>();
+        qDebug() << "min" << val;
+    }
+
+    // макс
+    if( __yaml_IsScalar( node[ GoodsMaxSection ] ) )
+    {
+        val = node[ GoodsMaxSection ].as<unsigned>();
+        qDebug() << "max" << val;
+    }
+
+    //
+    str = __yaml_GetString( node, GoodsMultiSection );
+    qDebug() << "multi" << QString::fromStdString(str);
+
+    // значение
+    str = __yaml_GetString( node, GoodsValuesSection );
+    qDebug() << "values" << QString::fromStdString(str);
 }
 
 //------------------------------------------------------------------------------

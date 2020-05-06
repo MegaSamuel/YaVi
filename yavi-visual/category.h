@@ -3,6 +3,8 @@
 
 #include <QtWidgets>
 
+#include <yaml-cpp/yaml.h>
+
 //------------------------------------------------------------------------------
 
 class TCategory : public QWidget
@@ -26,6 +28,8 @@ public:
 
     const QString getCategoryId();
     const QString getCategoryName();
+
+    void  get_parameters( const YAML::Node&  node );
 
 protected Q_SLOTS :
     void    onBtnDec();

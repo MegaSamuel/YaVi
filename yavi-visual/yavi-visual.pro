@@ -41,7 +41,8 @@ HEADERS += \
     mainwindow.h \
     goods.h \
     table.h \
-    category.h
+    category.h \
+    func.h
 
 win32: RC_ICONS = $$PWD/favicon.ico
 
