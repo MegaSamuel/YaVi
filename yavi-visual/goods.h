@@ -125,6 +125,8 @@ class TGoods : public QWidget
 
         int     get_table_size() noexcept;
 
+        void     fix_table_size( int w, int h ) noexcept;
+
         QVBoxLayout *m_vlayout;
 
         QWidget     *m_wgt;

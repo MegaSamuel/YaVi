@@ -146,7 +146,8 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
     if( __yaml_IsSequence( config[ GoodsTableSection ] ) )
     {
         priv__->m_bEmpty = false;
-        qDebug() << GoodsTableSection << "is a sequence";
+
+//        qDebug() << GoodsTableSection << "is a sequence";
 
         for( auto& tab : config[ GoodsTableSection ] )
         {
@@ -161,7 +162,6 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             std::string  id = __yaml_GetString( tab, GoodsTableId );
 //            qDebug() << GoodsTableSection <<  GoodsTableId << "is a" << QString::fromStdString(id);
             pTable->setTableId( id );
-//            priv__->m_vVectors.emplace_back( id, s );
 
             // ищем имя секции id
             std::string  id_name = __yaml_GetString( tab, GoodsTableName );
@@ -185,14 +185,8 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     // значение
                     const std::string  col_val = __yaml_GetString( col, GoodsTableValue );
 //                    qDebug() << GoodsTableColumn << GoodsTableValue << QString::fromStdString(col_val);
-                    tmp = QString::fromStdString(col_val);
-                    tmp.remove( QRegExp("\\\\\\|-") );
                     priv__->m_vValues.clear();
-                    priv__->m_vValues = tmp.split( ' ', QString::SkipEmptyParts );
-
-//                    qDebug() << priv__->m_vValues.size();
-
-                    //split( priv__->m_vValues, col_val, '\n' );
+                    priv__->m_vValues = QString::fromStdString(col_val).split( '\n', QString::SkipEmptyParts );
 
                     for( auto& it : priv__->m_vValues )
                     {
@@ -224,13 +218,8 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     // значение
                     const std::string  row_val = __yaml_GetString( row, GoodsTableValue );
 //                    qDebug() << GoodsTableRow << GoodsTableValue << QString::fromStdString(row_val);
-                    tmp = QString::fromStdString(row_val);
-                    tmp.remove( QRegExp("\\\\\\|-") );
                     priv__->m_vValues.clear();
-                    priv__->m_vValues = tmp.split( ' ', QString::SkipEmptyParts );
-//                    split( priv__->m_vValues, row_val, '\n' );
-
-//                    qDebug() << priv__->m_vValues.size();
+                    priv__->m_vValues = QString::fromStdString(row_val).split( '\n', QString::SkipEmptyParts );
 
                     for( auto& it : priv__->m_vValues )
                     {
@@ -251,52 +240,12 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                 pTable->setTableLink( link );
             }
 
-            int w = pTable->getTableWidth();
-            int h = pTable->getTableHeight();
-
-            if( w > m_w )
-                m_w = w;
-
-            m_h += h;
-
-            m_wgt->setMinimumWidth( m_w );
-            m_scroll->setMinimumWidth( m_w );
-
-            m_wgt->setMinimumHeight( m_h );
-            m_scroll->setMinimumHeight( m_h );
+            fix_table_size( pTable->getTableWidth(), pTable->getTableHeight() );
         }
     }
 
 //    qDebug() << "TableList size" << priv__->m_apTableList.size();
 
-    /*
-    if( __yaml_IsMap( config[ ProtocolHeaderSectionName ] ) )
-    {
-	    priv__->m_zId = __yaml_GetString( config[ ProtocolHeaderSectionName ], "id" );
-	    priv__->m_zName = __yaml_GetString( config[ ProtocolHeaderSectionName ], "name" );
-	    priv__->m_zVersion = __yaml_GetString( config[ ProtocolHeaderSectionName ], "version" );
-	    priv__->m_zDescription = __yaml_GetString( config[ ProtocolHeaderSectionName ], "description" );
-	    priv__->m_zDesignation = __yaml_GetString( config[ ProtocolHeaderSectionName ], "designation" );
-
-        if( __yaml_IsScalar( config[ ProtocolHeaderSectionName ][ "network" ] ) )
-        {
-            priv__->m_uNetwork = config[ ProtocolHeaderSectionName ][ "network" ].as<unsigned>();
-        }
-
-	    // documents list
-	    if( __yaml_IsScalar( config[ ProtocolHeaderSectionName ][ "documents" ] ) )
-	    {
-		    const std::string 	val = config[ ProtocolHeaderSectionName ][ "documents" ].as<std::string>();
-            split( priv__->m_vDocuments, val, '\n' );
-	    }
-	    // suffixes list
-	    if( __yaml_IsScalar( config[ ProtocolHeaderSectionName ][ "suffixes" ] ) )
-	    {
-		    const std::string 	val = config[ ProtocolHeaderSectionName ][ "suffixes" ].as<std::string>();
-            split( priv__->m_vSuffixes, val, '\n' );
-	    }
-    }	
-*/
 	return true;
 }
 
@@ -361,6 +310,20 @@ bool TGoods::empty() const noexcept
 int TGoods::get_table_size() noexcept
 {
     return priv__->m_apTableList.size();
+}
+
+void TGoods::fix_table_size( int w, int h ) noexcept
+{
+    if( w > m_w )
+        m_w = w;
+
+    m_h += h;
+
+    m_wgt->setMinimumWidth( m_w );
+    m_scroll->setMinimumWidth( m_w );
+
+    m_wgt->setMinimumHeight( m_h );
+    m_scroll->setMinimumHeight( m_h );
 }
 
 //------------------------------------------------------------------------------
