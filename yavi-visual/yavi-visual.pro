@@ -34,12 +34,14 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     work.cpp \
-    goods.cpp
+    goods.cpp \
+    table.cpp
 
 HEADERS += \
     mainwindow.h \
     work.h \
-    goods.h
+    goods.h \
+    table.h
 
 win32: RC_ICONS = $$PWD/favicon.ico
 
