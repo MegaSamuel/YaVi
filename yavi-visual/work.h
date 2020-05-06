@@ -17,21 +17,16 @@ public:
     TWork();
     ~TWork();
 
-    QString zFailReason;  // причина ошибки загрузки/выгрузки ямла
+    QString     zFailReason;  // причина ошибки загрузки/выгрузки ямла
 
-    bool    init( const QString&  filename ); // загружаем ямл из файла
-    bool    fini( const QString&  filename ); // выгружаем ямл в файл
-
-    void    draw();
-    void    undraw();
-
-    QHBoxLayout *m_hlayout;
+    bool        init( const QString&  filename ); // загружаем ямл из файла
+    bool        fini( const QString&  filename ); // выгружаем ямл в файл
 
 private Q_SLOTS:
-    void    TimerWork();
+    void        TimerWork();
 
 private:
-    YAML::Node 	m_config; // считанный ямл
+    YAML::Node  m_config; // считанный ямл
 
     double      cpu_time() const;
     double      current_time() const;
@@ -42,7 +37,7 @@ private:
     unsigned    m_uTimerCounter;
 
 protected:
-    TGoods 	*m_pGoods;    // товары считанные из файла
+    TGoods 	   *m_pGoods;    // товары считанные из файла
 };
 
 //------------------------------------------------------------------------------

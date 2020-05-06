@@ -15,6 +15,9 @@ MainWindow::MainWindow(QWidget *parent)
     QFrame  *frmBase = new QFrame();
 
     QHBoxLayout  *hlayout = new QHBoxLayout;
+    hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+//    hlayout->setMargin(10);
+//    hlayout->setSpacing(10);
 
     // кнопка "загрузить yaml из файла"
     m_ptBtnOpen = new QPushButton( "Open" );
@@ -34,19 +37,32 @@ MainWindow::MainWindow(QWidget *parent)
     hlayout->addWidget( m_ptLblNotice, 0, Qt::AlignLeft );
 
     // пружинка
-    hlayout->addStretch( 0 );
+    //hlayout->addStretch( 0 );
 
     QVBoxLayout  *vlayout = new QVBoxLayout;
+    vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+//    vlayout->setMargin(10);
+//    vlayout->setSpacing(10);
 
     // добавляем горизонтальный layout в вертикальный layout
     vlayout->addLayout( hlayout );
 
     // добавляем то где будет дерево ямла в вертикальный layout
+    // ->
+    QScrollArea *scroll = new QScrollArea;
+//    scroll->setMinimumWidth(256);
+//    scroll->setMinimumHeight(256);
+    scroll->setAlignment( Qt::AlignLeft | Qt::AlignTop );
     m_pWork = new TWork();
-    vlayout->addWidget( m_pWork );
+//    vlayout->addWidget( m_pWork );
+
+    scroll->setWidget( m_pWork );
+
+    vlayout->addWidget( scroll );
+    // <-
 
     // пружинка
-    vlayout->addStretch( 0 );
+//    vlayout->addStretch( 0 );
 
     // добавляем вертикальный layout в frame
     frmBase->setLayout( vlayout );
@@ -65,8 +81,6 @@ MainWindow::~MainWindow()
 void 	MainWindow::onBtnOpen()
 {
     qDebug() << "Open button";
-
-//    m_pWork->draw();
 
     // очищаем лэйбл с описанием ошибки
     m_ptLblNotice->clear();
@@ -110,10 +124,7 @@ void 	MainWindow::onBtnSave()
 {
     qDebug() << "Save button";
 
-//    m_pWork->undraw();
-
     // формируем имя файла по умолчанию
-//    QString deffilename = QString( "/pattern%1x%2.yml" ).arg(m_uRow).arg(m_uColumn);
     QString deffilename = QString( "/test.yml" );
 
     // каталог где мы находимся
@@ -151,4 +162,3 @@ void 	MainWindow::onBtnSave()
 }
 
 //------------------------------------------------------------------------------
-

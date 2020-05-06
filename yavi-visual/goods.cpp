@@ -282,6 +282,7 @@ TGoods::TGoods()
     m_layout->setAlignment( m_scroll, Qt::AlignHCenter | Qt::AlignTop );
 
     this->setLayout( m_layout );
+//    this->setLayout( m_vlayout );
 }
 
 TGoods::TGoods( const YAML::Node&  config )
@@ -320,10 +321,10 @@ void TGoods::fix_table_size( int w, int h ) noexcept
     m_h += h;
 
     m_wgt->setMinimumWidth( m_w );
-    m_scroll->setMinimumWidth( m_w );
+//    m_scroll->setMinimumWidth( m_w );
 
     m_wgt->setMinimumHeight( m_h );
-    m_scroll->setMinimumHeight( m_h );
+//    m_scroll->setMinimumHeight( m_h );
 }
 
 //------------------------------------------------------------------------------

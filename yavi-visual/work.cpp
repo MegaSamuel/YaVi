@@ -7,27 +7,6 @@
 
 //------------------------------------------------------------------------------
 
-void TWork::draw()
-{
-    QPushButton *button1 = new QPushButton("One");
-    QPushButton *button2 = new QPushButton("Two");
-    QPushButton *button3 = new QPushButton("Three");
-    m_hlayout->addWidget(button1);
-    m_hlayout->addWidget(button2);
-    m_hlayout->addWidget(button3);
-}
-
-void TWork::undraw()
-{
-    while( QLayoutItem* item = m_hlayout->takeAt(0) )
-    {
-        delete item->widget();
-        delete item;
-    }
-}
-
-//------------------------------------------------------------------------------
-
 TWork::TWork()
 {
     m_fBeginTime = cpu_time();
@@ -40,10 +19,10 @@ TWork::TWork()
     connect( m_ptTimer, SIGNAL(timeout()), this, SLOT(TimerWork()) );
     m_ptTimer->start(1000); // 1 Hz
 
-    m_hlayout = new QHBoxLayout;
-    m_hlayout->addWidget( m_pGoods );
+    QHBoxLayout *hlayout = new QHBoxLayout;
+    hlayout->addWidget( m_pGoods );
 
-    this->setLayout( m_hlayout );
+    this->setLayout( hlayout );
 }
 
 TWork::~TWork()
