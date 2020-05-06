@@ -98,6 +98,7 @@ private:
     YAML::Node 		config__;
 
     QList<TTable*>  m_apTableList;
+    QList<TCategory*>  m_apCategoryList;
 
     QStringList     m_vValues;
 //    std::vector<std::string>  m_vValues;
@@ -111,7 +112,14 @@ private:
             it->~TTable();
         }
 
+        for( auto& it : m_apCategoryList )
+        {
+            it->~TCategory();
+        }
+
         m_apTableList.clear();
+
+        m_apCategoryList.clear();
 
         m_vValues.clear();
 
@@ -137,10 +145,57 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
     priv__->config__ = config;
 
     // категория (category)
+    if( __yaml_IsSequence( config[ GoodsCategorySection ] ) )
+    {
+        priv__->m_bEmpty = false;
+
+        qDebug() << GoodsCategorySection << "is a sequence";
+
+        for( auto& cat : config[ GoodsCategorySection ] )
+        {
+            TCategory  *pCategory;
+            pCategory = new TCategory();
+            m_vlayout->addWidget( pCategory );
+            priv__->m_apCategoryList.append(pCategory);
+
+            // ищем секцию id
+            std::string  id = __yaml_GetString( cat, GoodsCategoryId );
+            qDebug() << GoodsCategorySection << GoodsCategoryId << "is a" << QString::fromStdString(id);
+            pCategory->setCategoryId( id );
+
+            // ищем имя секции id
+            std::string  id_name = __yaml_GetString( cat, GoodsCategoryName );
+            qDebug() << GoodsCategorySection << GoodsCategoryId << "is a" << QString::fromStdString(id) << "name" << QString::fromStdString(id_name) ;
+            pCategory->setCategoryName( id_name );
+
+            fix_widget_size( pCategory->getCategoryWidth(), pCategory->getCategoryHeight() );
+        }
+    }
+
     if( __yaml_IsMap( config[ GoodsCategorySection ] ) )
     {
         priv__->m_bEmpty = false;
+
         qDebug() << GoodsCategorySection << "is a map";
+
+        std::string  param = __yaml_GetString( config[ GoodsCategorySection ], GoodsParametersSection );
+        qDebug() << QString::fromStdString(param);
+
+
+        /*
+        for( auto& cat : config[ GoodsCategorySection ] )
+        {
+            TCategory  *pCategory;
+            pCategory = new TCategory();
+            m_vlayout->addWidget( pCategory );
+            priv__->m_apCategoryList.append(pCategory);
+
+            if( __yaml_IsMap( cat ) )
+            {
+                qDebug() << GoodsCategorySection << "is a map" << "and it has an another map";
+            }
+        }
+*/
     }
 
     // таблица (tables)

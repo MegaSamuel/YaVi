@@ -8,10 +8,11 @@
 #include <string>
 #include <yaml-cpp/yaml.h>
 
+#include "category.h"
 #include "table.h"
 
 //------------------------------------------------------------------------------
-
+/*
 class TValues
 {
 public:
@@ -70,7 +71,7 @@ public:
     QList<TCategories>  m_categories;
     QList<TParameters>  m_parameters;
 };
-
+*/
 //------------------------------------------------------------------------------
 
 class TGoodsPrivate;
@@ -83,6 +84,9 @@ class TGoods : public QWidget
 	public :
         // имена основных секций файла конфигурации
         #define  GoodsCategorySection    "category"
+        #define  GoodsCategoryId         "id"
+        #define  GoodsCategoryName       "name"
+
         #define  GoodsCategoriesSection  "categories"
         #define  GoodsParametersSection  "parameters"
 
@@ -113,22 +117,22 @@ class TGoods : public QWidget
 
         // constructors
         TGoods();
-        explicit TGoods( const YAML::Node&  config );  //!< создание из ноды yaml
+        explicit TGoods( const YAML::Node&  config );  // создание из ноды yaml
         ~TGoods();
 
-        //! разбор протокола, считанного предварительно в yaml
-        bool    parse_yaml( const YAML::Node&  config );
+        // разбор протокола, считанного предварительно в yaml
+        bool         parse_yaml( const YAML::Node&  config );
 
-        void    clear() noexcept;
-        bool    empty() const noexcept;
-        size_t  size() const noexcept;
+        void         clear() noexcept;
+        bool         empty() const noexcept;
+        size_t       size() const noexcept;
 
-        int     get_table_size() noexcept;
+        int          get_table_size() noexcept;
 
-        int      m_w, m_h;  // размеры виджета
-        void     fix_widget_size( int w, int h ) noexcept; // установка размеров виджета
+        int          m_w, m_h;  // размеры виджета
+        void         fix_widget_size( int w, int h ) noexcept; // установка размеров виджета
 
-        QVBoxLayout *m_vlayout;
+        QVBoxLayout  *m_vlayout;
 
 private :
         std::unique_ptr<TGoodsPrivate> 	priv__;
