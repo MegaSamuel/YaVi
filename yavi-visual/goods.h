@@ -113,8 +113,6 @@ class TGoods : public QWidget
         #define  GoodsMultiSection       "multi"
         #define  GoodsValuesSection      "values"
 
-        #define  GoodsDefName            "noname"
-
         // constructors
         TGoods();
         explicit TGoods( const YAML::Node&  config );  // создание из ноды yaml
@@ -129,13 +127,16 @@ class TGoods : public QWidget
 
         int          get_table_size() noexcept;
 
-        int          m_w, m_h;  // размеры виджета
-        void         fix_widget_size( int w, int h ) noexcept; // установка размеров виджета
-
         QVBoxLayout  *m_vlayout;
 
 private :
         std::unique_ptr<TGoodsPrivate> 	priv__;
+
+        void         get_parameters( const YAML::Node&  node );
+        void         get_categories( const YAML::Node&  node );
+
+        int          m_w, m_h;  // размеры виджета
+        void         fix_widget_size( int w, int h ) noexcept; // установка размеров виджета
 };
 
 //! тип - указатель на протокол, описанный в файле

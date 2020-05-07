@@ -162,50 +162,24 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
             // ищем секцию id
             std::string  id = __yaml_GetString( cat, GoodsCategoryId );
-            qDebug() << GoodsCategorySection << GoodsCategoryId << "is a" << QString::fromStdString(id);
+//            qDebug() << GoodsCategorySection << GoodsCategoryId << "is a" << QString::fromStdString(id);
             pCategory->setCategoryId( id );
 
             // ищем имя секции id
             std::string  id_name = __yaml_GetString( cat, GoodsCategoryName );
-            qDebug() << GoodsCategorySection << GoodsCategoryId << "is a" << QString::fromStdString(id) << "name" << QString::fromStdString(id_name) ;
+//            qDebug() << GoodsCategorySection << GoodsCategoryId << "is a" << QString::fromStdString(id) << "name" << QString::fromStdString(id_name) ;
             pCategory->setCategoryName( id_name );
 
             if( __yaml_IsSequence( cat[ GoodsParametersSection ] ) )
             {
                 for( auto& par : cat[ GoodsParametersSection ] )
                 {
-                    pCategory->get_parameters(par);
+                    get_parameters(par);
                 }
             }
 
             fix_widget_size( pCategory->getCategoryWidth(), pCategory->getCategoryHeight() );
         }
-    }
-
-    if( __yaml_IsMap( config[ GoodsCategorySection ] ) )
-    {
-        priv__->m_bEmpty = false;
-
-        qDebug() << GoodsCategorySection << "is a map";
-
-        std::string  param = __yaml_GetString( config[ GoodsCategorySection ], GoodsParametersSection );
-        qDebug() << QString::fromStdString(param);
-
-
-        /*
-        for( auto& cat : config[ GoodsCategorySection ] )
-        {
-            TCategory  *pCategory;
-            pCategory = new TCategory();
-            m_vlayout->addWidget( pCategory );
-            priv__->m_apCategoryList.append(pCategory);
-
-            if( __yaml_IsMap( cat ) )
-            {
-                qDebug() << GoodsCategorySection << "is a map" << "and it has an another map";
-            }
-        }
-*/
     }
 
     // таблица (tables)
@@ -311,6 +285,105 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 //    qDebug() << "TableList size" << priv__->m_apTableList.size();
 
 	return true;
+}
+
+//------------------------------------------------------------------------------
+
+void  TGoods::get_categories( const YAML::Node&  node )
+{
+//    unsigned  val;
+    std::string  str;
+
+    // имя
+    str = __yaml_GetString( node, GoodsNameSection );
+    qDebug() << "name" << QString::fromStdString(str);
+
+    if( __yaml_IsSequence( node[ GoodsParametersSection ] ) )
+    {
+//        qDebug() << GoodsParametersSection << "is a sequence";
+
+        for( auto& par : node[ GoodsParametersSection ] )
+        {
+            get_parameters( par );
+        }
+    }
+}
+
+void  TGoods::get_parameters( const YAML::Node&  node )
+{
+    unsigned  val;
+    std::string  str;
+
+    // имя
+    str = __yaml_GetString( node, GoodsNameSection );
+    qDebug() << "name" << QString::fromStdString(str);
+
+    // тип
+    if( __yaml_IsScalar( node[ GoodsTypeSection ] ) )
+    {
+        val = node[ GoodsTypeSection ].as<unsigned>();
+//        qDebug() << "type" << val;
+    }
+
+    //
+    str = __yaml_GetString( node, GoodsPlaceholderSection );
+//    qDebug() << "placeholder" << QString::fromStdString(str);
+
+    //
+    str = __yaml_GetString( node, GoodsNewSection );
+//    qDebug() << "new" << QString::fromStdString(str);
+
+    //
+    str = __yaml_GetString( node, GoodsAfterSection );
+//    qDebug() << "after" << QString::fromStdString(str);
+
+    //
+    str = __yaml_GetString( node, GoodsBeforeSection );
+//    qDebug() << "before" << QString::fromStdString(str);
+
+    //
+    str = __yaml_GetString( node, GoodsUlinkSection );
+//    qDebug() << "ulink" << QString::fromStdString(str);
+
+    //
+    str = __yaml_GetString( node, GoodsUnameSection );
+//    qDebug() << "umane" << QString::fromStdString(str);
+
+    // мин
+    if( __yaml_IsScalar( node[ GoodsMinSection ] ) )
+    {
+        val = node[ GoodsMinSection ].as<unsigned>();
+//        qDebug() << "min" << val;
+    }
+
+    // макс
+    if( __yaml_IsScalar( node[ GoodsMaxSection ] ) )
+    {
+        val = node[ GoodsMaxSection ].as<unsigned>();
+//        qDebug() << "max" << val;
+    }
+
+    //
+    str = __yaml_GetString( node, GoodsMultiSection );
+//    qDebug() << "multi" << QString::fromStdString(str);
+
+    // значение
+    str = __yaml_GetString( node, GoodsValuesSection );
+
+    if( 0 != QString::fromStdString(str).length() )
+    {
+        qDebug() << "values" << QString::fromStdString(str);
+
+        if( __yaml_IsSequence( node[ GoodsCategoriesSection ] ) )
+        {
+//            qDebug() << GoodsCategoriesSection << "is a sequence";
+
+            for( auto& cat : node[ GoodsCategoriesSection ] )
+            {
+                get_categories( cat );
+            }
+        }
+    }
 }
 
 //------------------------------------------------------------------------------

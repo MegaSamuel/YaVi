@@ -20,7 +20,7 @@ inline bool __yaml_IsMap( const YAML::Node&  node )
     return ( node.IsDefined() ? ( node.IsMap() ? true : false ) : false );
 }
 
-inline const std::string __yaml_GetString( const YAML::Node&  node, const std::string&  name, const std::string  def = "no_name" )
+inline const std::string __yaml_GetString( const YAML::Node&  node, const std::string&  name, const std::string  def = "" )
 {
     if( __yaml_IsScalar( node[ name ] ) )
         return node[ name ].as<std::string>();

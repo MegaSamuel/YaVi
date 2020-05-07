@@ -29,8 +29,6 @@ public:
     const QString getCategoryId();
     const QString getCategoryName();
 
-    void  get_parameters( const YAML::Node&  node );
-
 protected Q_SLOTS :
     void    onBtnDec();
     void    onBtnInc();
