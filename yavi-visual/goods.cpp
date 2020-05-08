@@ -160,14 +160,9 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             m_vlayout->addWidget( pCategory );
             priv__->m_apCategoryList.append(pCategory);
 
-            // ищем секцию id
-            std::string  id = __yaml_GetString( cat, GoodsCategoryId );
-//            qDebug() << GoodsCategorySection << GoodsCategoryId << "is a" << QString::fromStdString(id);
-            pCategory->setCategoryId( id );
-
-            // ищем имя секции id
+            // ищем имя
             std::string  id_name = __yaml_GetString( cat, GoodsCategoryName );
-//            qDebug() << GoodsCategorySection << GoodsCategoryId << "is a" << QString::fromStdString(id) << "name" << QString::fromStdString(id_name) ;
+            qDebug() << GoodsCategorySection << "name is" << QString::fromStdString(id_name);
             pCategory->setCategoryName( id_name );
 
             if( __yaml_IsSequence( cat[ GoodsParametersSection ] ) )

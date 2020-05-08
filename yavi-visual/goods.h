@@ -84,7 +84,6 @@ class TGoods : public QWidget
 	public :
         // имена основных секций файла конфигурации
         #define  GoodsCategorySection    "category"
-        #define  GoodsCategoryId         "id"
         #define  GoodsCategoryName       "name"
 
         #define  GoodsCategoriesSection  "categories"

@@ -14,21 +14,17 @@ TCategory::TCategory()
     m_grid = new QGridLayout;
     m_grid->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
-    // кнопка минус
-    m_ptBtnDec = new QPushButton( "-", this );
-    connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
-    m_grid->addWidget( m_ptBtnDec, m_row, 0, Qt::AlignLeft );
-
     // лэйбл
     m_ptLblName = new QLabel( this, Q_NULLPTR );
     m_ptLblName->setText( "m_ptLblName" );
+    m_ptLblName->setMinimumWidth( 94 );
     m_ptLblName->setFrameStyle( QFrame::Panel | QFrame::Raised );
-    m_grid->addWidget( m_ptLblName, m_row, 1, Qt::AlignLeft );
+    m_grid->addWidget( m_ptLblName, m_row, 0, Qt::AlignLeft );
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+", this );
     connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
-    m_grid->addWidget( m_ptBtnInc, m_row, 2, Qt::AlignLeft );
+    m_grid->addWidget( m_ptBtnInc, m_row, 1, Qt::AlignLeft );
 
     // перевод строки и колонки в grid для следующих добавлений
     nextRow();
@@ -50,27 +46,12 @@ TCategory::~TCategory()
 
 //------------------------------------------------------------------------------
 
-void  TCategory::onBtnDec()
-{
-    qDebug() << "Dec button";
-}
-
 void  TCategory::onBtnInc()
 {
-    qDebug() << "Inc button";
+    qDebug() << m_zName << "inc button";
 }
 
 //------------------------------------------------------------------------------
-
-void  TCategory::setCategoryId( const std::string&  name )
-{
-    m_zId = QString::fromStdString(name);
-}
-
-const QString TCategory::getCategoryId()
-{
-    return m_zId;
-}
 
 void  TCategory::setCategoryName( const std::string&  name )
 {
