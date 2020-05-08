@@ -39,11 +39,20 @@ public:
     unsigned  getParamMin();
     unsigned  getParamMax();
 
+    int       getParamWidth();
+    int       getParamHeight();
 protected Q_SLOTS :
-    void    onBtnDec();
-    void    onBtnInc();
+    void      onBtnDec();
+    void      onBtnInc();
 
 private:
+    void      clear();
+
+    void      resetRow();
+    void      resetColumn();
+    void      nextRow();
+    void      nextColumn();
+
     QString   m_zName;
     QString   m_zPlaceholder;
     QString   m_zNew;
@@ -56,6 +65,15 @@ private:
     unsigned  m_uType;
     unsigned  m_uMin;
     unsigned  m_uMax;
+
+    QGridLayout  *m_grid;
+
+    QPushButton  *m_ptBtnDec;
+    QPushButton  *m_ptBtnInc;
+    QLabel       *m_ptLblName;
+
+    int       m_row;
+    int       m_column;
 };
 
 //------------------------------------------------------------------------------

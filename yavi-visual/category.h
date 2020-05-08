@@ -17,20 +17,23 @@ public:
     TCategory();
     ~TCategory();
 
-    void  resetRow();
-    void  resetColumn();
-    void  nextRow();
-    void  nextColumn();
+    void          getCategories( const YAML::Node&  node );
+    void          getParameters( const YAML::Node&  node );
 
-    int   getCategoryWidth();
-    int   getCategoryHeight();
+    void          resetRow();
+    void          resetColumn();
+    void          nextRow();
+    void          nextColumn();
 
-    void  setCategoryName( const std::string&  name );
+    int           getCategoryWidth();
+    int           getCategoryHeight();
+
+    void          setCategoryName( const std::string&  name );
 
     const QString getCategoryName();
 
 protected Q_SLOTS :
-    void    onBtnInc();
+    void          onBtnInc();
 
 private:
     QGridLayout  *m_grid;

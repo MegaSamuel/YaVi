@@ -22,6 +22,8 @@ TTable::TTable()
     // лэйбл
     m_ptLblName = new QLabel( this, Q_NULLPTR );
     m_ptLblName->setText( "m_ptLblName" );
+    m_ptLblName->setMinimumWidth( 94 );
+    m_ptLblName->setAlignment( Qt::AlignCenter );
     m_ptLblName->setFrameStyle( QFrame::Panel | QFrame::Raised );
     m_grid->addWidget( m_ptLblName, m_row, 1, Qt::AlignLeft );
 
@@ -107,7 +109,8 @@ void TTable::setTableRow( QStringList& list )
     {
         QLabel  *label = new QLabel( this, Q_NULLPTR );
         label->setText( it );
-//        label->setMinimumHeight( 25 );
+        label->setMinimumWidth( 94 );
+        label->setAlignment( Qt::AlignCenter );
         label->setFrameStyle( QFrame::Panel | QFrame::Raised );
         m_grid->addWidget( label, m_row, m_column + column, Qt::AlignLeft );
 
@@ -125,7 +128,8 @@ void TTable::setTableColumn( QStringList& list )
     {
         QLabel  *label = new QLabel( this, Q_NULLPTR );
         label->setText( it );
-//        label->setMinimumHeight( 25 );
+        label->setMinimumWidth( 94 );
+        label->setAlignment( Qt::AlignCenter );
         label->setFrameStyle( QFrame::Panel | QFrame::Raised );
         m_grid->addWidget( label, m_row + row, m_column, Qt::AlignLeft );
 

@@ -4,12 +4,65 @@
 
 TParam::TParam()
 {
+    clear();
 
+    resetRow();
+    resetColumn();
+
+    m_grid = new QGridLayout;
+    m_grid->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    m_grid->setMargin( 0 );
+
+    // кнопка минус
+    m_ptBtnDec = new QPushButton( "-", this );
+    connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
+    m_grid->addWidget( m_ptBtnDec, m_row, 0, Qt::AlignLeft );
+
+    // лэйбл
+    m_ptLblName = new QLabel( this, Q_NULLPTR );
+    m_ptLblName->setText( "m_ptLblName" );
+    m_ptLblName->setMinimumWidth( 94 );
+    m_ptLblName->setAlignment( Qt::AlignCenter );
+    m_ptLblName->setFrameStyle( QFrame::Panel | QFrame::Raised );
+    m_grid->addWidget( m_ptLblName, m_row, 1, Qt::AlignLeft );
+
+    // кнопка плюс
+    m_ptBtnInc = new QPushButton( "+", this );
+    connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
+    m_grid->addWidget( m_ptBtnInc, m_row, 2, Qt::AlignLeft );
+
+    // перевод строки и колонки в grid для следующих добавлений
+    nextRow();
+    nextColumn();
+
+    this->setLayout( m_grid );
 }
 
 TParam::~TParam()
 {
+    QLayoutItem *child;
 
+    while( ( child = m_grid->takeAt(0) ) != Q_NULLPTR )
+    {
+        delete child->widget();
+        delete child;
+    }
+}
+
+void  TParam::clear()
+{
+    m_zName.clear();
+    m_zPlaceholder.clear();
+    m_zNew.clear();
+    m_zAfter.clear();
+    m_zBefore.clear();
+    m_zUlink.clear();
+    m_zUname.clear();
+    m_zMulti.clear();
+
+    m_uType = 0;
+    m_uMin = 0;
+    m_uMax = 0;
 }
 
 //------------------------------------------------------------------------------
@@ -29,6 +82,7 @@ void  TParam::onBtnInc()
 void  TParam::setParamName( const std::string&  name )
 {
     m_zName = QString::fromStdString(name);
+    m_ptLblName->setText( m_zName );
 }
 
 void  TParam::setParamPlaceholder( const std::string&  name )
@@ -140,4 +194,39 @@ unsigned  TParam::getParamMax()
     return m_uMax;
 }
 
+//------------------------------------------------------------------------------
+
+void TParam::resetRow()
+{
+    m_row = 0;
+}
+
+void TParam::resetColumn()
+{
+    m_column = 0;
+}
+
+void TParam::nextRow()
+{
+    m_row += 1;
+}
+
+void TParam::nextColumn()
+{
+    m_column += 1;
+}
+
+int TParam::getParamWidth()
+{
+    QSize size = m_grid->minimumSize();
+
+    return size.width();
+}
+
+int TParam::getParamHeight()
+{
+    QSize size = m_grid->minimumSize();
+
+    return size.height();
+}
 //------------------------------------------------------------------------------

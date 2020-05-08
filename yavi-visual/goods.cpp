@@ -161,15 +161,17 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             priv__->m_apCategoryList.append(pCategory);
 
             // ищем имя
-            std::string  id_name = __yaml_GetString( cat, GoodsCategoryName );
-            qDebug() << GoodsCategorySection << "name is" << QString::fromStdString(id_name);
-            pCategory->setCategoryName( id_name );
+            std::string cat_name = __yaml_GetString( cat, GoodsCategoryName );
+            qDebug() << GoodsCategorySection << "name is" << QString::fromStdString(cat_name);
+            pCategory->setCategoryName( cat_name );
 
             if( __yaml_IsSequence( cat[ GoodsParametersSection ] ) )
             {
                 for( auto& par : cat[ GoodsParametersSection ] )
                 {
-                    get_parameters(par);
+//                    get_parameters(par);
+
+                    pCategory->getParameters( par );
                 }
             }
 
