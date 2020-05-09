@@ -66,7 +66,8 @@ private:
     unsigned  m_uMin;
     unsigned  m_uMax;
 
-    QGridLayout  *m_grid;
+//    QGridLayout  *m_grid;
+    QVBoxLayout  *m_vlayout;
 
     QPushButton  *m_ptBtnDec;
     QPushButton  *m_ptBtnInc;

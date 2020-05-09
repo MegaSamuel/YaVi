@@ -9,14 +9,17 @@ TParam::TParam()
     resetRow();
     resetColumn();
 
-    m_grid = new QGridLayout;
-    m_grid->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-    m_grid->setMargin( 0 );
+    m_vlayout = new QVBoxLayout;
+    m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    m_vlayout->setMargin( 0 );
+
+    QHBoxLayout *hlayout = new QHBoxLayout;
+    hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
     // кнопка минус
     m_ptBtnDec = new QPushButton( "-", this );
     connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
-    m_grid->addWidget( m_ptBtnDec, m_row, 0, Qt::AlignLeft );
+    hlayout->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
 
     // лэйбл
     m_ptLblName = new QLabel( this, Q_NULLPTR );
@@ -24,25 +27,26 @@ TParam::TParam()
     m_ptLblName->setMinimumWidth( 94 );
     m_ptLblName->setAlignment( Qt::AlignCenter );
     m_ptLblName->setFrameStyle( QFrame::Panel | QFrame::Raised );
-    m_grid->addWidget( m_ptLblName, m_row, 1, Qt::AlignLeft );
+    hlayout->addWidget( m_ptLblName, 0, Qt::AlignLeft );
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+", this );
     connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
-    m_grid->addWidget( m_ptBtnInc, m_row, 2, Qt::AlignLeft );
+    hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
 
+    m_vlayout->addLayout( hlayout, 0 );
     // перевод строки и колонки в grid для следующих добавлений
-    nextRow();
-    nextColumn();
+//    nextRow();
+//    nextColumn();
 
-    this->setLayout( m_grid );
+    this->setLayout( m_vlayout );
 }
 
 TParam::~TParam()
 {
     QLayoutItem *child;
 
-    while( ( child = m_grid->takeAt(0) ) != Q_NULLPTR )
+    while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
     {
         delete child->widget();
         delete child;
@@ -69,12 +73,12 @@ void  TParam::clear()
 
 void  TParam::onBtnDec()
 {
-    qDebug() << "Dec button";
+    qDebug() << m_zName << "dec button";
 }
 
 void  TParam::onBtnInc()
 {
-    qDebug() << "Inc button";
+    qDebug() << m_zName << "inc button";
 }
 
 //------------------------------------------------------------------------------
@@ -218,14 +222,14 @@ void TParam::nextColumn()
 
 int TParam::getParamWidth()
 {
-    QSize size = m_grid->minimumSize();
+    QSize size = m_vlayout->minimumSize();
 
     return size.width();
 }
 
 int TParam::getParamHeight()
 {
-    QSize size = m_grid->minimumSize();
+    QSize size = m_vlayout->minimumSize();
 
     return size.height();
 }

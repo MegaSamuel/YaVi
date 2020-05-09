@@ -36,7 +36,8 @@ protected Q_SLOTS :
     void          onBtnInc();
 
 private:
-    QGridLayout  *m_grid;
+//    QGridLayout  *m_grid;
+    QVBoxLayout  *m_vlayout;
 
     QPushButton  *m_ptBtnInc;
     QLabel       *m_ptLblName;
