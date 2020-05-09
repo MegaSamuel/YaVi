@@ -13,28 +13,6 @@
 
 //------------------------------------------------------------------------------
 /*
-class TValues
-{
-public:
-    TValues();
-    ~TValues();
-
-    QString  m_name;
-    QString  m_type;
-    QString  m_placeholder;
-    QString  m_new;
-    QString  m_after;
-    QString  m_before;
-    QString  m_ulink;
-    QString  m_uname;
-    QString  m_min;
-    QString  m_max;
-    QString  m_multi;
-    std::vector<std::string> 	m_vValues;
-};
-
-//------------------------------------------------------------------------------
-
 class TParameters : public QObject
 {
 public:

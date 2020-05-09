@@ -138,7 +138,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
         // файл не пуст
         priv__->m_bEmpty = false;
 
-        qDebug() << GoodsCategorySection << "is a sequence";
+//        qDebug() << GoodsCategorySection << "is a sequence";
 
         for( auto& cat : config[ GoodsCategorySection ] )
         {
@@ -149,7 +149,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
             // ищем имя
             std::string cat_name = __yaml_GetString( cat, GoodsCategoryName );
-            qDebug() << GoodsCategorySection << "name is" << QString::fromStdString(cat_name);
+//            qDebug() << GoodsCategorySection << "name is" << QString::fromStdString(cat_name);
             pCategory->setCategoryName( cat_name );
 
             if( __yaml_IsSequence( cat[ GoodsParametersSection ] ) )

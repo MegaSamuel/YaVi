@@ -7,6 +7,7 @@
 
 #include "dialog.h"
 #include "param.h"
+#include "values.h"
 
 //------------------------------------------------------------------------------
 
@@ -45,6 +46,8 @@ private:
     QList<TParam*>  m_apParamList;
 
     TDialog        *m_ptDialog;
+
+    TValues         m_tValues;
 };
 
 //------------------------------------------------------------------------------
