@@ -2,12 +2,11 @@
 
 //------------------------------------------------------------------------------
 
-TParam::TParam()
+TCategories::TCategories( int  depth )
 {
     clear();
 
-    resetRow();
-    resetColumn();
+    m_depth = depth + 1;
 
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
@@ -15,6 +14,114 @@ TParam::TParam()
 
     QHBoxLayout *hlayout = new QHBoxLayout;
     hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+
+    // отступ
+    for( int i = 0; i < m_depth; i++ )
+    {
+        QLabel *label = new QLabel( this, Q_NULLPTR );
+        label->setMinimumWidth( 94 );
+        hlayout->addWidget( label, 0, Qt::AlignLeft );
+    }
+
+    // кнопка минус
+    m_ptBtnDec = new QPushButton( "-", this );
+    connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
+    hlayout->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
+
+    // лэйбл
+    m_ptLblName = new QLabel( this, Q_NULLPTR );
+    m_ptLblName->setText( "m_ptLblName" );
+    m_ptLblName->setMinimumWidth( 94 );
+    m_ptLblName->setAlignment( Qt::AlignCenter );
+    m_ptLblName->setFrameStyle( QFrame::Panel | QFrame::Raised );
+    hlayout->addWidget( m_ptLblName, 0, Qt::AlignLeft );
+
+    // кнопка плюс
+    m_ptBtnInc = new QPushButton( "+", this );
+    connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
+    hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
+
+    m_vlayout->addLayout( hlayout, 0 );
+
+    this->setLayout( m_vlayout );
+}
+
+TCategories::~TCategories()
+{
+    QLayoutItem *child;
+
+    while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
+    {
+        delete child->widget();
+        delete child;
+    }
+
+    for( auto& it : m_apParamList )
+    {
+        it->~TParam();
+    }
+
+    clear();
+}
+
+void TCategories::clear()
+{
+    m_apParamList.clear();
+}
+
+//------------------------------------------------------------------------------
+
+void  TCategories::onBtnDec()
+{
+    qDebug() << getCategoriesName() << "dec button";
+}
+
+void  TCategories::onBtnInc()
+{
+    qDebug() << getCategoriesName() << "inc button";
+}
+
+void  TCategories::setCategoriesName( const std::string&  name )
+{
+    m_zName = QString::fromStdString(name);
+    m_ptLblName->setText( m_zName );
+}
+
+QString  TCategories::getCategoriesName()
+{
+    return m_zName;
+}
+
+int  TCategories::getCategoriesDepth()
+{
+    return m_depth;
+}
+
+//------------------------------------------------------------------------------
+
+//------------------------------------------------------------------------------
+
+TParam::TParam( int  depth )
+{
+    clear();
+
+//    resetRow();
+//    resetColumn();
+
+    m_vlayout = new QVBoxLayout;
+    m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    m_vlayout->setMargin( 0 );
+
+    QHBoxLayout *hlayout = new QHBoxLayout;
+    hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+
+    // отступ
+    for( int i = 0; i < depth; i++ )
+    {
+        QLabel *label = new QLabel( this, Q_NULLPTR );
+        label->setMinimumWidth( 94 );
+        hlayout->addWidget( label, 0, Qt::AlignLeft );
+    }
 
     // кнопка минус
     m_ptBtnDec = new QPushButton( "-", this );
@@ -51,6 +158,13 @@ TParam::~TParam()
         delete child->widget();
         delete child;
     }
+
+    for( auto& it : m_apCategoriesList )
+    {
+        it->~TCategories();
+    }
+
+    clear();
 }
 
 void  TParam::clear()
@@ -67,18 +181,20 @@ void  TParam::clear()
     m_uType = 0;
     m_uMin = 0;
     m_uMax = 0;
+
+    m_apCategoriesList.clear();
 }
 
 //------------------------------------------------------------------------------
 
 void  TParam::onBtnDec()
 {
-    qDebug() << m_zName << "dec button";
+    qDebug() << getParamName() << "dec button";
 }
 
 void  TParam::onBtnInc()
 {
-    qDebug() << m_zName << "inc button";
+    qDebug() << getParamName() << "inc button";
 }
 
 //------------------------------------------------------------------------------
@@ -199,7 +315,7 @@ unsigned  TParam::getParamMax()
 }
 
 //------------------------------------------------------------------------------
-
+/*
 void TParam::resetRow()
 {
     m_row = 0;
@@ -219,7 +335,7 @@ void TParam::nextColumn()
 {
     m_column += 1;
 }
-
+*/
 int TParam::getParamWidth()
 {
     QSize size = m_vlayout->minimumSize();
@@ -233,4 +349,5 @@ int TParam::getParamHeight()
 
     return size.height();
 }
+
 //------------------------------------------------------------------------------

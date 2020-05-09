@@ -5,12 +5,52 @@
 
 //------------------------------------------------------------------------------
 
+class TParam;
+
+//------------------------------------------------------------------------------
+
+class TCategories : public QWidget
+{
+   Q_OBJECT
+
+public:
+    TCategories( int  depth );
+    ~TCategories();
+
+    void            setCategoriesName( const std::string&  name );
+    QString         getCategoriesName();
+
+    int             getCategoriesDepth();
+
+    QList<TParam*>  m_apParamList;
+
+protected Q_SLOTS :
+    void            onBtnDec();
+    void            onBtnInc();
+
+private:
+    void  clear();
+
+    QVBoxLayout    *m_vlayout;
+
+    QPushButton    *m_ptBtnDec;
+    QPushButton    *m_ptBtnInc;
+    QLabel         *m_ptLblName;
+
+    QString         m_zName;  // categories Name
+
+    int             m_depth;
+};
+
+//------------------------------------------------------------------------------
+
+
 class TParam : public QWidget
 {
    Q_OBJECT
 
 public:
-    TParam();
+    TParam( int  depth );
     ~TParam();
 
     void      setParamName( const std::string&  name );
@@ -41,6 +81,9 @@ public:
 
     int       getParamWidth();
     int       getParamHeight();
+
+    QList<TCategories*>  m_apCategoriesList;
+
 protected Q_SLOTS :
     void      onBtnDec();
     void      onBtnInc();
@@ -48,10 +91,10 @@ protected Q_SLOTS :
 private:
     void      clear();
 
-    void      resetRow();
-    void      resetColumn();
-    void      nextRow();
-    void      nextColumn();
+//    void      resetRow();
+//    void      resetColumn();
+//    void      nextRow();
+//    void      nextColumn();
 
     QString   m_zName;
     QString   m_zPlaceholder;
@@ -73,8 +116,9 @@ private:
     QPushButton  *m_ptBtnInc;
     QLabel       *m_ptLblName;
 
-    int       m_row;
-    int       m_column;
+//    int       m_row;
+//    int       m_column;
+
 };
 
 //------------------------------------------------------------------------------

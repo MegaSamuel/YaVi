@@ -8,8 +8,10 @@ TCategory::TCategory()
 {
     m_zName.clear();
 
-    resetRow();
-    resetColumn();
+    m_depth = 0;
+
+//    resetRow();
+//    resetColumn();
 
 //    m_grid = new QGridLayout;
 //    m_grid->setAlignment( Qt::AlignLeft | Qt::AlignTop );
@@ -60,90 +62,104 @@ TCategory::~TCategory()
 
 void  TCategory::onBtnInc()
 {
-    qDebug() << m_zName << "inc button";
+    qDebug() << getCategoryName() << "inc button";
 }
 
 //------------------------------------------------------------------------------
 
-void  TCategory::getCategories( const YAML::Node&  node )
+void  TCategory::getCategories( const YAML::Node&  node, TParam  *a_pParam, int  depth )
 {
 //    unsigned  val;
     std::string  str;
 
+    TCategories  *pCategories;
+    pCategories = new TCategories( depth );
+    m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
+
+    // добавляем Categories с список класса TParam
+    a_pParam->m_apCategoriesList.append(pCategories);
+
     // имя
     str = __yaml_GetString( node, GoodsNameSection );
-    qDebug() << "name" << QString::fromStdString(str);
+    pCategories->setCategoriesName( str );
+//    qDebug() << "name" << QString::fromStdString(str);
 
     if( __yaml_IsSequence( node[ GoodsParametersSection ] ) )
     {
-        qDebug() << GoodsParametersSection << "is a sequence";
+//        qDebug() << GoodsParametersSection << "is a sequence";
 
-//        for( auto& par : node[ GoodsParametersSection ] )
-//        {
-//            get_parameters( par );
-//        }
+        for( auto& par : node[ GoodsParametersSection ] )
+        {
+            TParam  *pParam;
+            pParam = new TParam( pCategories->getCategoriesDepth() );
+
+            // добавляем Parameters в список класса TCategories
+            pCategories->m_apParamList.append(pParam);
+
+            getParameters( par, pParam, pCategories->getCategoriesDepth() );
+        }
     }
 }
 
-void  TCategory::getParameters( const YAML::Node&  node )
+void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  depth )
 {
     unsigned  val;
     std::string  str;
 
-    TParam  *pParam;
-    pParam = new TParam();
-    m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
-    m_apParamList.append(pParam);
-    nextRow();
+//    m_depth = depth;
+
+    m_vlayout->addWidget( a_pParam, 0, Qt::AlignLeft | Qt::AlignTop );
+    m_apParamList.append( a_pParam );
+//    nextRow();
 
     // имя
     str = __yaml_GetString( node, GoodsNameSection );
-    pParam->setParamName( str );
-    qDebug() << "name" << QString::fromStdString(str);
+    a_pParam->setParamName( str );
+//    qDebug() << "name" << QString::fromStdString(str);
 
     // тип
     if( __yaml_IsScalar( node[ GoodsTypeSection ] ) )
     {
         val = node[ GoodsTypeSection ].as<unsigned>();
-        pParam->setParamType( val );
+        a_pParam->setParamType( val );
 //        qDebug() << "type" << val;
     }
 
     //
     str = __yaml_GetString( node, GoodsPlaceholderSection );
-    pParam->setParamPlaceholder( str );
+    a_pParam->setParamPlaceholder( str );
 //    qDebug() << "placeholder" << QString::fromStdString(str);
 
     //
     str = __yaml_GetString( node, GoodsNewSection );
-    pParam->setParamNew( str );
+    a_pParam->setParamNew( str );
 //    qDebug() << "new" << QString::fromStdString(str);
 
     //
     str = __yaml_GetString( node, GoodsAfterSection );
-    pParam->setParamAfter( str );
+    a_pParam->setParamAfter( str );
 //    qDebug() << "after" << QString::fromStdString(str);
 
     //
     str = __yaml_GetString( node, GoodsBeforeSection );
-    pParam->setParamBefore( str );
+    a_pParam->setParamBefore( str );
 //    qDebug() << "before" << QString::fromStdString(str);
 
     //
     str = __yaml_GetString( node, GoodsUlinkSection );
-    pParam->setParamUlink( str );
+    a_pParam->setParamUlink( str );
 //    qDebug() << "ulink" << QString::fromStdString(str);
 
     //
     str = __yaml_GetString( node, GoodsUnameSection );
-    pParam->setParamUname( str );
+    a_pParam->setParamUname( str );
 //    qDebug() << "umane" << QString::fromStdString(str);
 
     // мин
     if( __yaml_IsScalar( node[ GoodsMinSection ] ) )
     {
         val = node[ GoodsMinSection ].as<unsigned>();
-        pParam->setParamMin( val );
+        a_pParam->setParamMin( val );
 //        qDebug() << "min" << val;
     }
 
@@ -151,13 +167,13 @@ void  TCategory::getParameters( const YAML::Node&  node )
     if( __yaml_IsScalar( node[ GoodsMaxSection ] ) )
     {
         val = node[ GoodsMaxSection ].as<unsigned>();
-        pParam->setParamMax( val );
+        a_pParam->setParamMax( val );
 //        qDebug() << "max" << val;
     }
 
     //
     str = __yaml_GetString( node, GoodsMultiSection );
-    pParam->setParamMulti( str );
+    a_pParam->setParamMulti( str );
 //    qDebug() << "multi" << QString::fromStdString(str);
 
     // значение
@@ -165,7 +181,7 @@ void  TCategory::getParameters( const YAML::Node&  node )
 
     if( 0 != QString::fromStdString(str).length() )
     {
-        qDebug() << "values" << QString::fromStdString(str);
+//        qDebug() << "values" << QString::fromStdString(str);
 
         if( __yaml_IsSequence( node[ GoodsCategoriesSection ] ) )
         {
@@ -173,7 +189,7 @@ void  TCategory::getParameters( const YAML::Node&  node )
 
             for( auto& cat : node[ GoodsCategoriesSection ] )
             {
-                getCategories( cat );
+                getCategories( cat, a_pParam, depth );
             }
         }
     }
@@ -193,7 +209,7 @@ const QString TCategory::getCategoryName()
 }
 
 //------------------------------------------------------------------------------
-
+/*
 void TCategory::resetRow()
 {
     m_row = 0;
@@ -214,7 +230,7 @@ void TCategory::nextColumn()
 {
     m_column += 1;
 }
-
+*/
 int TCategory::getCategoryWidth()
 {
     QSize size = m_vlayout->minimumSize();

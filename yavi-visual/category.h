@@ -17,13 +17,13 @@ public:
     TCategory();
     ~TCategory();
 
-    void          getCategories( const YAML::Node&  node );
-    void          getParameters( const YAML::Node&  node );
+    void          getCategories( const YAML::Node&  node, TParam  *a_pParam, int  depth );
+    void          getParameters( const YAML::Node&  node, TParam  *a_pParam, int  depth );
 
-    void          resetRow();
-    void          resetColumn();
-    void          nextRow();
-    void          nextColumn();
+//    void          resetRow();
+//    void          resetColumn();
+//    void          nextRow();
+//    void          nextColumn();
 
     int           getCategoryWidth();
     int           getCategoryHeight();
@@ -44,8 +44,9 @@ private:
 
     QString       m_zName;  // category Name
 
-    int           m_row;
-    int           m_column;
+//    int           m_row;
+//    int           m_column;
+    int           m_depth;
 
     QList<TParam*>  m_apParamList;
 };

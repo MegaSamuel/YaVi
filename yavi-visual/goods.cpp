@@ -171,7 +171,10 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                 {
 //                    get_parameters(par);
 
-                    pCategory->getParameters( par );
+                    TParam  *pParam;
+                    pParam = new TParam( 0 );
+
+                    pCategory->getParameters( par, pParam, 0 );
                 }
             }
 
