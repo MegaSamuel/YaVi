@@ -5,6 +5,7 @@
 
 #include <yaml-cpp/yaml.h>
 
+#include "dialog.h"
 #include "param.h"
 
 //------------------------------------------------------------------------------
@@ -42,6 +43,8 @@ private:
     int             m_depth;    // глубина вложения
 
     QList<TParam*>  m_apParamList;
+
+    TDialog        *m_ptDialog;
 };
 
 //------------------------------------------------------------------------------

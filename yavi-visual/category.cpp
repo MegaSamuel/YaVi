@@ -10,6 +10,9 @@ TCategory::TCategory()
 
     m_depth = 0;
 
+    // диалог
+    m_ptDialog = new TDialog( this );
+
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
@@ -50,6 +53,8 @@ TCategory::~TCategory()
 void  TCategory::onBtnName()
 {
     qDebug() << getCategoryName() << "button";
+
+    m_ptDialog->open();
 }
 
 void  TCategory::onBtnInc()
