@@ -131,9 +131,6 @@ class TGoods : public QWidget
 private :
         std::unique_ptr<TGoodsPrivate> 	priv__;
 
-        void         get_parameters( const YAML::Node&  node );
-        void         get_categories( const YAML::Node&  node );
-
         int          m_w, m_h;  // размеры виджета
         void         fix_widget_size( int w, int h ) noexcept; // установка размеров виджета
 };

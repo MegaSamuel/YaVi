@@ -10,39 +10,26 @@ TCategory::TCategory()
 
     m_depth = 0;
 
-//    resetRow();
-//    resetColumn();
-
-//    m_grid = new QGridLayout;
-//    m_grid->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-//    m_grid->SetMinimumSize(  );
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-//    m_vlayout->setMargin( 0 );
 
     QHBoxLayout *hlayout = new QHBoxLayout;
     hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
-    // лэйбл
-    m_ptLblName = new QLabel( this, Q_NULLPTR );
-    m_ptLblName->setText( "m_ptLblName" );
-    m_ptLblName->setMinimumWidth( 94 );
-    m_ptLblName->setAlignment( Qt::AlignCenter );
-    m_ptLblName->setFrameStyle( QFrame::Panel | QFrame::Raised );
-//    m_grid->addWidget( m_ptLblName, m_row, 0, Qt::AlignLeft );
-    hlayout->addWidget( m_ptLblName, 0, Qt::AlignLeft );
+    // кнопка с именем
+    m_ptBtnName = new QPushButton( "button", this );
+    m_ptBtnName->setFixedWidth( 93 );
+    connect( m_ptBtnName, SIGNAL(clicked()), this, SLOT(onBtnName()) );
+    hlayout->addWidget( m_ptBtnName, 0, Qt::AlignLeft );
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+", this );
+    m_ptBtnInc->setToolTip( "Добавить параметр" );
+    m_ptBtnInc->setFixedWidth( 93 );
     connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
-//    m_grid->addWidget( m_ptBtnInc, m_row, 1, Qt::AlignLeft );
     hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
 
     m_vlayout->addLayout( hlayout, 0 );
-
-    // перевод строки и колонки в grid для следующих добавлений
-//    nextRow();
-//    nextColumn();
 
     this->setLayout( m_vlayout );
 }
@@ -59,6 +46,11 @@ TCategory::~TCategory()
 }
 
 //------------------------------------------------------------------------------
+
+void  TCategory::onBtnName()
+{
+    qDebug() << getCategoryName() << "button";
+}
 
 void  TCategory::onBtnInc()
 {
@@ -106,11 +98,8 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
     unsigned  val;
     std::string  str;
 
-//    m_depth = depth;
-
     m_vlayout->addWidget( a_pParam, 0, Qt::AlignLeft | Qt::AlignTop );
     m_apParamList.append( a_pParam );
-//    nextRow();
 
     // имя
     str = __yaml_GetString( node, GoodsNameSection );
@@ -200,7 +189,12 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
 void  TCategory::setCategoryName( const std::string&  name )
 {
     m_zName = QString::fromStdString(name);
-    m_ptLblName->setText( m_zName );
+
+    m_zBtnName = QString::fromStdString(name);
+    m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );  // убираем подряд идущие пробелы на один
+    m_zBtnName.replace( " ", "\n" );                // заменяем пробелы на перевод строки
+    m_ptBtnName->setText( m_zBtnName );             // правленное имя кнопки
+    m_ptBtnName->setToolTip( m_zName );             // подсказка с оригинальным именем
 }
 
 const QString TCategory::getCategoryName()
@@ -209,28 +203,7 @@ const QString TCategory::getCategoryName()
 }
 
 //------------------------------------------------------------------------------
-/*
-void TCategory::resetRow()
-{
-    m_row = 0;
-}
 
-void TCategory::resetColumn()
-{
-    m_column = 0;
-}
-
-
-void TCategory::nextRow()
-{
-    m_row += 1;
-}
-
-void TCategory::nextColumn()
-{
-    m_column += 1;
-}
-*/
 int TCategory::getCategoryWidth()
 {
     QSize size = m_vlayout->minimumSize();

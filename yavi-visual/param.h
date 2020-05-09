@@ -27,6 +27,7 @@ public:
 protected Q_SLOTS :
     void            onBtnDec();
     void            onBtnInc();
+    void            onBtnName();
 
 private:
     void  clear();
@@ -35,9 +36,10 @@ private:
 
     QPushButton    *m_ptBtnDec;
     QPushButton    *m_ptBtnInc;
-    QLabel         *m_ptLblName;
+    QPushButton    *m_ptBtnName;
 
-    QString         m_zName;  // categories Name
+    QString         m_zName;     // categories Name
+    QString         m_zBtnName;  // текст на кнопке
 
     int             m_depth;
 };
@@ -53,72 +55,65 @@ public:
     TParam( int  depth );
     ~TParam();
 
-    void      setParamName( const std::string&  name );
-    void      setParamPlaceholder( const std::string&  name );
-    void      setParamNew( const std::string&  name );
-    void      setParamAfter( const std::string&  name );
-    void      setParamBefore( const std::string&  name );
-    void      setParamUlink( const std::string&  name );
-    void      setParamUname( const std::string&  name );
-    void      setParamMulti( const std::string&  name );
+    void           setParamName( const std::string&  name );
+    void           setParamPlaceholder( const std::string&  name );
+    void           setParamNew( const std::string&  name );
+    void           setParamAfter( const std::string&  name );
+    void           setParamBefore( const std::string&  name );
+    void           setParamUlink( const std::string&  name );
+    void           setParamUname( const std::string&  name );
+    void           setParamMulti( const std::string&  name );
 
-    void      setParamType( unsigned  val );
-    void      setParamMin( unsigned  val );
-    void      setParamMax( unsigned  val );
+    void           setParamType( unsigned  val );
+    void           setParamMin( unsigned  val );
+    void           setParamMax( unsigned  val );
 
-    QString   getParamName();
-    QString   getParamPlaceholder();
-    QString   getParamNew();
-    QString   getParamAfter();
-    QString   getParamBefore();
-    QString   getParamUlink();
-    QString   getParamUname();
-    QString   getParamMulti();
+    QString        getParamName();
+    QString        getParamPlaceholder();
+    QString        getParamNew();
+    QString        getParamAfter();
+    QString        getParamBefore();
+    QString        getParamUlink();
+    QString        getParamUname();
+    QString        getParamMulti();
 
-    unsigned  getParamType();
-    unsigned  getParamMin();
-    unsigned  getParamMax();
+    unsigned       getParamType();
+    unsigned       getParamMin();
+    unsigned       getParamMax();
 
-    int       getParamWidth();
-    int       getParamHeight();
+    int            getParamWidth();
+    int            getParamHeight();
 
     QList<TCategories*>  m_apCategoriesList;
 
 protected Q_SLOTS :
-    void      onBtnDec();
-    void      onBtnInc();
+    void           onBtnDec();
+    void           onBtnInc();
+    void           onBtnName();
 
 private:
-    void      clear();
+    void           clear();
 
-//    void      resetRow();
-//    void      resetColumn();
-//    void      nextRow();
-//    void      nextColumn();
+    QString         m_zName;
+    QString         m_zPlaceholder;
+    QString         m_zNew;
+    QString         m_zAfter;
+    QString         m_zBefore;
+    QString         m_zUlink;
+    QString         m_zUname;
+    QString         m_zMulti;
 
-    QString   m_zName;
-    QString   m_zPlaceholder;
-    QString   m_zNew;
-    QString   m_zAfter;
-    QString   m_zBefore;
-    QString   m_zUlink;
-    QString   m_zUname;
-    QString   m_zMulti;
+    unsigned        m_uType;
+    unsigned        m_uMin;
+    unsigned        m_uMax;
 
-    unsigned  m_uType;
-    unsigned  m_uMin;
-    unsigned  m_uMax;
+    QVBoxLayout    *m_vlayout;
 
-//    QGridLayout  *m_grid;
-    QVBoxLayout  *m_vlayout;
+    QPushButton    *m_ptBtnDec;
+    QPushButton    *m_ptBtnInc;
+    QPushButton    *m_ptBtnName;
 
-    QPushButton  *m_ptBtnDec;
-    QPushButton  *m_ptBtnInc;
-    QLabel       *m_ptLblName;
-
-//    int       m_row;
-//    int       m_column;
-
+    QString         m_zBtnName;  // текст на кнопке
 };
 
 //------------------------------------------------------------------------------

@@ -17,36 +17,29 @@ public:
     TCategory();
     ~TCategory();
 
-    void          getCategories( const YAML::Node&  node, TParam  *a_pParam, int  depth );
-    void          getParameters( const YAML::Node&  node, TParam  *a_pParam, int  depth );
+    void           getCategories( const YAML::Node&  node, TParam  *a_pParam, int  depth );
+    void           getParameters( const YAML::Node&  node, TParam  *a_pParam, int  depth );
 
-//    void          resetRow();
-//    void          resetColumn();
-//    void          nextRow();
-//    void          nextColumn();
+    int            getCategoryWidth();  // вернуть ширину
+    int            getCategoryHeight(); // вернуть высоту
 
-    int           getCategoryWidth();
-    int           getCategoryHeight();
-
-    void          setCategoryName( const std::string&  name );
-
-    const QString getCategoryName();
+    void           setCategoryName( const std::string&  name );
+    const QString  getCategoryName();
 
 protected Q_SLOTS :
-    void          onBtnInc();
+    void           onBtnName();
+    void           onBtnInc();
 
 private:
-//    QGridLayout  *m_grid;
-    QVBoxLayout  *m_vlayout;
+    QVBoxLayout    *m_vlayout;
 
-    QPushButton  *m_ptBtnInc;
-    QLabel       *m_ptLblName;
+    QPushButton    *m_ptBtnName;
+    QPushButton    *m_ptBtnInc;
 
-    QString       m_zName;  // category Name
+    QString         m_zName;    // category Name
+    QString         m_zBtnName; // текст на кнопке
 
-//    int           m_row;
-//    int           m_column;
-    int           m_depth;
+    int             m_depth;    // глубина вложения
 
     QList<TParam*>  m_apParamList;
 };

@@ -19,25 +19,27 @@ TCategories::TCategories( int  depth )
     for( int i = 0; i < m_depth; i++ )
     {
         QLabel *label = new QLabel( this, Q_NULLPTR );
-        label->setMinimumWidth( 94 );
+        label->setMinimumWidth( 93 );
         hlayout->addWidget( label, 0, Qt::AlignLeft );
     }
 
     // кнопка минус
     m_ptBtnDec = new QPushButton( "-", this );
+    m_ptBtnDec->setToolTip( "Удалить параметр" );
+    m_ptBtnDec->setFixedWidth( 93 );
     connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
     hlayout->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
 
-    // лэйбл
-    m_ptLblName = new QLabel( this, Q_NULLPTR );
-    m_ptLblName->setText( "m_ptLblName" );
-    m_ptLblName->setMinimumWidth( 94 );
-    m_ptLblName->setAlignment( Qt::AlignCenter );
-    m_ptLblName->setFrameStyle( QFrame::Panel | QFrame::Raised );
-    hlayout->addWidget( m_ptLblName, 0, Qt::AlignLeft );
+    // кнопка с именем
+    m_ptBtnName = new QPushButton( "button", this );
+    m_ptBtnName->setFixedWidth( 93 );
+    connect( m_ptBtnName, SIGNAL(clicked()), this, SLOT(onBtnName()) );
+    hlayout->addWidget( m_ptBtnName, 0, Qt::AlignLeft );
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+", this );
+    m_ptBtnInc->setToolTip( "Добавить параметр" );
+    m_ptBtnInc->setFixedWidth( 93 );
     connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
     hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
 
@@ -81,10 +83,20 @@ void  TCategories::onBtnInc()
     qDebug() << getCategoriesName() << "inc button";
 }
 
+void  TCategories::onBtnName()
+{
+    qDebug() << getCategoriesName() << "button";
+}
+
 void  TCategories::setCategoriesName( const std::string&  name )
 {
     m_zName = QString::fromStdString(name);
-    m_ptLblName->setText( m_zName );
+
+    m_zBtnName = QString::fromStdString(name);
+    m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );  // убираем подряд идущие пробелы на один
+    m_zBtnName.replace( " ", "\n" );                // заменяем пробелы на перевод строки
+    m_ptBtnName->setText( m_zBtnName );             // правленное имя кнопки
+    m_ptBtnName->setToolTip( m_zName );             // подсказка с оригинальным именем
 }
 
 QString  TCategories::getCategoriesName()
@@ -105,9 +117,6 @@ TParam::TParam( int  depth )
 {
     clear();
 
-//    resetRow();
-//    resetColumn();
-
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
     m_vlayout->setMargin( 0 );
@@ -119,32 +128,31 @@ TParam::TParam( int  depth )
     for( int i = 0; i < depth; i++ )
     {
         QLabel *label = new QLabel( this, Q_NULLPTR );
-        label->setMinimumWidth( 94 );
+        label->setMinimumWidth( 93 );
         hlayout->addWidget( label, 0, Qt::AlignLeft );
     }
 
     // кнопка минус
     m_ptBtnDec = new QPushButton( "-", this );
+    m_ptBtnDec->setToolTip( "Удалить параметр" );
+    m_ptBtnDec->setFixedWidth( 93 );
     connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
     hlayout->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
 
-    // лэйбл
-    m_ptLblName = new QLabel( this, Q_NULLPTR );
-    m_ptLblName->setText( "m_ptLblName" );
-    m_ptLblName->setMinimumWidth( 94 );
-    m_ptLblName->setAlignment( Qt::AlignCenter );
-    m_ptLblName->setFrameStyle( QFrame::Panel | QFrame::Raised );
-    hlayout->addWidget( m_ptLblName, 0, Qt::AlignLeft );
+    // кнопка с именем
+    m_ptBtnName = new QPushButton( "button", this );
+    m_ptBtnName->setFixedWidth( 93 );
+    connect( m_ptBtnName, SIGNAL(clicked()), this, SLOT(onBtnName()) );
+    hlayout->addWidget( m_ptBtnName, 0, Qt::AlignLeft );
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+", this );
+    m_ptBtnInc->setToolTip( "Добавить параметр" );
+    m_ptBtnInc->setFixedWidth( 93 );
     connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
     hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
 
     m_vlayout->addLayout( hlayout, 0 );
-    // перевод строки и колонки в grid для следующих добавлений
-//    nextRow();
-//    nextColumn();
 
     this->setLayout( m_vlayout );
 }
@@ -197,12 +205,22 @@ void  TParam::onBtnInc()
     qDebug() << getParamName() << "inc button";
 }
 
+void  TParam::onBtnName()
+{
+    qDebug() << getParamName() << "button";
+}
+
 //------------------------------------------------------------------------------
 
 void  TParam::setParamName( const std::string&  name )
 {
     m_zName = QString::fromStdString(name);
-    m_ptLblName->setText( m_zName );
+
+    m_zBtnName = QString::fromStdString(name);
+    m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );  // убираем подряд идущие пробелы на один
+    m_zBtnName.replace( " ", "\n" );                // заменяем пробелы на перевод строки
+    m_ptBtnName->setText( m_zBtnName );             // правленное имя кнопки
+    m_ptBtnName->setToolTip( m_zName );             // подсказка с оригинальным именем
 }
 
 void  TParam::setParamPlaceholder( const std::string&  name )
@@ -315,27 +333,7 @@ unsigned  TParam::getParamMax()
 }
 
 //------------------------------------------------------------------------------
-/*
-void TParam::resetRow()
-{
-    m_row = 0;
-}
 
-void TParam::resetColumn()
-{
-    m_column = 0;
-}
-
-void TParam::nextRow()
-{
-    m_row += 1;
-}
-
-void TParam::nextColumn()
-{
-    m_column += 1;
-}
-*/
 int TParam::getParamWidth()
 {
     QSize size = m_vlayout->minimumSize();
