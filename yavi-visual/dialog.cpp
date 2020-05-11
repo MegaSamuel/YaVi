@@ -4,50 +4,35 @@
 
 class TPrivDialog
 {
-  friend class  TDialog;
+    friend class  TDialog;
 public:
 
-    QPushButton 		*m_ptBtnConfigPath;
-    QPushButton 		*m_ptBtnBinaryPath;
-    QPushButton 		*m_ptBtnDevPath;
-    QComboBox 			*m_ptComboNetwork;
-    QCheckBox 			*m_ptCboxMilstdTest;
-    QCheckBox 			*m_ptCboxTasrv;
-    QCheckBox 			*m_ptCboxDd64Imit;
-    QCheckBox 			*m_ptCboxPci429Imit;
-    QCheckBox 			*m_ptCboxShowExchange;
-    QCheckBox 			*m_ptCboxShowRoute;
-    QDialogButtonBox 	*m_ptBtnBox;
-    QPushButton 		*m_ptBtnRestart;
-    QGridLayout 	    *layout;
+    QLineEdit    *m_ptTextName;
+    QSpinBox     *m_ptSpinType;
+    QTextEdit    *m_ptTextPlaceholder;
+    QTextEdit    *m_ptTextNew;
+    QTextEdit    *m_ptTextAfter;
+    QTextEdit    *m_ptTextBefore;
+    QTextEdit    *m_ptTextUlink;
+    QTextEdit    *m_ptTextUname;
+    QSpinBox     *m_ptSpinMin;
+    QSpinBox     *m_ptSpinMax;
+    QTextEdit    *m_ptTextMulti;
+    QComboBox    *m_ptComboList;
 
-    QSpinBox 			*m_ptRunningHours;
-    QSpinBox 			*m_ptRunningCount;
-    QSpinBox 			*m_ptUsedHours;
-    QLabel 				*m_ptInfoName;
-    QLabel 				*m_ptInfoBrief;
-    QLabel 				*m_ptInfoSerial;
+    QDialogButtonBox  *m_ptBtnBox;
 
-    int 				m_uRunningHours;
-    int 				m_uRunningCount;
-    double 				m_fRunningCoeff;
-    QString 			m_zRunningSmart;
-    QString 			m_zRunningInfo;
+    QGridLayout  *m_grid;
 
     inline TPrivDialog()
     {
-        layout = new QGridLayout;
+        m_grid = new QGridLayout;
 
-        m_ptRunningHours = Q_NULLPTR;
-        m_ptRunningCount = Q_NULLPTR;
-        m_ptUsedHours = Q_NULLPTR;
-        m_ptInfoName = Q_NULLPTR;
-        m_ptInfoBrief = Q_NULLPTR;
-        m_ptInfoSerial = Q_NULLPTR;
+        m_ptTextName = new QLineEdit;
     }
     ~TPrivDialog()
     {
-        layout->deleteLater();
+        m_grid->deleteLater();
     }
 
 };
@@ -60,8 +45,8 @@ TDialog::TDialog( QWidget *parent)
 //    QPushButton 	*btn;
 //    QComboBox       *combo;
 //    QCheckBox 		*cbox;
-    QLabel          *title;
-    int              row = 0;
+    QLabel    *title;
+    int        row = 0;
 
     // заголовок формы
     setWindowTitle("YAML Visualizer");
@@ -71,14 +56,14 @@ TDialog::TDialog( QWidget *parent)
 
     priv__ = std::unique_ptr<TPrivDialog>(new TPrivDialog);
 
-    title = new QLabel( "Developer", this );
-    QLabel 	*pCompanyName = new QLabel( "JSC «Helicopter avionics»", this );
-    priv__->layout->addWidget( title, row, 0, 1, 1 );
-    priv__->layout->addWidget( pCompanyName, row, 1, 1, 1 );
+    title = new QLabel( QString( "%1%2" ).arg("Name").arg(":"), this );
+    title->setMinimumWidth( 93 );
+    priv__->m_grid->addWidget( title, row, 0, 1, 1 );
+    priv__->m_grid->addWidget( priv__->m_ptTextName, row, 1, 1, 1 );
     row++;
 
     // создаем диалоговые кнопки
-    QDialogButtonBox  *box = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Reset | QDialogButtonBox::Cancel, this );
+    QDialogButtonBox  *box = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this );
 
     connect( box, SIGNAL(accepted()), this, SIGNAL(accepted()) );
     connect( box, SIGNAL(rejected()), this, SIGNAL(rejected()) );
@@ -88,16 +73,23 @@ TDialog::TDialog( QWidget *parent)
 
     // добавляем диалоговые кнопки в окно
     priv__->m_ptBtnBox = box;
-    priv__->layout->addWidget( box, row, 0, 1, 2 );
+    priv__->m_grid->addWidget( box, row, 0, 1, 2 );
     row++;
 
-    priv__->layout->setSizeConstraint( QLayout::SetFixedSize );
-    setLayout( priv__->layout );
+//    priv__->m_grid->setSizeConstraint( QLayout::SetFixedSize );
+    setLayout( priv__->m_grid );
 }
 
 TDialog::~TDialog()
 {
 
+}
+
+//------------------------------------------------------------------------------
+
+void  TDialog::setName( const QString& name )
+{
+    priv__->m_ptTextName->setText( name );
 }
 
 //------------------------------------------------------------------------------
@@ -112,17 +104,17 @@ void TDialog::onReset( QAbstractButton*  btn )
 
     if( QDialogButtonBox::AcceptRole == priv__->m_ptBtnBox->buttonRole( btn ) )
     {
-        qDebug() << "dialog accept";
+        qDebug() << "dialog Ok" << priv__->m_ptTextName->text();
     }
 
     if( QDialogButtonBox::ResetRole == priv__->m_ptBtnBox->buttonRole( btn ) )
     {
-        qDebug() << "dialog reset";
+        qDebug() << "dialog Reset";
     }
 
     if( QDialogButtonBox::RejectRole == priv__->m_ptBtnBox->buttonRole( btn ) )
     {
-        qDebug() << "dialog reject";
+        qDebug() << "dialog Cancel";
     }
 }
 

@@ -54,6 +54,8 @@ void  TCategory::onBtnName()
 {
     qDebug() << getCategoryName() << "button";
 
+    m_ptDialog->setName( getCategoryName() );
+
     m_ptDialog->open();
 }
 

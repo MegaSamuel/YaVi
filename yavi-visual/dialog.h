@@ -19,6 +19,7 @@ public :
     TDialog( QWidget *parent = Q_NULLPTR );
     ~TDialog();
 
+    void  setName( const QString&  name );
 
 protected Q_SLOTS:
     void 	onReset( QAbstractButton *btn );
