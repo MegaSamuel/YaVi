@@ -11,7 +11,10 @@ TCategory::TCategory()
     m_depth = 0;
 
     // диалог
-    m_ptDialog = new TDialog( this );
+    m_ptDialog = new TDialog( false, "Category", this );
+
+    // ловим сигнал от диалога с данными
+    connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
 
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
@@ -54,7 +57,7 @@ void  TCategory::onBtnName()
 {
     qDebug() << getCategoryName() << "button";
 
-    m_ptDialog->setName( getCategoryName() );
+    m_ptDialog->setDlgName( getCategoryName() );
 
     m_ptDialog->open();
 }
@@ -62,6 +65,13 @@ void  TCategory::onBtnName()
 void  TCategory::onBtnInc()
 {
     qDebug() << getCategoryName() << "inc button";
+}
+
+void  TCategory::onSendValues( TValues& a_tValues )
+{
+    m_tValues = a_tValues;
+
+    setCategoryName( m_tValues.m_zName.toStdString() );
 }
 
 //------------------------------------------------------------------------------
@@ -174,6 +184,8 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
 
     // значение
     str = __yaml_GetString( node, GoodsValuesSection );
+    QStringList list = QString::fromStdString(str).split( '\n', QString::SkipEmptyParts );
+    a_pParam->setParamList( list );
 
     if( 0 != QString::fromStdString(str).length() )
     {

@@ -3,6 +3,9 @@
 
 #include <QtWidgets>
 
+#include "dialog.h"
+#include "values.h"
+
 //------------------------------------------------------------------------------
 
 class TParam;
@@ -17,31 +20,36 @@ public:
     TCategories( int  depth );
     ~TCategories();
 
-    void            setCategoriesName( const std::string&  name );
-    QString         getCategoriesName();
+    void           setCategoriesName( const std::string&  name );
+    QString        getCategoriesName();
 
-    int             getCategoriesDepth();
+    int            getCategoriesDepth();
 
-    QList<TParam*>  m_apParamList;
+    QList<TParam*> m_apParamList;
 
 protected Q_SLOTS :
-    void            onBtnDec();
-    void            onBtnInc();
-    void            onBtnName();
+    void           onBtnDec();
+    void           onBtnInc();
+    void           onBtnName();
+    void           onSendValues( TValues& );
 
 private:
-    void  clear();
+    void           clear();
 
-    QVBoxLayout    *m_vlayout;
+    QVBoxLayout   *m_vlayout;
 
-    QPushButton    *m_ptBtnDec;
-    QPushButton    *m_ptBtnInc;
-    QPushButton    *m_ptBtnName;
+    QPushButton   *m_ptBtnDec;
+    QPushButton   *m_ptBtnInc;
+    QPushButton   *m_ptBtnName;
 
-    QString         m_zName;     // categories Name
-    QString         m_zBtnName;  // текст на кнопке
+    QString        m_zName;     // categories Name
+    QString        m_zBtnName;  // текст на кнопке
 
-    int             m_depth;
+    int            m_depth;
+
+    TDialog       *m_ptDialog;
+
+    TValues        m_tValues;
 };
 
 //------------------------------------------------------------------------------
@@ -68,6 +76,8 @@ public:
     void           setParamMin( unsigned  val );
     void           setParamMax( unsigned  val );
 
+    void           setParamList( QStringList  list );
+
     QString        getParamName();
     QString        getParamPlaceholder();
     QString        getParamNew();
@@ -81,6 +91,8 @@ public:
     unsigned       getParamMin();
     unsigned       getParamMax();
 
+    QStringList    getParamList();
+
     int            getParamWidth();
     int            getParamHeight();
 
@@ -90,30 +102,37 @@ protected Q_SLOTS :
     void           onBtnDec();
     void           onBtnInc();
     void           onBtnName();
+    void           onSendValues( TValues& );
 
 private:
     void           clear();
 
-    QString         m_zName;
-    QString         m_zPlaceholder;
-    QString         m_zNew;
-    QString         m_zAfter;
-    QString         m_zBefore;
-    QString         m_zUlink;
-    QString         m_zUname;
-    QString         m_zMulti;
+    QString        m_zName;
+    QString        m_zPlaceholder;
+    QString        m_zNew;
+    QString        m_zAfter;
+    QString        m_zBefore;
+    QString        m_zUlink;
+    QString        m_zUname;
+    QString        m_zMulti;
 
-    unsigned        m_uType;
-    unsigned        m_uMin;
-    unsigned        m_uMax;
+    unsigned       m_uType;
+    unsigned       m_uMin;
+    unsigned       m_uMax;
 
-    QVBoxLayout    *m_vlayout;
+    QStringList    m_vList;
 
-    QPushButton    *m_ptBtnDec;
-    QPushButton    *m_ptBtnInc;
-    QPushButton    *m_ptBtnName;
+    QVBoxLayout   *m_vlayout;
 
-    QString         m_zBtnName;  // текст на кнопке
+    QPushButton   *m_ptBtnDec;
+    QPushButton   *m_ptBtnInc;
+    QPushButton   *m_ptBtnName;
+
+    QString        m_zBtnName;  // текст на кнопке
+
+    TDialog       *m_ptDialog;
+
+    TValues        m_tValues;
 };
 
 //------------------------------------------------------------------------------

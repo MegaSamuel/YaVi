@@ -140,6 +140,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
 //        qDebug() << GoodsCategorySection << "is a sequence";
 
+        // по заданию в ини-файле только одна Category, но на всякий случай ищем все
         for( auto& cat : config[ GoodsCategorySection ] )
         {
             TCategory  *pCategory;

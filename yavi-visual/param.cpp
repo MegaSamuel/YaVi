@@ -6,6 +6,12 @@ TCategories::TCategories( int  depth )
 {
     clear();
 
+    // диалог
+    m_ptDialog = new TDialog( false, "Categories",  this );
+
+    // ловим сигнал от диалога с данными
+    connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
+
     m_depth = depth + 1;
 
     m_vlayout = new QVBoxLayout;
@@ -86,6 +92,17 @@ void  TCategories::onBtnInc()
 void  TCategories::onBtnName()
 {
     qDebug() << getCategoriesName() << "button";
+
+    m_ptDialog->setDlgName( getCategoriesName() );
+
+    m_ptDialog->open();
+}
+
+void  TCategories::onSendValues( TValues& a_tValues )
+{
+    m_tValues = a_tValues;
+
+    setCategoriesName( m_tValues.m_zName.toStdString() );
 }
 
 void  TCategories::setCategoriesName( const std::string&  name )
@@ -116,6 +133,12 @@ int  TCategories::getCategoriesDepth()
 TParam::TParam( int  depth )
 {
     clear();
+
+    // диалог
+    m_ptDialog = new TDialog( true, "Parameters",  this );
+
+    // ловим сигнал от диалога с данными
+    connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
 
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
@@ -190,6 +213,8 @@ void  TParam::clear()
     m_uMin = 0;
     m_uMax = 0;
 
+    m_vList.clear();
+
     m_apCategoriesList.clear();
 }
 
@@ -208,6 +233,30 @@ void  TParam::onBtnInc()
 void  TParam::onBtnName()
 {
     qDebug() << getParamName() << "button";
+
+    m_ptDialog->setDlgName( getParamName() );
+    m_ptDialog->setDlgPlaceholder( getParamPlaceholder() );
+    m_ptDialog->setDlgNew( getParamNew() );
+    m_ptDialog->setDlgAfter( getParamAfter() );
+    m_ptDialog->setDlgBefore( getParamBefore() );
+    m_ptDialog->setDlgUlink( getParamUlink() );
+    m_ptDialog->setDlgUname( getParamUname() );
+    m_ptDialog->setDlgMulti( getParamMulti() );
+
+    m_ptDialog->setDlgType( getParamType() );
+    m_ptDialog->setDlgMin( getParamMin() );
+    m_ptDialog->setDlgMax( getParamMax() );
+
+    m_ptDialog->setDlgCombo( getParamList() );
+
+    m_ptDialog->open();
+}
+
+void  TParam::onSendValues( TValues& a_tValues )
+{
+    m_tValues = a_tValues;
+
+    setParamName( m_tValues.m_zName.toStdString() );
 }
 
 //------------------------------------------------------------------------------
@@ -274,6 +323,12 @@ void  TParam::setParamMax( unsigned  val )
     m_uMax = val;
 }
 
+
+void  TParam::setParamList( QStringList  list )
+{
+    m_vList = list;
+}
+
 //------------------------------------------------------------------------------
 
 QString  TParam::getParamName()
@@ -330,6 +385,12 @@ unsigned  TParam::getParamMin()
 unsigned  TParam::getParamMax()
 {
     return m_uMax;
+}
+
+
+QStringList  TParam::getParamList()
+{
+    return m_vList;
 }
 
 //------------------------------------------------------------------------------

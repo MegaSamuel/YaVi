@@ -31,6 +31,7 @@ public:
 protected Q_SLOTS :
     void           onBtnName();
     void           onBtnInc();
+    void           onSendValues( TValues& );
 
 private:
     QVBoxLayout    *m_vlayout;

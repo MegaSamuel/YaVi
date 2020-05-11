@@ -14,23 +14,16 @@ TTable::TTable()
     m_grid = new QGridLayout;
     m_grid->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
-    // кнопка минус
-    m_ptBtnDec = new QPushButton( "-", this );
-    connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
-    m_grid->addWidget( m_ptBtnDec, m_row, 0, Qt::AlignLeft );
-
-    // лэйбл
-    m_ptLblName = new QLabel( this, Q_NULLPTR );
-    m_ptLblName->setText( "m_ptLblName" );
-    m_ptLblName->setMinimumWidth( 94 );
-    m_ptLblName->setAlignment( Qt::AlignCenter );
-    m_ptLblName->setFrameStyle( QFrame::Panel | QFrame::Raised );
-    m_grid->addWidget( m_ptLblName, m_row, 1, Qt::AlignLeft );
+    // кнопка с именем
+    m_ptBtnName = new QPushButton( "button", this );
+    m_ptBtnName->setFixedWidth( 93 );
+    connect( m_ptBtnName, SIGNAL(clicked()), this, SLOT(onBtnName()) );
+    m_grid->addWidget( m_ptBtnName, m_row, 0, Qt::AlignLeft );
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+", this );
     connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
-    m_grid->addWidget( m_ptBtnInc, m_row, 2, Qt::AlignLeft );
+    m_grid->addWidget( m_ptBtnInc, m_row, 1, Qt::AlignLeft );
 
     // перевод строки и колонки в grid для следующих добавлений
     nextRow();
@@ -52,15 +45,17 @@ TTable::~TTable()
 
 //------------------------------------------------------------------------------
 
-void  TTable::onBtnDec()
+void  TTable::onBtnName()
 {
-    qDebug() << "Dec button" << getTableId() << getTableName();
+    qDebug() << getTableName() << "button";
 }
 
 void  TTable::onBtnInc()
 {
     qDebug() << "Inc button" << getTableId() << getTableName();
 }
+
+//------------------------------------------------------------------------------
 
 void  TTable::setTableId( const std::string&  name )
 {
@@ -75,7 +70,12 @@ const QString TTable::getTableId()
 void  TTable::setTableName( const std::string&  name )
 {
     m_zName = QString::fromStdString(name);
-    m_ptLblName->setText( m_zName );
+
+    m_zBtnName = QString::fromStdString(name);
+    m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );  // убираем подряд идущие пробелы на один
+    m_zBtnName.replace( " ", "\n" );                // заменяем пробелы на перевод строки
+    m_ptBtnName->setText( m_zBtnName );             // правленное имя кнопки
+    m_ptBtnName->setToolTip( m_zName );             // подсказка с оригинальным именем
 }
 
 const QString TTable::getTableName()
@@ -109,7 +109,7 @@ void TTable::setTableRow( QStringList& list )
     {
         QLabel  *label = new QLabel( this, Q_NULLPTR );
         label->setText( it );
-        label->setMinimumWidth( 94 );
+        label->setMinimumWidth( 93 );
         label->setAlignment( Qt::AlignCenter );
         label->setFrameStyle( QFrame::Panel | QFrame::Raised );
         m_grid->addWidget( label, m_row, m_column + column, Qt::AlignLeft );
@@ -128,7 +128,7 @@ void TTable::setTableColumn( QStringList& list )
     {
         QLabel  *label = new QLabel( this, Q_NULLPTR );
         label->setText( it );
-        label->setMinimumWidth( 94 );
+        label->setMinimumWidth( 93 );
         label->setAlignment( Qt::AlignCenter );
         label->setFrameStyle( QFrame::Panel | QFrame::Raised );
         m_grid->addWidget( label, m_row + row, m_column, Qt::AlignLeft );
