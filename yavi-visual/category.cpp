@@ -100,7 +100,7 @@ void  TCategory::getCategories( const YAML::Node&  node, TParam  *a_pParam, int 
         for( auto& par : node[ GoodsParametersSection ] )
         {
             TParam  *pParam;
-            pParam = new TParam( pCategories->getCategoriesDepth() );
+            pParam = new TParam( pCategories->getCategoriesDepth() + 1 );
 
             // добавляем Parameters в список класса TCategories
             pCategories->m_apParamList.append(pParam);
