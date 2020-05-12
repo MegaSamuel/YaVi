@@ -1,4 +1,5 @@
 #include "param.h"
+#include "category.h"
 
 //------------------------------------------------------------------------------
 
@@ -358,6 +359,7 @@ void  TParam::ParamDelete()
     // удаляем себя из списка родителя
     if( Q_NULLPTR != m_pMentor )
     {
+        // родитель
         for( int i = 0; i < m_pMentor->m_apParamList.count(); i++ )
         {
             if( this == m_pMentor->m_apParamList.at(i) )
@@ -367,7 +369,20 @@ void  TParam::ParamDelete()
                 m_pMentor->m_apParamList.removeAt(i);
             }
         }
-    }
+    }/*
+    else
+    {
+        // прародитель
+        for( int i = 0; i < TCategory::getMasterPointer()->m_apParamList.count(); i++ )
+        {
+            if( this == TCategory::getMasterPointer()->m_apParamList.at(i) )
+            {
+                qDebug() << TCategory::getMasterPointer()->m_apParamList.at(i)->getParamName() << "obsolete";
+
+                TCategory::getMasterPointer()->m_apParamList.removeAt(i);
+            }
+        }
+    }*/
 }
 
 //------------------------------------------------------------------------------

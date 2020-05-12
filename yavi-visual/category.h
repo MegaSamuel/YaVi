@@ -28,6 +28,8 @@ public:
     void           setCategoryName( const std::string&  name );
     const QString  getCategoryName();
 
+    QList<TParam*>  m_apParamList;
+
 protected Q_SLOTS :
     void           onBtnName();
     void           onBtnInc();
@@ -43,8 +45,6 @@ private:
     QString         m_zBtnName; // текст на кнопке
 
     int             m_depth;    // глубина вложения
-
-    QList<TParam*>  m_apParamList;
 
     TDialog        *m_ptDialog;
 

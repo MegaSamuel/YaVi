@@ -106,6 +106,9 @@ class TGoods : public QWidget
 
         QVBoxLayout  *m_vlayout;
 
+        TCategory    *m_pCategory;
+        TCategory    *getMasterPointer();
+
 private :
         std::unique_ptr<TGoodsPrivate> 	priv__;
 
