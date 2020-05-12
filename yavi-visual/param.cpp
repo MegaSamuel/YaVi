@@ -56,6 +56,7 @@ TCategories::TCategories( int  depth )
 
 TCategories::~TCategories()
 {
+    /*
     QLayoutItem *child;
 
     while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
@@ -68,12 +69,16 @@ TCategories::~TCategories()
     {
         it->~TParam();
     }
+    */
 
-    clear();
+//    clear();
 }
 
 void TCategories::clear()
 {
+    m_zName.clear();
+    m_zBtnName.clear();
+
     m_apParamList.clear();
 }
 
@@ -82,6 +87,9 @@ void TCategories::clear()
 void  TCategories::onBtnDec()
 {
     qDebug() << getCategoriesName() << "dec button";
+
+    // шлем сигнал об удалении
+    Q_EMIT DelCategoriesObj();
 }
 
 void  TCategories::onBtnInc()
@@ -104,6 +112,51 @@ void  TCategories::onSendValues( TValues& a_tValues )
 
     setCategoriesName( m_tValues.m_zName.toStdString() );
 }
+
+void  TCategories::onDelParamObj( TParam  *pParam )
+{
+    pParam->ParamDelete();
+}
+
+//------------------------------------------------------------------------------
+
+void  TCategories::CategoriesDelete()
+{
+    QLayoutItem *child;
+
+    // уничтожаем диалог
+    m_ptDialog->~TDialog();
+
+    qDebug() << getCategoriesName() << "del dialog";
+
+    // для всех вложенных Parameters вызываем очистку
+    for( auto& it : m_apParamList )
+    {
+        qDebug() << getCategoriesName() << "del param" << it->getParamName();
+
+        it->ParamDelete();
+
+//        it->~TParam();
+    }
+
+    qDebug() << getCategoriesName() << "del param";
+
+    // уничтожаем виджеты
+    while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
+    {
+        delete child->widget();
+        delete child;
+    }
+
+    qDebug() << getCategoriesName() << "del widgets";
+
+    // уничтожаем layout
+    m_vlayout->deleteLater();
+
+    qDebug() << getCategoriesName() << "del layout";
+}
+
+//------------------------------------------------------------------------------
 
 void  TCategories::setCategoriesName( const std::string&  name )
 {
@@ -182,6 +235,7 @@ TParam::TParam( int  depth )
 
 TParam::~TParam()
 {
+    /*
     QLayoutItem *child;
 
     while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
@@ -194,8 +248,9 @@ TParam::~TParam()
     {
         it->~TCategories();
     }
+    */
 
-    clear();
+//    clear();
 }
 
 void  TParam::clear()
@@ -223,6 +278,9 @@ void  TParam::clear()
 void  TParam::onBtnDec()
 {
     qDebug() << getParamName() << "dec button";
+
+    // шлем сигнал об удалении
+    Q_EMIT DelParamObj();
 }
 
 void  TParam::onBtnInc()
@@ -257,6 +315,39 @@ void  TParam::onSendValues( TValues& a_tValues )
     m_tValues = a_tValues;
 
     setParamName( m_tValues.m_zName.toStdString() );
+}
+
+void  TParam::onDelCategoriesObj( TCategories *pCategories )
+{
+    pCategories->CategoriesDelete();
+}
+
+//------------------------------------------------------------------------------
+
+void  TParam::ParamDelete()
+{
+    QLayoutItem *child;
+
+    // уничтожаем диалог
+    m_ptDialog->~TDialog();
+
+    // для всех вложенных Categories вызываем очистку
+    for( auto& it : m_apCategoriesList )
+    {
+        it->CategoriesDelete();
+
+//        it->~TCategories();
+    }
+
+    // уничтожаем виджеты
+    while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
+    {
+        delete child->widget();
+        delete child;
+    }
+
+    // уничтожаем layout
+    m_vlayout->deleteLater();
 }
 
 //------------------------------------------------------------------------------
