@@ -6,15 +6,15 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 {
     clear();
 
+    obsolete = false;
+
     // диалог
     m_ptDialog = new TDialog( false, "Categories",  this );
 
     // ловим сигнал от диалога с данными
     connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
 
-    // ловим сигнал об удалении
     m_pMentor = pMentor;
-    connect( m_pMentor, SIGNAL(DelParamObj(TParam&)), this, SLOT(onDelParamObj(TParam&)) );
 
     m_depth = depth + 1;
 
@@ -92,8 +92,7 @@ void  TCategories::onBtnDec()
 {
     qDebug() << getCategoriesName() << "dec button";
 
-    // шлем сигнал об удалении
-    Q_EMIT DelCategoriesObj( m_pMentor );
+    CategoriesDelete();
 }
 
 void  TCategories::onBtnInc()
@@ -117,33 +116,30 @@ void  TCategories::onSendValues( TValues& a_tValues )
     setCategoriesName( m_tValues.m_zName.toStdString() );
 }
 
-void  TCategories::onDelParamObj( TParam  *pMentor )
-{
-    pMentor->ParamDelete();
-}
-
 //------------------------------------------------------------------------------
 
 void  TCategories::CategoriesDelete()
 {
     QLayoutItem *child;
 
+    obsolete = true;
+
     // уничтожаем диалог
     m_ptDialog->~TDialog();
 
-    qDebug() << getCategoriesName() << "del dialog";
+//    qDebug() << getCategoriesName() << "del dialog";
 
     // для всех вложенных Parameters вызываем очистку
     for( auto& it : m_apParamList )
     {
-        qDebug() << getCategoriesName() << "del param" << it->getParamName();
+//        qDebug() << getCategoriesName() << "del param" << it->getParamName();
 
         it->ParamDelete();
 
 //        it->~TParam();
     }
 
-    qDebug() << getCategoriesName() << "del param";
+//    qDebug() << getCategoriesName() << "del param";
 
     // уничтожаем виджеты
     while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
@@ -152,12 +148,23 @@ void  TCategories::CategoriesDelete()
         delete child;
     }
 
-    qDebug() << getCategoriesName() << "del widgets";
+//    qDebug() << getCategoriesName() << "del widgets";
 
     // уничтожаем layout
     m_vlayout->deleteLater();
 
-    qDebug() << getCategoriesName() << "del layout";
+//    qDebug() << getCategoriesName() << "del layout";
+
+    // удаляем себя из списка родителя
+    for( int i = 0; i < m_pMentor->m_apCategoriesList.count(); i++ )
+    {
+        if( this == m_pMentor->m_apCategoriesList.at(i) )
+        {
+            qDebug() << m_pMentor->m_apCategoriesList.at(i)->getCategoriesName() << "obsolete";
+
+            m_pMentor->m_apCategoriesList.removeAt(i);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -191,15 +198,15 @@ TParam::TParam( TCategories  *pMentor, int  depth )
 {
     clear();
 
+    obsolete = false;
+
     // диалог
     m_ptDialog = new TDialog( true, "Parameters",  this );
 
     // ловим сигнал от диалога с данными
     connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
 
-    // ловим сигнал об удалении
     m_pMentor = pMentor;
-    connect( m_pMentor, SIGNAL(DelCategoriesObj(TCategories&)), this, SLOT(onDelCategoriesObj(TCategories&)) );
 
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
@@ -287,8 +294,7 @@ void  TParam::onBtnDec()
 {
     qDebug() << getParamName() << "dec button";
 
-    // шлем сигнал об удалении
-    Q_EMIT DelParamObj( m_pMentor );
+    ParamDelete();
 }
 
 void  TParam::onBtnInc()
@@ -325,16 +331,13 @@ void  TParam::onSendValues( TValues& a_tValues )
     setParamName( m_tValues.m_zName.toStdString() );
 }
 
-void  TParam::onDelCategoriesObj( TCategories  *pMentor )
-{
-    pMentor->CategoriesDelete();
-}
-
 //------------------------------------------------------------------------------
 
 void  TParam::ParamDelete()
 {
     QLayoutItem *child;
+
+    obsolete = true;
 
     // уничтожаем диалог
     m_ptDialog->~TDialog();
@@ -356,6 +359,17 @@ void  TParam::ParamDelete()
 
     // уничтожаем layout
     m_vlayout->deleteLater();
+
+    // удаляем себя из списка родителя
+    for( int i = 0; i < m_pMentor->m_apParamList.count(); i++ )
+    {
+        if( this == m_pMentor->m_apParamList.at(i) )
+        {
+            qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete";
+
+            m_pMentor->m_apParamList.removeAt(i);
+        }
+    }
 }
 
 //------------------------------------------------------------------------------

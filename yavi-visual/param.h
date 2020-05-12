@@ -25,19 +25,16 @@ public:
 
     int            getCategoriesDepth();
 
+    bool           obsolete;
     void           CategoriesDelete();
 
     QList<TParam*> m_apParamList;
-
-Q_SIGNALS:
-    void           DelCategoriesObj( TParam* );
 
 protected Q_SLOTS :
     void           onBtnDec();
     void           onBtnInc();
     void           onBtnName();
     void           onSendValues( TValues& );
-    void           onDelParamObj( TParam* );
 
 private:
     void           clear();
@@ -104,19 +101,16 @@ public:
     int            getParamWidth();
     int            getParamHeight();
 
+    bool           obsolete;
     void           ParamDelete();
 
     QList<TCategories*>  m_apCategoriesList;
-
-Q_SIGNALS:
-    void           DelParamObj( TCategories* );
 
 protected Q_SLOTS :
     void           onBtnDec();
     void           onBtnInc();
     void           onBtnName();
     void           onSendValues( TValues& );
-    void           onDelCategoriesObj( TCategories* );
 
 private:
     void           clear();
