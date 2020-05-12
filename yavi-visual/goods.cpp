@@ -158,7 +158,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                 for( auto& par : cat[ GoodsParametersSection ] )
                 {
                     TParam  *pParam;
-                    pParam = new TParam( 0 );
+                    pParam = new TParam( Q_NULLPTR, 0 );
 
                     pCategory->getParameters( par, pParam, 0 );
                 }

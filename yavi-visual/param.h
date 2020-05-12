@@ -17,7 +17,7 @@ class TCategories : public QWidget
    Q_OBJECT
 
 public:
-    TCategories( int  depth );
+    TCategories( TParam *pMentor, int  depth );
     ~TCategories();
 
     void           setCategoriesName( const std::string&  name );
@@ -30,7 +30,7 @@ public:
     QList<TParam*> m_apParamList;
 
 Q_SIGNALS:
-    void           DelCategoriesObj();
+    void           DelCategoriesObj( TParam* );
 
 protected Q_SLOTS :
     void           onBtnDec();
@@ -56,6 +56,8 @@ private:
     TDialog       *m_ptDialog;
 
     TValues        m_tValues;
+
+    TParam        *m_pMentor;
 };
 
 //------------------------------------------------------------------------------
@@ -66,7 +68,7 @@ class TParam : public QWidget
    Q_OBJECT
 
 public:
-    TParam( int  depth );
+    TParam( TCategories *pMentor, int  depth );
     ~TParam();
 
     void           setParamName( const std::string&  name );
@@ -107,7 +109,7 @@ public:
     QList<TCategories*>  m_apCategoriesList;
 
 Q_SIGNALS:
-    void           DelParamObj();
+    void           DelParamObj( TCategories* );
 
 protected Q_SLOTS :
     void           onBtnDec();
@@ -145,6 +147,8 @@ private:
     TDialog       *m_ptDialog;
 
     TValues        m_tValues;
+
+    TCategories   *m_pMentor;
 };
 
 //------------------------------------------------------------------------------

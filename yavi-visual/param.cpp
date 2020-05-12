@@ -2,7 +2,7 @@
 
 //------------------------------------------------------------------------------
 
-TCategories::TCategories( int  depth )
+TCategories::TCategories( TParam  *pMentor, int  depth )
 {
     clear();
 
@@ -10,7 +10,11 @@ TCategories::TCategories( int  depth )
     m_ptDialog = new TDialog( false, "Categories",  this );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
+    connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
+
+    // ловим сигнал об удалении
+    m_pMentor = pMentor;
+    connect( m_pMentor, SIGNAL(DelParamObj(TParam&)), this, SLOT(onDelParamObj(TParam&)) );
 
     m_depth = depth + 1;
 
@@ -89,7 +93,7 @@ void  TCategories::onBtnDec()
     qDebug() << getCategoriesName() << "dec button";
 
     // шлем сигнал об удалении
-    Q_EMIT DelCategoriesObj();
+    Q_EMIT DelCategoriesObj( m_pMentor );
 }
 
 void  TCategories::onBtnInc()
@@ -113,9 +117,9 @@ void  TCategories::onSendValues( TValues& a_tValues )
     setCategoriesName( m_tValues.m_zName.toStdString() );
 }
 
-void  TCategories::onDelParamObj( TParam  *pParam )
+void  TCategories::onDelParamObj( TParam  *pMentor )
 {
-    pParam->ParamDelete();
+    pMentor->ParamDelete();
 }
 
 //------------------------------------------------------------------------------
@@ -183,7 +187,7 @@ int  TCategories::getCategoriesDepth()
 
 //------------------------------------------------------------------------------
 
-TParam::TParam( int  depth )
+TParam::TParam( TCategories  *pMentor, int  depth )
 {
     clear();
 
@@ -191,7 +195,11 @@ TParam::TParam( int  depth )
     m_ptDialog = new TDialog( true, "Parameters",  this );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
+    connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
+
+    // ловим сигнал об удалении
+    m_pMentor = pMentor;
+    connect( m_pMentor, SIGNAL(DelCategoriesObj(TCategories&)), this, SLOT(onDelCategoriesObj(TCategories&)) );
 
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
@@ -280,7 +288,7 @@ void  TParam::onBtnDec()
     qDebug() << getParamName() << "dec button";
 
     // шлем сигнал об удалении
-    Q_EMIT DelParamObj();
+    Q_EMIT DelParamObj( m_pMentor );
 }
 
 void  TParam::onBtnInc()
@@ -317,9 +325,9 @@ void  TParam::onSendValues( TValues& a_tValues )
     setParamName( m_tValues.m_zName.toStdString() );
 }
 
-void  TParam::onDelCategoriesObj( TCategories *pCategories )
+void  TParam::onDelCategoriesObj( TCategories  *pMentor )
 {
-    pCategories->CategoriesDelete();
+    pMentor->CategoriesDelete();
 }
 
 //------------------------------------------------------------------------------

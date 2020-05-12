@@ -82,7 +82,7 @@ void  TCategory::getCategories( const YAML::Node&  node, TParam  *a_pParam, int 
     std::string  str;
 
     TCategories  *pCategories;
-    pCategories = new TCategories( depth );
+    pCategories = new TCategories( a_pParam, depth );
     m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
 
     // добавляем Categories с список класса TParam
@@ -100,7 +100,7 @@ void  TCategory::getCategories( const YAML::Node&  node, TParam  *a_pParam, int 
         for( auto& par : node[ GoodsParametersSection ] )
         {
             TParam  *pParam;
-            pParam = new TParam( pCategories->getCategoriesDepth() + 1 );
+            pParam = new TParam( pCategories, pCategories->getCategoriesDepth() + 1 );
 
             // добавляем Parameters в список класса TCategories
             pCategories->m_apParamList.append(pParam);
