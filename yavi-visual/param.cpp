@@ -6,8 +6,6 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 {
     clear();
 
-    obsolete = false;
-
     // диалог
     m_ptDialog = new TDialog( false, "Categories",  this );
 
@@ -122,8 +120,6 @@ void  TCategories::CategoriesDelete()
 {
     QLayoutItem *child;
 
-    obsolete = true;
-
     // уничтожаем диалог
     m_ptDialog->~TDialog();
 
@@ -136,7 +132,7 @@ void  TCategories::CategoriesDelete()
 
         it->ParamDelete();
 
-//        it->~TParam();
+        it->~TParam();
     }
 
 //    qDebug() << getCategoriesName() << "del param";
@@ -156,13 +152,16 @@ void  TCategories::CategoriesDelete()
 //    qDebug() << getCategoriesName() << "del layout";
 
     // удаляем себя из списка родителя
-    for( int i = 0; i < m_pMentor->m_apCategoriesList.count(); i++ )
+    if( Q_NULLPTR != m_pMentor )
     {
-        if( this == m_pMentor->m_apCategoriesList.at(i) )
+        for( int i = 0; i < m_pMentor->m_apCategoriesList.count(); i++ )
         {
-            qDebug() << m_pMentor->m_apCategoriesList.at(i)->getCategoriesName() << "obsolete";
+            if( this == m_pMentor->m_apCategoriesList.at(i) )
+            {
+                qDebug() << m_pMentor->m_apCategoriesList.at(i)->getCategoriesName() << "obsolete";
 
-            m_pMentor->m_apCategoriesList.removeAt(i);
+                m_pMentor->m_apCategoriesList.removeAt(i);
+            }
         }
     }
 }
@@ -197,8 +196,6 @@ int  TCategories::getCategoriesDepth()
 TParam::TParam( TCategories  *pMentor, int  depth )
 {
     clear();
-
-    obsolete = false;
 
     // диалог
     m_ptDialog = new TDialog( true, "Parameters",  this );
@@ -337,8 +334,6 @@ void  TParam::ParamDelete()
 {
     QLayoutItem *child;
 
-    obsolete = true;
-
     // уничтожаем диалог
     m_ptDialog->~TDialog();
 
@@ -347,7 +342,7 @@ void  TParam::ParamDelete()
     {
         it->CategoriesDelete();
 
-//        it->~TCategories();
+        it->~TCategories();
     }
 
     // уничтожаем виджеты
@@ -361,13 +356,16 @@ void  TParam::ParamDelete()
     m_vlayout->deleteLater();
 
     // удаляем себя из списка родителя
-    for( int i = 0; i < m_pMentor->m_apParamList.count(); i++ )
+    if( Q_NULLPTR != m_pMentor )
     {
-        if( this == m_pMentor->m_apParamList.at(i) )
+        for( int i = 0; i < m_pMentor->m_apParamList.count(); i++ )
         {
-            qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete";
+            if( this == m_pMentor->m_apParamList.at(i) )
+            {
+                qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete";
 
-            m_pMentor->m_apParamList.removeAt(i);
+                m_pMentor->m_apParamList.removeAt(i);
+            }
         }
     }
 }

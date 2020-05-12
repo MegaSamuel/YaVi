@@ -25,7 +25,6 @@ public:
 
     int            getCategoriesDepth();
 
-    bool           obsolete;
     void           CategoriesDelete();
 
     QList<TParam*> m_apParamList;
@@ -101,7 +100,6 @@ public:
     int            getParamWidth();
     int            getParamHeight();
 
-    bool           obsolete;
     void           ParamDelete();
 
     QList<TCategories*>  m_apCategoriesList;
