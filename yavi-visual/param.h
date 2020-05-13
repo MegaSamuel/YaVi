@@ -8,6 +8,8 @@
 
 //------------------------------------------------------------------------------
 
+class TCategory;
+
 class TParam;
 
 //------------------------------------------------------------------------------
@@ -17,7 +19,7 @@ class TCategories : public QWidget
    Q_OBJECT
 
 public:
-    TCategories( TParam *pMentor, int  depth );
+    TCategories( TParam  *pMentor = Q_NULLPTR, int  depth = 0 );
     ~TCategories();
 
     void           setCategoriesName( const std::string&  name );
@@ -64,7 +66,7 @@ class TParam : public QWidget
    Q_OBJECT
 
 public:
-    TParam( TCategories *pMentor, int  depth );
+    TParam( TCategory  *pAncestor = Q_NULLPTR, TCategories  *pMentor = Q_NULLPTR, int  depth = 0 );
     ~TParam();
 
     void           setParamName( const std::string&  name );
@@ -140,6 +142,7 @@ private:
 
     TValues        m_tValues;
 
+    TCategory     *m_pAncestor;
     TCategories   *m_pMentor;
 };
 

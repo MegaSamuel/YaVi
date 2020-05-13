@@ -131,8 +131,10 @@ void  TCategories::CategoriesDelete()
     {
 //        qDebug() << getCategoriesName() << "del param" << it->getParamName();
 
+        // очищаем
         it->ParamDelete();
 
+        // уничтожаем
         it->~TParam();
     }
 
@@ -194,7 +196,7 @@ int  TCategories::getCategoriesDepth()
 
 //------------------------------------------------------------------------------
 
-TParam::TParam( TCategories  *pMentor, int  depth )
+TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
 {
     clear();
 
@@ -204,6 +206,10 @@ TParam::TParam( TCategories  *pMentor, int  depth )
     // ловим сигнал от диалога с данными
     connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
 
+    // указатель на прародителя (имеется у первого, по дереву, TParam)
+    m_pAncestor = pAncestor;
+
+    // указатель на родителя (имеется со второго, по дереву, TParam)
     m_pMentor = pMentor;
 
     m_vlayout = new QVBoxLayout;
@@ -341,8 +347,10 @@ void  TParam::ParamDelete()
     // для всех вложенных Categories вызываем очистку
     for( auto& it : m_apCategoriesList )
     {
+        // очищаем
         it->CategoriesDelete();
 
+        // уничтожаем
         it->~TCategories();
     }
 
@@ -364,25 +372,25 @@ void  TParam::ParamDelete()
         {
             if( this == m_pMentor->m_apParamList.at(i) )
             {
-                qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete";
+                qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete (mentor)";
 
                 m_pMentor->m_apParamList.removeAt(i);
             }
         }
-    }/*
-    else
+    }
+    else if( Q_NULLPTR != m_pAncestor )
     {
         // прародитель
-        for( int i = 0; i < TCategory::getMasterPointer()->m_apParamList.count(); i++ )
+        for( int i = 0; i < m_pAncestor->m_apParamList.count(); i++ )
         {
-            if( this == TCategory::getMasterPointer()->m_apParamList.at(i) )
+            if( this == m_pAncestor->m_apParamList.at(i) )
             {
-                qDebug() << TCategory::getMasterPointer()->m_apParamList.at(i)->getParamName() << "obsolete";
+                qDebug() << m_pAncestor->m_apParamList.at(i)->getParamName() << "obsolete (ancestor)";
 
-                TCategory::getMasterPointer()->m_apParamList.removeAt(i);
+                m_pAncestor->m_apParamList.removeAt(i);
             }
         }
-    }*/
+    }
 }
 
 //------------------------------------------------------------------------------
