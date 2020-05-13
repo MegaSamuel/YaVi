@@ -8,6 +8,8 @@ TCategory::TCategory()
 {
     m_zName.clear();
 
+//    m_node = Q_NULLPTR;
+
     m_depth = 0;
 
     // диалог
@@ -71,10 +73,15 @@ void  TCategory::onSendValues( TValues& a_tValues )
 {
     m_tValues = a_tValues;
 
-    setCategoryName( m_tValues.m_zName.toStdString() );
+    setCategoryName( m_tValues.m_zName.toStdString(), true );
 }
 
 //------------------------------------------------------------------------------
+
+void  TCategory::setNode( const YAML::Node&  node )
+{
+    m_node = node;
+}
 
 void  TCategory::getCategories( const YAML::Node&  node, TParam  *a_pParam, int  depth )
 {
@@ -205,7 +212,7 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
 
 //------------------------------------------------------------------------------
 
-void  TCategory::setCategoryName( const std::string&  name )
+void  TCategory::setCategoryName( const std::string&  name, bool  set_to_node )
 {
     m_zName = QString::fromStdString(name);
 
@@ -214,6 +221,13 @@ void  TCategory::setCategoryName( const std::string&  name )
     m_zBtnName.replace( " ", "\n" );                // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );             // правленное имя кнопки
     m_ptBtnName->setToolTip( m_zName );             // подсказка с оригинальным именем
+
+    if( set_to_node )
+    {
+        bool res = __yaml_SetString( m_node, GoodsCategoryName, name );
+
+        qDebug() << "set" << GoodsCategoryName << m_zName << "result" << res;
+    }
 }
 
 const QString TCategory::getCategoryName()

@@ -145,6 +145,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
         {
             TCategory  *pCategory;
             pCategory = new TCategory();
+            pCategory->setNode( cat );
             m_vlayout->addWidget( pCategory );
             priv__->m_apCategoryList.append(pCategory);
 

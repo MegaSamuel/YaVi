@@ -12,45 +12,6 @@
 #include "table.h"
 
 //------------------------------------------------------------------------------
-/*
-class TParameters : public QObject
-{
-public:
-    TParameters(QWidget  *parent);
-    ~TParameters();
-
-    TValues  m_value;
-};
-
-//------------------------------------------------------------------------------
-
-class TCategories : public QObject
-{
-public:
-    TCategories(QWidget  *parent);
-    ~TCategories();
-
-    TValues  m_value;
-
-    QList<TCategories>  m_categories;
-    QList<TParameters>  m_parameters;
-};
-
-//------------------------------------------------------------------------------
-
-class TCategory : public QObject
-{
-public:
-    TCategory(QWidget  *parent);
-    ~TCategory();
-
-    TValues  m_value;
-
-    QList<TCategories>  m_categories;
-    QList<TParameters>  m_parameters;
-};
-*/
-//------------------------------------------------------------------------------
 
 class TGoodsPrivate;
 

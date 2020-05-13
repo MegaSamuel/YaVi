@@ -29,4 +29,19 @@ inline const std::string __yaml_GetString( const YAML::Node&  node, const std::s
 
 //------------------------------------------------------------------------------
 
+inline bool __yaml_SetString( YAML::Node&  node, const std::string&  name, const std::string&  str )
+{
+    if( node.IsNull() )
+        return false;
+
+    if( 0 == name.length() )
+        return false;
+
+    node[ name ] = str;
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+
 #endif // FUNC_H
