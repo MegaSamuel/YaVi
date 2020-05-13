@@ -29,13 +29,23 @@ inline const std::string __yaml_GetString( const YAML::Node&  node, const std::s
 
 //------------------------------------------------------------------------------
 
+inline bool __yaml_SetScalar( YAML::Node&  node, const std::string&  name, const unsigned  val )
+{
+    if( node.IsNull() )
+        return false;
+
+    node[ name ] = val;
+
+    return true;
+}
+
 inline bool __yaml_SetString( YAML::Node&  node, const std::string&  name, const std::string&  str )
 {
     if( node.IsNull() )
         return false;
 
-    if( 0 == name.length() )
-        return false;
+//    if( 0 == name.length() )
+//        return false;
 
     node[ name ] = str;
 

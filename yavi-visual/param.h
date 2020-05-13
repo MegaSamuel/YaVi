@@ -22,7 +22,9 @@ public:
     TCategories( TParam  *pMentor = Q_NULLPTR, int  depth = 0 );
     ~TCategories();
 
-    void           setCategoriesName( const std::string&  name );
+    void           setNode( const YAML::Node&  node );
+
+    void           setCategoriesName( const std::string&  name, bool  set_to_node = false );
     QString        getCategoriesName();
 
     int            getCategoriesDepth();
@@ -39,6 +41,8 @@ protected Q_SLOTS :
 
 private:
     void           clear();
+
+    YAML::Node     m_node;      // текущий уровнь дерева ямла
 
     QVBoxLayout   *m_vlayout;
 
@@ -69,20 +73,22 @@ public:
     TParam( TCategory  *pAncestor = Q_NULLPTR, TCategories  *pMentor = Q_NULLPTR, int  depth = 0 );
     ~TParam();
 
-    void           setParamName( const std::string&  name );
-    void           setParamPlaceholder( const std::string&  name );
-    void           setParamNew( const std::string&  name );
-    void           setParamAfter( const std::string&  name );
-    void           setParamBefore( const std::string&  name );
-    void           setParamUlink( const std::string&  name );
-    void           setParamUname( const std::string&  name );
-    void           setParamMulti( const std::string&  name );
+    void           setNode( const YAML::Node&  node );
 
-    void           setParamType( unsigned  val );
-    void           setParamMin( unsigned  val );
-    void           setParamMax( unsigned  val );
+    void           setParamName( const std::string&  name, bool  set_to_node = false );
+    void           setParamPlaceholder( const std::string&  name, bool  set_to_node = false );
+    void           setParamNew( const std::string&  name, bool  set_to_node = false );
+    void           setParamAfter( const std::string&  name, bool  set_to_node = false );
+    void           setParamBefore( const std::string&  name, bool  set_to_node = false );
+    void           setParamUlink( const std::string&  name, bool  set_to_node = false );
+    void           setParamUname( const std::string&  name, bool  set_to_node = false );
+    void           setParamMulti( const std::string&  name, bool  set_to_node = false );
 
-    void           setParamList( QStringList  list );
+    void           setParamType( unsigned  val, bool  set_to_node = false );
+    void           setParamMin( unsigned  val, bool  set_to_node = false );
+    void           setParamMax( unsigned  val, bool  set_to_node = false );
+
+    void           setParamList( QStringList  list, bool  set_to_node = false );
 
     QString        getParamName();
     QString        getParamPlaceholder();
@@ -114,6 +120,8 @@ protected Q_SLOTS :
 
 private:
     void           clear();
+
+    YAML::Node     m_node;      // текущий уровнь дерева ямла
 
     QString        m_zName;
     QString        m_zPlaceholder;

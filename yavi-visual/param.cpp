@@ -1,3 +1,4 @@
+#include "func.h"
 #include "param.h"
 #include "category.h"
 
@@ -112,7 +113,7 @@ void  TCategories::onSendValues( TValues& a_tValues )
 {
     m_tValues = a_tValues;
 
-    setCategoriesName( m_tValues.m_zName.toStdString() );
+    setCategoriesName( m_tValues.m_zName.toStdString(), true );
 }
 
 //------------------------------------------------------------------------------
@@ -171,7 +172,13 @@ void  TCategories::CategoriesDelete()
 
 //------------------------------------------------------------------------------
 
-void  TCategories::setCategoriesName( const std::string&  name )
+void  TCategories::setNode( const YAML::Node&  node )
+{
+    m_node = node;
+}
+
+
+void  TCategories::setCategoriesName( const std::string&  name, bool  set_to_node )
 {
     m_zName = QString::fromStdString(name);
 
@@ -180,6 +187,13 @@ void  TCategories::setCategoriesName( const std::string&  name )
     m_zBtnName.replace( " ", "\n" );                // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );             // правленное имя кнопки
     m_ptBtnName->setToolTip( m_zName );             // подсказка с оригинальным именем
+
+    if( set_to_node )
+    {
+        bool res = __yaml_SetString( m_node, GoodsNameSection, name );
+
+        qDebug() << "set" << GoodsNameSection << m_zName << res;
+    }
 }
 
 QString  TCategories::getCategoriesName()
@@ -332,7 +346,20 @@ void  TParam::onSendValues( TValues& a_tValues )
 {
     m_tValues = a_tValues;
 
-    setParamName( m_tValues.m_zName.toStdString() );
+    setParamName( m_tValues.m_zName.toStdString(), true );
+    setParamPlaceholder( m_tValues.m_zPlaceholder.toStdString(), true );
+    setParamNew( m_tValues.m_zNew.toStdString(), true );
+    setParamAfter( m_tValues.m_zAfter.toStdString(), true );
+    setParamBefore( m_tValues.m_zBefore.toStdString(), true );
+    setParamUlink( m_tValues.m_zUlink.toStdString(), true );
+    setParamUname( m_tValues.m_zUname.toStdString(), true );
+    setParamMulti( m_tValues.m_zMulti.toStdString(), true );
+
+    setParamType( m_tValues.m_uType, true );
+    setParamMin( m_tValues.m_uMin, true );
+    setParamMax( m_tValues.m_uMax, true );
+
+//    setParamList( m_tValues.m_vList, true );
 }
 
 //------------------------------------------------------------------------------
@@ -395,7 +422,12 @@ void  TParam::ParamDelete()
 
 //------------------------------------------------------------------------------
 
-void  TParam::setParamName( const std::string&  name )
+void  TParam::setNode( const YAML::Node&  node )
+{
+    m_node = node;
+}
+
+void  TParam::setParamName( const std::string&  name, bool  set_to_node )
 {
     m_zName = QString::fromStdString(name);
 
@@ -404,63 +436,145 @@ void  TParam::setParamName( const std::string&  name )
     m_zBtnName.replace( " ", "\n" );                // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );             // правленное имя кнопки
     m_ptBtnName->setToolTip( m_zName );             // подсказка с оригинальным именем
+
+    if( set_to_node )
+    {
+        bool res = __yaml_SetString( m_node, GoodsNameSection, name );
+
+        qDebug() << "set" << GoodsNameSection << m_zName << res;
+    }
 }
 
-void  TParam::setParamPlaceholder( const std::string&  name )
+void  TParam::setParamPlaceholder( const std::string&  name, bool  set_to_node )
 {
     m_zPlaceholder = QString::fromStdString(name);
+
+    if( set_to_node )
+    {
+        bool res = __yaml_SetString( m_node, GoodsPlaceholderSection, name );
+
+        qDebug() << "set" << GoodsPlaceholderSection << m_zPlaceholder << res;
+    }
 }
 
-void  TParam::setParamNew( const std::string&  name )
+void  TParam::setParamNew( const std::string&  name, bool  set_to_node )
 {
     m_zNew = QString::fromStdString(name);
+
+    if( set_to_node )
+    {
+        bool res = __yaml_SetString( m_node, GoodsNewSection, name );
+
+        qDebug() << "set" << GoodsNewSection << m_zNew << res;
+    }
 }
 
-void  TParam::setParamAfter( const std::string&  name )
+void  TParam::setParamAfter( const std::string&  name, bool  set_to_node )
 {
     m_zAfter = QString::fromStdString(name);
+
+    if( set_to_node )
+    {
+        bool res = __yaml_SetString( m_node, GoodsAfterSection, name );
+
+        qDebug() << "set" << GoodsAfterSection << m_zAfter << res;
+    }
 }
 
-void  TParam::setParamBefore( const std::string&  name )
+void  TParam::setParamBefore( const std::string&  name, bool  set_to_node )
 {
     m_zBefore = QString::fromStdString(name);
+
+    if( set_to_node )
+    {
+        bool res = __yaml_SetString( m_node, GoodsBeforeSection, name );
+
+        qDebug() << "set" << GoodsBeforeSection << m_zBefore << res;
+    }
 }
 
-void  TParam::setParamUlink( const std::string&  name )
+void  TParam::setParamUlink( const std::string&  name, bool  set_to_node )
 {
     m_zUlink = QString::fromStdString(name);
+
+    if( set_to_node )
+    {
+        bool res = __yaml_SetString( m_node, GoodsUlinkSection, name );
+
+        qDebug() << "set" << GoodsUlinkSection << m_zUlink << res;
+    }
 }
 
-void  TParam::setParamUname( const std::string&  name )
+void  TParam::setParamUname( const std::string&  name, bool  set_to_node )
 {
     m_zUname = QString::fromStdString(name);
+
+    if( set_to_node )
+    {
+        bool res = __yaml_SetString( m_node, GoodsUnameSection, name );
+
+        qDebug() << "set" << GoodsUnameSection << m_zUname << res;
+    }
 }
 
-void  TParam::setParamMulti( const std::string&  name )
+void  TParam::setParamMulti( const std::string&  name, bool  set_to_node )
 {
     m_zMulti = QString::fromStdString(name);
+
+    if( set_to_node )
+    {
+        bool res = __yaml_SetString( m_node, GoodsMultiSection, name );
+
+        qDebug() << "set" << GoodsMultiSection << m_zMulti << res;
+    }
 }
 
 
-void  TParam::setParamType( unsigned  val )
+void  TParam::setParamType( unsigned  val, bool  set_to_node )
 {
     m_uType = val;
+
+    if( set_to_node )
+    {
+        bool res = __yaml_SetScalar( m_node, GoodsTypeSection, val );
+
+        qDebug() << "set" << GoodsTypeSection << m_uType << res;
+    }
 }
 
-void  TParam::setParamMin( unsigned  val )
+void  TParam::setParamMin( unsigned  val, bool  set_to_node )
 {
     m_uMin = val;
+
+    if( set_to_node )
+    {
+        bool res = __yaml_SetScalar( m_node, GoodsMinSection, val );
+
+        qDebug() << "set" << GoodsMinSection << m_uMin << res;
+    }
 }
 
-void  TParam::setParamMax( unsigned  val )
+void  TParam::setParamMax( unsigned  val, bool  set_to_node )
 {
     m_uMax = val;
+
+    if( set_to_node )
+    {
+        bool res = __yaml_SetScalar( m_node, GoodsMaxSection, val );
+
+        qDebug() << "set" << GoodsMaxSection << m_uMax << res;
+    }
 }
 
 
-void  TParam::setParamList( QStringList  list )
+void  TParam::setParamList( QStringList  list, bool  set_to_node )
 {
     m_vList = list;
+
+    if( set_to_node )
+    {
+
+    }
 }
 
 //------------------------------------------------------------------------------

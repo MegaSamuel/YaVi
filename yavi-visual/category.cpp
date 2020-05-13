@@ -8,8 +8,6 @@ TCategory::TCategory()
 {
     m_zName.clear();
 
-//    m_node = Q_NULLPTR;
-
     m_depth = 0;
 
     // диалог
@@ -90,6 +88,7 @@ void  TCategory::getCategories( const YAML::Node&  node, TParam  *a_pParam, int 
 
     TCategories  *pCategories;
     pCategories = new TCategories( a_pParam, depth );
+    pCategories->setNode( node );
     m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
 
     // добавляем Categories с список класса TParam
@@ -108,6 +107,7 @@ void  TCategory::getCategories( const YAML::Node&  node, TParam  *a_pParam, int 
         {
             TParam  *pParam;
             pParam = new TParam( Q_NULLPTR, pCategories, pCategories->getCategoriesDepth() + 1 );
+            pParam->setNode( par );
 
             // добавляем Parameters в список класса TCategories
             pCategories->m_apParamList.append(pParam);

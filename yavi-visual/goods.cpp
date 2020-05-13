@@ -160,6 +160,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                 {
                     TParam  *pParam;
                     pParam = new TParam( pCategory, Q_NULLPTR, 0 );
+                    pParam->setNode( par );
 
                     pCategory->getParameters( par, pParam, 0 );
                 }

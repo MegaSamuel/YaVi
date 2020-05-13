@@ -3,8 +3,6 @@
 
 #include <QtWidgets>
 
-#include <yaml-cpp/yaml.h>
-
 #include "dialog.h"
 #include "param.h"
 #include "values.h"
@@ -38,7 +36,7 @@ protected Q_SLOTS :
     void           onSendValues( TValues& );
 
 private:
-    YAML::Node 		m_node;      // текущий уровнь дерева ямла
+    YAML::Node      m_node;      // текущий уровнь дерева ямла
 
     QVBoxLayout    *m_vlayout;
 

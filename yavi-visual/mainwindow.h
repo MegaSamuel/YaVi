@@ -4,8 +4,6 @@
 #include <QMainWindow>
 #include <QtWidgets>
 
-#include <yaml-cpp/yaml.h>
-
 #include "goods.h"
 
 //------------------------------------------------------------------------------

@@ -3,11 +3,6 @@
 
 #include <QtWidgets>
 
-#include <stdio.h>
-
-#include <string>
-#include <yaml-cpp/yaml.h>
-
 #include "category.h"
 #include "table.h"
 
@@ -21,37 +16,6 @@ class TGoods : public QWidget
     friend class TGoodsPrivate;
 
 	public :
-        // имена основных секций файла конфигурации
-        #define  GoodsCategorySection    "category"
-        #define  GoodsCategoryName       "name"
-
-        #define  GoodsCategoriesSection  "categories"
-        #define  GoodsParametersSection  "parameters"
-
-        // имена основных секций таблицы файла конфигурации
-        #define  GoodsTableSection       "tables"
-        #define  GoodsTableId            "id"
-        #define  GoodsTableName          "name"
-        #define  GoodsTableValue         "values"
-        #define  GoodsTableColumn        "colums"
-        #define  GoodsTableRow           "rows"
-        #define  GoodsTableLink          "link"
-
-        // имена основных секций таблицы файла конфигурации
-        #define  GoodsNameSection        "name"
-        #define  GoodsTypeSection        "type"
-        #define  GoodsPlaceholderSection "placeholder"
-        #define  GoodsNewSection         "new"
-        #define  GoodsAfterSection       "after"
-        #define  GoodsBeforeSection      "before"
-        #define  GoodsUlinkSection       "ulink"
-        #define  GoodsUnameSection       "uname"
-        #define  GoodsMinSection         "min"
-        #define  GoodsMaxSection         "max"
-        #define  GoodsMultiSection       "multi"
-        #define  GoodsValuesSection      "values"
-
-        // constructors
         TGoods();
         explicit TGoods( const YAML::Node&  config );  // создание из ноды yaml
         ~TGoods();
