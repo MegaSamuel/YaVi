@@ -4,7 +4,7 @@
 
 //------------------------------------------------------------------------------
 
-TCategory::TCategory()
+TCategory::TCategory( TGoods  *pAncestor )
 {
     m_zName.clear();
 
@@ -15,6 +15,9 @@ TCategory::TCategory()
 
     // ловим сигнал от диалога с данными
     connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
+
+    // указатель на родителя
+    m_pAncestor = pAncestor;
 
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
@@ -42,6 +45,7 @@ TCategory::TCategory()
 
 TCategory::~TCategory()
 {
+    /*
     QLayoutItem *child;
 
     while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
@@ -49,6 +53,7 @@ TCategory::~TCategory()
         delete child->widget();
         delete child;
     }
+    */
 }
 
 //------------------------------------------------------------------------------
@@ -76,9 +81,65 @@ void  TCategory::onSendValues( TValues& a_tValues )
 
 //------------------------------------------------------------------------------
 
+void  TCategory::CategoryDelete()
+{
+    QLayoutItem *child;
+
+    // уничтожаем диалог
+    m_ptDialog->~TDialog();
+
+    qDebug() << getCategoryName() << "del dialog";
+
+/* тут падает
+    // для всех вложенных Parameters вызываем очистку
+    for( auto& it : m_apParamList )
+    {
+        // очищаем
+        it->ParamDelete();
+
+        // уничтожаем
+        it->~TParam();
+    }
+*/
+    qDebug() << getCategoryName() << "del param";
+
+    // уничтожаем виджеты
+    while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
+    {
+        delete child->widget();
+        delete child;
+    }
+
+    qDebug() << getCategoryName() << "del widgets";
+
+    // уничтожаем layout
+    m_vlayout->deleteLater();
+
+    qDebug() << getCategoryName() << "del layout";
+
+    // удаляем себя из списка родителя
+    if( Q_NULLPTR != m_pAncestor )
+    {
+        for( int i = 0; i < m_pAncestor->m_apCategoryList.count(); i++ )
+        {
+            if( this == m_pAncestor->m_apCategoryList.at(i) )
+            {
+                qDebug() << m_pAncestor->m_apCategoryList.at(i)->getCategoryName() << "obsolete";
+
+                m_pAncestor->m_apCategoryList.removeAt(i);
+            }
+        }
+    }
+}
+
 void  TCategory::setNode( const YAML::Node&  node )
 {
     m_node = node;
+}
+
+YAML::Node&  TCategory::getNode()
+{
+    return m_node;
 }
 
 void  TCategory::getCategories( const YAML::Node&  node, TParam  *a_pParam, int  depth )

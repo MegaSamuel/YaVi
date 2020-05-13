@@ -5,12 +5,17 @@
 
 //------------------------------------------------------------------------------
 
+class  TGoods;
+
+//------------------------------------------------------------------------------
+
+
 class TTable : public QWidget
 {
    Q_OBJECT
 
 public:
-    TTable();
+    TTable( TGoods  *pAncestor = Q_NULLPTR );
     ~TTable();
 
     void           setTableId( const std::string&  name );
@@ -30,6 +35,8 @@ public:
     const QString  getTableId();
     const QString  getTableName();
     const QString  getTableLink();
+
+    void           TableDelete();
 
 protected Q_SLOTS :
     void           onBtnName();
@@ -57,6 +64,8 @@ private:
     {
         m_vValues.clear();
     }
+
+    TGoods        *m_pAncestor;
 };
 
 //------------------------------------------------------------------------------

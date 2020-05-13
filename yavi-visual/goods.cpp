@@ -92,8 +92,8 @@ private:
 
     YAML::Node 		config__;
 
-    QList<TTable*>     m_apTableList;
-    QList<TCategory*>  m_apCategoryList;
+//    QList<TTable*>     m_apTableList;
+//    QList<TCategory*>  m_apCategoryList;
 
     QStringList     m_vValues;
 
@@ -101,19 +101,19 @@ private:
     {
         m_bEmpty = true;
 
-        for( auto& it : m_apTableList )
-        {
-            it->~TTable();
-        }
+//        for( auto& it : m_apTableList )
+//        {
+//            it->~TTable();
+//        }
 
-        for( auto& it : m_apCategoryList )
-        {
-            it->~TCategory();
-        }
+//        for( auto& it : m_apCategoryList )
+//        {
+//            it->~TCategory();
+//        }
 
-        m_apTableList.clear();
+//        m_apTableList.clear();
 
-        m_apCategoryList.clear();
+//        m_apCategoryList.clear();
 
         m_vValues.clear();
     }
@@ -144,10 +144,11 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
         for( auto& cat : config[ GoodsCategorySection ] )
         {
             TCategory  *pCategory;
-            pCategory = new TCategory();
+            pCategory = new TCategory( this );
             pCategory->setNode( cat );
             m_vlayout->addWidget( pCategory );
-            priv__->m_apCategoryList.append(pCategory);
+//            priv__->m_apCategoryList.append(pCategory);
+            m_apCategoryList.append(pCategory);
 
             // ищем имя
             std::string cat_name = __yaml_GetString( cat, GoodsCategoryName );
@@ -184,9 +185,10 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             bool  table_fill = false; // признак что таблица не заполнена
 
             TTable  *pTable;
-            pTable = new TTable();
+            pTable = new TTable( this );
             m_vlayout->addWidget( pTable );
-            priv__->m_apTableList.append(pTable);
+//            priv__->m_apTableList.append(pTable);
+            m_apTableList.append(pTable);
 
             // ищем секцию id
             std::string  id = __yaml_GetString( tab, GoodsTableId );
@@ -312,19 +314,30 @@ TGoods::~TGoods()
 
 //------------------------------------------------------------------------------
 
+void  TGoods::GoodsDelete()
+{
+    for( auto& it : m_apCategoryList )
+    {
+        it->CategoryDelete();
+    }
+
+    for( auto& it : m_apTableList )
+    {
+//        it->TableDelete();
+    }
+}
+
 void  TGoods::clear() noexcept
 {
+    m_apTableList.clear();
+    m_apCategoryList.clear();
+
     priv__->clear();
 }
 
 bool  TGoods::empty() const noexcept
 {
     return priv__->m_bEmpty;
-}
-
-int  TGoods::get_table_size() noexcept
-{
-    return priv__->m_apTableList.size();
 }
 
 void  TGoods::fix_widget_size( int w, int h ) noexcept

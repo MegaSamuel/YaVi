@@ -90,19 +90,19 @@ void TCategories::clear()
 
 void  TCategories::onBtnDec()
 {
-    qDebug() << getCategoriesName() << "dec button";
+//    qDebug() << getCategoriesName() << "dec button";
 
     CategoriesDelete();
 }
 
 void  TCategories::onBtnInc()
 {
-    qDebug() << getCategoriesName() << "inc button";
+//    qDebug() << getCategoriesName() << "inc button";
 }
 
 void  TCategories::onBtnName()
 {
-    qDebug() << getCategoriesName() << "button";
+//    qDebug() << getCategoriesName() << "button";
 
     m_ptDialog->setDlgName( getCategoriesName() );
 
@@ -118,6 +118,25 @@ void  TCategories::onSendValues( TValues& a_tValues )
 
 //------------------------------------------------------------------------------
 
+
+void  TCategories::clearNodeSequence()
+{
+    m_node.remove( GoodsNameSection );
+    m_node.remove( GoodsTypeSection );
+    m_node.remove( GoodsPlaceholderSection );
+    m_node.remove( GoodsNewSection );
+    m_node.remove( GoodsAfterSection );
+    m_node.remove( GoodsBeforeSection );
+    m_node.remove( GoodsUlinkSection );
+    m_node.remove( GoodsUnameSection );
+    m_node.remove( GoodsMinSection );
+    m_node.remove( GoodsMaxSection );
+    m_node.remove( GoodsMultiSection );
+    m_node.remove( GoodsValuesSection );
+
+    m_node.remove( GoodsParametersSection );
+}
+
 void  TCategories::CategoriesDelete()
 {
     QLayoutItem *child;
@@ -131,6 +150,14 @@ void  TCategories::CategoriesDelete()
     for( auto& it : m_apParamList )
     {
 //        qDebug() << getCategoriesName() << "del param" << it->getParamName();
+        // удаляем ветку из ямла
+//        bool res = __yaml_DelNode( m_node, it->getNode() );
+
+//        qDebug() << getCategoriesName() << "del node" << res;
+
+//        m_node.remove( GoodsParametersSection );
+//        bool res = m_node.remove( it->getNode() );
+//        qDebug() << getCategoriesName() << it->getParamName()  << "del node" << res;
 
         // очищаем
         it->ParamDelete();
@@ -158,11 +185,13 @@ void  TCategories::CategoriesDelete()
     // удаляем себя из списка родителя
     if( Q_NULLPTR != m_pMentor )
     {
+        clearNodeSequence();
+
         for( int i = 0; i < m_pMentor->m_apCategoriesList.count(); i++ )
         {
             if( this == m_pMentor->m_apCategoriesList.at(i) )
             {
-                qDebug() << m_pMentor->m_apCategoriesList.at(i)->getCategoriesName() << "obsolete";
+//                qDebug() << m_pMentor->m_apCategoriesList.at(i)->getCategoriesName() << "obsolete";
 
                 m_pMentor->m_apCategoriesList.removeAt(i);
             }
@@ -177,6 +206,10 @@ void  TCategories::setNode( const YAML::Node&  node )
     m_node = node;
 }
 
+YAML::Node&  TCategories::getNode()
+{
+    return m_node;
+}
 
 void  TCategories::setCategoriesName( const std::string&  name, bool  set_to_node )
 {
@@ -310,19 +343,19 @@ void  TParam::clear()
 
 void  TParam::onBtnDec()
 {
-    qDebug() << getParamName() << "dec button";
+//    qDebug() << getParamName() << "dec button";
 
     ParamDelete();
 }
 
 void  TParam::onBtnInc()
 {
-    qDebug() << getParamName() << "inc button";
+//    qDebug() << getParamName() << "inc button";
 }
 
 void  TParam::onBtnName()
 {
-    qDebug() << getParamName() << "button";
+//    qDebug() << getParamName() << "button";
 
     m_ptDialog->setDlgName( getParamName() );
     m_ptDialog->setDlgPlaceholder( getParamPlaceholder() );
@@ -364,6 +397,24 @@ void  TParam::onSendValues( TValues& a_tValues )
 
 //------------------------------------------------------------------------------
 
+void  TParam::clearNodeSequence()
+{
+    m_node.remove( GoodsNameSection );
+    m_node.remove( GoodsTypeSection );
+    m_node.remove( GoodsPlaceholderSection );
+    m_node.remove( GoodsNewSection );
+    m_node.remove( GoodsAfterSection );
+    m_node.remove( GoodsBeforeSection );
+    m_node.remove( GoodsUlinkSection );
+    m_node.remove( GoodsUnameSection );
+    m_node.remove( GoodsMinSection );
+    m_node.remove( GoodsMaxSection );
+    m_node.remove( GoodsMultiSection );
+    m_node.remove( GoodsValuesSection );
+
+    m_node.remove( GoodsCategoriesSection );
+}
+
 void  TParam::ParamDelete()
 {
     QLayoutItem *child;
@@ -374,6 +425,11 @@ void  TParam::ParamDelete()
     // для всех вложенных Categories вызываем очистку
     for( auto& it : m_apCategoriesList )
     {
+        // удаляем ветку из ямла
+//        bool res = __yaml_DelNode( m_node, it->getNode() );
+
+//        qDebug() << getParamName() << "del node" << res;
+
         // очищаем
         it->CategoriesDelete();
 
@@ -395,11 +451,14 @@ void  TParam::ParamDelete()
     if( Q_NULLPTR != m_pMentor )
     {
         // родитель
+
+        clearNodeSequence();
+
         for( int i = 0; i < m_pMentor->m_apParamList.count(); i++ )
         {
             if( this == m_pMentor->m_apParamList.at(i) )
             {
-                qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete (mentor)";
+//                qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete (mentor)";
 
                 m_pMentor->m_apParamList.removeAt(i);
             }
@@ -408,11 +467,27 @@ void  TParam::ParamDelete()
     else if( Q_NULLPTR != m_pAncestor )
     {
         // прародитель
+
+        // удаляем ветку из ямла
+//        bool res = __yaml_DelNode( m_pAncestor->getNode(), m_node );
+
+//        bool res = m_pAncestor->getNode().remove( 1 );
+
+//        bool res = m_node.remove( "type" );
+
+//        qDebug() << getParamName() << "del node (ancestor)" << res;
+
+        clearNodeSequence();
+
+//        y.remove(y["b"]);
+
+//        m_pAncestor->getNode().remove( m_node );
+
         for( int i = 0; i < m_pAncestor->m_apParamList.count(); i++ )
         {
             if( this == m_pAncestor->m_apParamList.at(i) )
             {
-                qDebug() << m_pAncestor->m_apParamList.at(i)->getParamName() << "obsolete (ancestor)";
+//                qDebug() << m_pAncestor->m_apParamList.at(i)->getParamName() << "obsolete (ancestor)";
 
                 m_pAncestor->m_apParamList.removeAt(i);
             }
@@ -425,6 +500,11 @@ void  TParam::ParamDelete()
 void  TParam::setNode( const YAML::Node&  node )
 {
     m_node = node;
+}
+
+YAML::Node  TParam::getNode()
+{
+    return m_node;
 }
 
 void  TParam::setParamName( const std::string&  name, bool  set_to_node )

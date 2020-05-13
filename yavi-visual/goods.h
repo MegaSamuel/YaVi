@@ -27,12 +27,12 @@ class TGoods : public QWidget
         bool         empty() const noexcept;
         size_t       size() const noexcept;
 
-        int          get_table_size() noexcept;
-
         QVBoxLayout  *m_vlayout;
 
-        TCategory    *m_pCategory;
-        TCategory    *getMasterPointer();
+        void           GoodsDelete();
+
+        QList<TTable*>     m_apTableList;
+        QList<TCategory*>  m_apCategoryList;
 
 private :
         std::unique_ptr<TGoodsPrivate> 	priv__;

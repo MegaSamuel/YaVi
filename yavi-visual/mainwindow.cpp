@@ -74,7 +74,7 @@ MainWindow::~MainWindow()
 
 void 	MainWindow::onBtnOpen()
 {
-    qDebug() << "Open button";
+//    qDebug() << "Open button";
 
     // очищаем лэйбл с описанием ошибки
     m_ptLblNotice->clear();
@@ -91,19 +91,26 @@ void 	MainWindow::onBtnOpen()
 
     if( !filename.isEmpty() )
     {
+        if( !m_config.IsNull() )
+        {
+            qDebug() << "m_config does not empty!";
+
+            m_pGoods->GoodsDelete();
+        }
+
         if( false == init( filename ) )
         {
             QString  zReport;
             zReport = "Cannot open " + filename + " with result -> " + zFailReason;
 
-            qDebug() << zReport;
+//            qDebug() << zReport;
 
             m_ptLblNotice->setText( zReport );
 //            m_ptLblNotice->setStyleSheet( "QLabel {background-color: red;}" );
         }
         else
         {
-            qDebug() << "Open file" << filename;
+//            qDebug() << "Open file" << filename;
         }
     }
     else
@@ -116,7 +123,7 @@ void 	MainWindow::onBtnOpen()
 
 void 	MainWindow::onBtnSave()
 {
-    qDebug() << "Save button";
+//    qDebug() << "Save button";
 
     // формируем имя файла по умолчанию
     QString deffilename = QString( "/test.yml" );
@@ -137,21 +144,21 @@ void 	MainWindow::onBtnSave()
             QString  zReport;
             zReport = "Cannot write " + filename + " with result -> " + zFailReason;
 
-            qDebug() << zReport;
+//            qDebug() << zReport;
 
             m_ptLblNotice->setText( zReport );
 //            m_ptLblNotice->setStyleSheet( "QLabel {background-color: red;}" );
         }
         else
         {
-            qDebug() << "Save file" << filename;
+//            qDebug() << "Save file" << filename;
         }
     }
     else
     {
         // долбоящер не ввел имя файла
 
-        qDebug() << "Cannot save: no filename";
+//        qDebug() << "Cannot save: no filename";
     }
 }
 
@@ -180,20 +187,20 @@ void  MainWindow::onTimerWork()
 
 bool  MainWindow::init( const QString&  filename )
 {
-    YAML::Node 	config;
+//    YAML::Node 	config;
     QFile 		fp( filename );
 
     // а есть ли файл?
     if( !fp.exists() )
     {
-        qDebug() << "File" << filename << "is not exists";
+//        qDebug() << "File" << filename << "is not exists";
         return false;
     }
 
     // открываем файл только на чтение
     if( !fp.open( QIODevice::ReadOnly | QIODevice::Text ) )
     {
-        qDebug() << "Cannot open file " << filename;
+//        qDebug() << "Cannot open file " << filename;
         return false;
     }
 
@@ -203,7 +210,7 @@ bool  MainWindow::init( const QString&  filename )
 
     // пробуем читать ямл
     try {
-        config = YAML::Load( in.readAll().toStdString() );
+        m_config = YAML::Load( in.readAll().toStdString() );
     } catch ( const YAML::Exception&  e ) {
         // что-то пошло не так, а что смотрим в e.what()
         zFailReason = QString::fromStdString( e.what() );
@@ -211,10 +218,10 @@ bool  MainWindow::init( const QString&  filename )
     }
 
     // сохраняем ямл
-    m_config = config;
+//    m_config = config;
 
     // разбираем ямл
-    m_pGoods->parse_yaml( config );
+    m_pGoods->parse_yaml( m_config );
 
     // возможно ямл пустой
     if( m_pGoods->empty() )
@@ -235,7 +242,7 @@ bool  MainWindow::fini( const QString&  filename )
     // открываем файл на запись
     if( !fp.open( QIODevice::ReadWrite | QIODevice::Text ) )
     {
-        qDebug() << "Cannot create file " << filename;
+//        qDebug() << "Cannot create file " << filename;
         zFailReason = "Cannot create file " + filename;
         return false;
     }

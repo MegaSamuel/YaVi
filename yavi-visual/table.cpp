@@ -2,11 +2,14 @@
 
 //------------------------------------------------------------------------------
 
-TTable::TTable()
+TTable::TTable( TGoods  *pAncestor )
 {
     m_zId.clear();
     m_zName.clear();
     m_zLink.clear();
+
+    // указатель на родителя
+    m_pAncestor = pAncestor;
 
     resetRow();
     resetColumn();
@@ -56,6 +59,11 @@ void  TTable::onBtnInc()
 }
 
 //------------------------------------------------------------------------------
+
+void  TTable::TableDelete()
+{
+
+}
 
 void  TTable::setTableId( const std::string&  name )
 {

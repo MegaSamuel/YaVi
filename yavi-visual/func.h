@@ -54,4 +54,17 @@ inline bool __yaml_SetString( YAML::Node&  node, const std::string&  name, const
 
 //------------------------------------------------------------------------------
 
+inline bool __yaml_DelNode( YAML::Node&  parent, YAML::Node&  child )
+{
+    if( parent.IsNull() )
+        return false;
+
+    if( child.IsNull() )
+        return false;
+
+    return parent.remove( child );
+}
+
+//------------------------------------------------------------------------------
+
 #endif // FUNC_H

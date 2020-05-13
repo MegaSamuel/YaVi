@@ -23,6 +23,7 @@ public:
     ~TCategories();
 
     void           setNode( const YAML::Node&  node );
+    YAML::Node&    getNode();
 
     void           setCategoriesName( const std::string&  name, bool  set_to_node = false );
     QString        getCategoriesName();
@@ -41,6 +42,8 @@ protected Q_SLOTS :
 
 private:
     void           clear();
+
+    void           clearNodeSequence();
 
     YAML::Node     m_node;      // текущий уровнь дерева ямла
 
@@ -74,6 +77,7 @@ public:
     ~TParam();
 
     void           setNode( const YAML::Node&  node );
+    YAML::Node     getNode();
 
     void           setParamName( const std::string&  name, bool  set_to_node = false );
     void           setParamPlaceholder( const std::string&  name, bool  set_to_node = false );
@@ -120,6 +124,8 @@ protected Q_SLOTS :
 
 private:
     void           clear();
+
+    void           clearNodeSequence();
 
     YAML::Node     m_node;      // текущий уровнь дерева ямла
 
