@@ -88,7 +88,7 @@ void  TCategory::CategoryDelete()
     // уничтожаем диалог
     m_ptDialog->~TDialog();
 
-    qDebug() << getCategoryName() << "del dialog";
+//    qDebug() << getCategoryName() << "del dialog";
 
 /* тут падает
     // для всех вложенных Parameters вызываем очистку
@@ -101,7 +101,7 @@ void  TCategory::CategoryDelete()
         it->~TParam();
     }
 */
-    qDebug() << getCategoryName() << "del param";
+//    qDebug() << getCategoryName() << "del param";
 
     // уничтожаем виджеты
     while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
@@ -110,12 +110,12 @@ void  TCategory::CategoryDelete()
         delete child;
     }
 
-    qDebug() << getCategoryName() << "del widgets";
+//    qDebug() << getCategoryName() << "del widgets";
 
     // уничтожаем layout
     m_vlayout->deleteLater();
 
-    qDebug() << getCategoryName() << "del layout";
+//    qDebug() << getCategoryName() << "del layout";
 
     // удаляем себя из списка родителя
     if( Q_NULLPTR != m_pAncestor )

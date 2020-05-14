@@ -318,12 +318,20 @@ void  TGoods::GoodsDelete()
 {
     for( auto& it : m_apCategoryList )
     {
+        // очищаем
         it->CategoryDelete();
+
+        // уничтожаем
+        it->~TCategory();
     }
 
     for( auto& it : m_apTableList )
     {
-//        it->TableDelete();
+        // очищаем
+        it->TableDelete();
+
+        // уничтожаем
+        it->~TTable();
     }
 }
 

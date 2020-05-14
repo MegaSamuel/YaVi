@@ -21,13 +21,13 @@ class TGoods : public QWidget
         ~TGoods();
 
         // разбор протокола, считанного предварительно в yaml
-        bool         parse_yaml( const YAML::Node&  config );
+        bool           parse_yaml( const YAML::Node&  config );
 
-        void         clear() noexcept;
-        bool         empty() const noexcept;
-        size_t       size() const noexcept;
+        void           clear() noexcept;
+        bool           empty() const noexcept;
+        size_t         size() const noexcept;
 
-        QVBoxLayout  *m_vlayout;
+        QVBoxLayout   *m_vlayout;
 
         void           GoodsDelete();
 
@@ -37,8 +37,8 @@ class TGoods : public QWidget
 private :
         std::unique_ptr<TGoodsPrivate> 	priv__;
 
-        int          m_w, m_h;  // размеры виджета
-        void         fix_widget_size( int w, int h ) noexcept; // установка размеров виджета
+        int            m_w, m_h;  // размеры виджета
+        void           fix_widget_size( int w, int h ) noexcept; // установка размеров виджета
 };
 
 //! тип - указатель на протокол, описанный в файле

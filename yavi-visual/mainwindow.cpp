@@ -91,6 +91,7 @@ void 	MainWindow::onBtnOpen()
 
     if( !filename.isEmpty() )
     {
+        // похоже что уже есть открытый ямл
         if( !m_config.IsNull() )
         {
             qDebug() << "m_config does not empty!";

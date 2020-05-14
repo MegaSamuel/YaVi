@@ -422,6 +422,8 @@ void  TParam::ParamDelete()
     // уничтожаем диалог
     m_ptDialog->~TDialog();
 
+    qDebug() << getParamName() << "del dialog";
+
     // для всех вложенных Categories вызываем очистку
     for( auto& it : m_apCategoriesList )
     {
@@ -437,6 +439,8 @@ void  TParam::ParamDelete()
         it->~TCategories();
     }
 
+    qDebug() << getParamName() << "del categories";
+
     // уничтожаем виджеты
     while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
     {
@@ -444,8 +448,12 @@ void  TParam::ParamDelete()
         delete child;
     }
 
+    qDebug() << getParamName() << "del widgets";
+
     // уничтожаем layout
     m_vlayout->deleteLater();
+
+    qDebug() << getParamName() << "del layout";
 
     // удаляем себя из списка родителя
     if( Q_NULLPTR != m_pMentor )
@@ -458,7 +466,7 @@ void  TParam::ParamDelete()
         {
             if( this == m_pMentor->m_apParamList.at(i) )
             {
-//                qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete (mentor)";
+                qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete (mentor)";
 
                 m_pMentor->m_apParamList.removeAt(i);
             }
@@ -487,7 +495,7 @@ void  TParam::ParamDelete()
         {
             if( this == m_pAncestor->m_apParamList.at(i) )
             {
-//                qDebug() << m_pAncestor->m_apParamList.at(i)->getParamName() << "obsolete (ancestor)";
+                qDebug() << m_pAncestor->m_apParamList.at(i)->getParamName() << "obsolete (ancestor)";
 
                 m_pAncestor->m_apParamList.removeAt(i);
             }

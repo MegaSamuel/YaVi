@@ -1,3 +1,5 @@
+#include "func.h"
+#include "goods.h"
 #include "table.h"
 
 //------------------------------------------------------------------------------
@@ -37,6 +39,7 @@ TTable::TTable( TGoods  *pAncestor )
 
 TTable::~TTable()
 {
+    /*
     QLayoutItem *child;
 
     while( ( child = m_grid->takeAt(0) ) != Q_NULLPTR )
@@ -44,6 +47,7 @@ TTable::~TTable()
         delete child->widget();
         delete child;
     }
+    */
 }
 
 //------------------------------------------------------------------------------
@@ -62,7 +66,40 @@ void  TTable::onBtnInc()
 
 void  TTable::TableDelete()
 {
+    QLayoutItem *child;
 
+    // уничтожаем диалог
+//    m_ptDialog->~TDialog();
+
+//    qDebug() << getTableName() << "del dialog";
+
+    // уничтожаем виджеты
+    while( ( child = m_grid->takeAt(0) ) != Q_NULLPTR )
+    {
+        delete child->widget();
+        delete child;
+    }
+
+//    qDebug() << getTableName() << "del widgets";
+
+    // уничтожаем grid
+    m_grid->deleteLater();
+
+//    qDebug() << getTableName() << "del grid";
+
+    // удаляем себя из списка родителя
+    if( Q_NULLPTR != m_pAncestor )
+    {
+        for( int i = 0; i < m_pAncestor->m_apTableList.count(); i++ )
+        {
+            if( this == m_pAncestor->m_apTableList.at(i) )
+            {
+                qDebug() << m_pAncestor->m_apTableList.at(i)->getTableName() << "obsolete";
+
+                m_pAncestor->m_apTableList.removeAt(i);
+            }
+        }
+    }
 }
 
 void  TTable::setTableId( const std::string&  name )
