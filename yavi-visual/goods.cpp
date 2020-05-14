@@ -92,28 +92,11 @@ private:
 
     YAML::Node 		config__;
 
-//    QList<TTable*>     m_apTableList;
-//    QList<TCategory*>  m_apCategoryList;
-
     QStringList     m_vValues;
 
     inline 	void clear()
     {
         m_bEmpty = true;
-
-//        for( auto& it : m_apTableList )
-//        {
-//            it->~TTable();
-//        }
-
-//        for( auto& it : m_apCategoryList )
-//        {
-//            it->~TCategory();
-//        }
-
-//        m_apTableList.clear();
-
-//        m_apCategoryList.clear();
 
         m_vValues.clear();
     }
@@ -168,7 +151,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             }
 
             // подгоняем размер виджета под содержимое для корректной работы скролла
-            fix_widget_size( pCategory->getCategoryWidth(), pCategory->getCategoryHeight() );
+            widget_stretch( pCategory->getCategoryWidth(), pCategory->getCategoryHeight() );
         }
     }
 
@@ -271,7 +254,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             }
 
             // подгоняем размер виджета под содержимое для корректной работы скролла
-            fix_widget_size( pTable->getTableWidth(), pTable->getTableHeight() );
+            widget_stretch( pTable->getTableWidth(), pTable->getTableHeight() );
         }
     }
 
@@ -292,9 +275,7 @@ TGoods::TGoods()
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
     // ставим начальный размер себя
-    m_w = 100;
-    m_h = 100;
-    fix_widget_size( 0, 0 );
+    widget_size_reset();
 
     this->setLayout( m_vlayout );
 }
@@ -316,6 +297,7 @@ TGoods::~TGoods()
 
 void  TGoods::GoodsDelete()
 {
+    // категории
     for( auto& it : m_apCategoryList )
     {
         // очищаем
@@ -325,6 +307,7 @@ void  TGoods::GoodsDelete()
         it->~TCategory();
     }
 
+    // таблицы
     for( auto& it : m_apTableList )
     {
         // очищаем
@@ -333,6 +316,11 @@ void  TGoods::GoodsDelete()
         // уничтожаем
         it->~TTable();
     }
+
+    clear();
+
+    // ставим начальный размер себя
+    widget_size_reset();
 }
 
 void  TGoods::clear() noexcept
@@ -348,7 +336,17 @@ bool  TGoods::empty() const noexcept
     return priv__->m_bEmpty;
 }
 
-void  TGoods::fix_widget_size( int w, int h ) noexcept
+void  TGoods::widget_size_reset() noexcept
+{
+    m_w = 100;
+    m_h = 100;
+
+    // ставим размер самого себя
+    this->setMinimumWidth( m_w );
+    this->setMinimumHeight( m_h );
+}
+
+void  TGoods::widget_stretch( int w, int h ) noexcept
 {
     // ширину выбираем максимальную из элементов
     if( w > m_w )

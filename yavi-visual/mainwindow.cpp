@@ -188,20 +188,19 @@ void  MainWindow::onTimerWork()
 
 bool  MainWindow::init( const QString&  filename )
 {
-//    YAML::Node 	config;
-    QFile 		fp( filename );
+    QFile  fp( filename );
 
     // а есть ли файл?
     if( !fp.exists() )
     {
-//        qDebug() << "File" << filename << "is not exists";
+        zFailReason = "file is not exists";
         return false;
     }
 
     // открываем файл только на чтение
     if( !fp.open( QIODevice::ReadOnly | QIODevice::Text ) )
     {
-//        qDebug() << "Cannot open file " << filename;
+        zFailReason = "cannot open file";
         return false;
     }
 
@@ -218,11 +217,10 @@ bool  MainWindow::init( const QString&  filename )
         return false;
     }
 
-    // сохраняем ямл
-//    m_config = config;
-
     // разбираем ямл
     m_pGoods->parse_yaml( m_config );
+
+    fp.close();
 
     // возможно ямл пустой
     if( m_pGoods->empty() )
@@ -243,8 +241,7 @@ bool  MainWindow::fini( const QString&  filename )
     // открываем файл на запись
     if( !fp.open( QIODevice::ReadWrite | QIODevice::Text ) )
     {
-//        qDebug() << "Cannot create file " << filename;
-        zFailReason = "Cannot create file " + filename;
+        zFailReason = "cannot create file";
         return false;
     }
 

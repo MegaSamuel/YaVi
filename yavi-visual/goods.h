@@ -37,8 +37,9 @@ class TGoods : public QWidget
 private :
         std::unique_ptr<TGoodsPrivate> 	priv__;
 
-        int            m_w, m_h;  // размеры виджета
-        void           fix_widget_size( int w, int h ) noexcept; // установка размеров виджета
+        int            m_w, m_h;  // текущие размеры виджета
+        void           widget_size_reset() noexcept; // сброс размера виджета
+        void           widget_stretch( int w, int h ) noexcept; // растягиваем виджет
 };
 
 //! тип - указатель на протокол, описанный в файле

@@ -39,15 +39,7 @@ TTable::TTable( TGoods  *pAncestor )
 
 TTable::~TTable()
 {
-    /*
-    QLayoutItem *child;
 
-    while( ( child = m_grid->takeAt(0) ) != Q_NULLPTR )
-    {
-        delete child->widget();
-        delete child;
-    }
-    */
 }
 
 //------------------------------------------------------------------------------
