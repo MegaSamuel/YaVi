@@ -120,6 +120,7 @@ protected Q_SLOTS :
     void           onBtnDec();
     void           onBtnInc();
     void           onBtnName();
+    void           onSendCancel();
     void           onSendValues( TValues& );
 
 private:
@@ -158,6 +159,9 @@ private:
 
     TCategory     *m_pAncestor;
     TCategories   *m_pMentor;
+    int            m_depth;
+
+    bool           need_to_add; // необходимость создать новый набор параметров в ямле
 };
 
 //------------------------------------------------------------------------------

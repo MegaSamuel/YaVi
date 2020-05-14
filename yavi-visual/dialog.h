@@ -36,7 +36,11 @@ public :
 
     void    setDlgCombo( QStringList  list );
 
+    void    setDlgEmpty();
+    void    setDlgTypeEnabled( bool  enabled );
+
 Q_SIGNALS:
+    void    sendCancel();
     void    sendValues( TValues&  values );
 
 protected Q_SLOTS:

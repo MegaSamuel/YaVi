@@ -232,6 +232,37 @@ void  TDialog::setDlgMax( unsigned  val )
 
 //------------------------------------------------------------------------------
 
+void  TDialog::setDlgEmpty()
+{
+    int  val;
+    QString  name;
+
+    val = 0;
+    name.clear();
+
+    priv__->m_ptLineName->setText( name );
+    priv__->m_ptLinePlaceholder->setText( name );
+    priv__->m_ptLineNew->setText( name );
+    priv__->m_ptLineAfter->setText( name );
+    priv__->m_ptLineBefore->setText( name );
+    priv__->m_ptLineUlink->setText( name );
+    priv__->m_ptLineUname->setText( name );
+    priv__->m_ptLineMulti->setText( name );
+
+    priv__->m_ptSpinType->setValue( val );
+    priv__->m_ptSpinMin->setValue( val );
+    priv__->m_ptSpinMax->setValue( val );
+
+    priv__->m_ptComboList->clear();
+}
+
+void  TDialog::setDlgTypeEnabled( bool enabled )
+{
+    priv__->m_ptSpinType->setEnabled( enabled );
+}
+
+//------------------------------------------------------------------------------
+
 void TDialog::onBtnAction( QAbstractButton*  btn )
 {
     // нажали Ok
@@ -266,6 +297,9 @@ void TDialog::onBtnAction( QAbstractButton*  btn )
     if( QDialogButtonBox::RejectRole == priv__->m_ptBtnBox->buttonRole( btn ) )
     {
         qDebug() << "dialog Cancel" << priv__->m_ptLineName->text();
+
+        // шлем сигнал с данными
+        Q_EMIT sendCancel();
     }
 }
 

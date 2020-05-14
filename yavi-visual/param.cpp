@@ -250,6 +250,9 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     // диалог
     m_ptDialog = new TDialog( true, "Parameters",  this );
 
+    // ловим сигнал от диалога об отмене
+    connect( m_ptDialog, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+
     // ловим сигнал от диалога с данными
     connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
 
@@ -259,6 +262,9 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     // указатель на родителя (имеется со второго, по дереву, TParam)
     m_pMentor = pMentor;
 
+    // глубина вложения
+    m_depth = depth;
+
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
     m_vlayout->setMargin( 0 );
@@ -267,7 +273,7 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
     // отступ
-    for( int i = 0; i < depth; i++ )
+    for( int i = 0; i < m_depth; i++ )
     {
         QLabel *label = new QLabel( this, Q_NULLPTR );
         label->setMinimumWidth( 93 );
@@ -301,22 +307,7 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
 
 TParam::~TParam()
 {
-    /*
-    QLayoutItem *child;
 
-    while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
-    {
-        delete child->widget();
-        delete child;
-    }
-
-    for( auto& it : m_apCategoriesList )
-    {
-        it->~TCategories();
-    }
-    */
-
-//    clear();
 }
 
 void  TParam::clear()
@@ -337,6 +328,8 @@ void  TParam::clear()
     m_vList.clear();
 
     m_apCategoriesList.clear();
+
+    need_to_add = false;
 }
 
 //------------------------------------------------------------------------------
@@ -351,6 +344,14 @@ void  TParam::onBtnDec()
 void  TParam::onBtnInc()
 {
 //    qDebug() << getParamName() << "inc button";
+
+    // признак что хотим создать новый набор параметров
+    need_to_add = true;
+
+    // диалог с пустыми параметрами
+    m_ptDialog->setDlgEmpty();
+
+    m_ptDialog->open();
 }
 
 void  TParam::onBtnName()
@@ -375,24 +376,71 @@ void  TParam::onBtnName()
     m_ptDialog->open();
 }
 
+void  TParam::onSendCancel()
+{
+    need_to_add = false;
+}
+
 void  TParam::onSendValues( TValues& a_tValues )
 {
-    m_tValues = a_tValues;
+    m_tValues = a_tValues; // зачем это кладем во внутреннюю переменную??
 
-    setParamName( m_tValues.m_zName.toStdString(), true );
-    setParamPlaceholder( m_tValues.m_zPlaceholder.toStdString(), true );
-    setParamNew( m_tValues.m_zNew.toStdString(), true );
-    setParamAfter( m_tValues.m_zAfter.toStdString(), true );
-    setParamBefore( m_tValues.m_zBefore.toStdString(), true );
-    setParamUlink( m_tValues.m_zUlink.toStdString(), true );
-    setParamUname( m_tValues.m_zUname.toStdString(), true );
-    setParamMulti( m_tValues.m_zMulti.toStdString(), true );
+    if( false == need_to_add )
+    {
+        // редактируем текущий набор параметров
 
-    setParamType( m_tValues.m_uType, true );
-    setParamMin( m_tValues.m_uMin, true );
-    setParamMax( m_tValues.m_uMax, true );
+        setParamName( m_tValues.m_zName.toStdString(), true );
+        setParamPlaceholder( m_tValues.m_zPlaceholder.toStdString(), true );
+        setParamNew( m_tValues.m_zNew.toStdString(), true );
+        setParamAfter( m_tValues.m_zAfter.toStdString(), true );
+        setParamBefore( m_tValues.m_zBefore.toStdString(), true );
+        setParamUlink( m_tValues.m_zUlink.toStdString(), true );
+        setParamUname( m_tValues.m_zUname.toStdString(), true );
+        setParamMulti( m_tValues.m_zMulti.toStdString(), true );
+
+        setParamType( m_tValues.m_uType, true );
+        setParamMin( m_tValues.m_uMin, true );
+        setParamMax( m_tValues.m_uMax, true );
+    }
+
+    if( true == need_to_add )
+    {
+        // создаем новый набор параметров
+/*
+        TParam  *pParam;
+        pParam = new TParam( m_pAncestor, m_pMentor, m_depth );
+        pParam->setNode( m_node );
+
+        // добавляемся к родителю
+        if( Q_NULLPTR != m_pAncestor )
+        {
+            m_pAncestor->drawParam( pParam );
+            m_pAncestor->m_apParamList.append( pParam );
+        }
+        else if( Q_NULLPTR != m_pMentor )
+        {
+            m_pMentor->m_apParamList.append( pParam );
+        }
+
+        // ставим значения параметров и пишем их в ямл
+        pParam->setParamName( m_tValues.m_zName.toStdString(), true );
+        pParam->setParamPlaceholder( m_tValues.m_zPlaceholder.toStdString(), true );
+        pParam->setParamNew( m_tValues.m_zNew.toStdString(), true );
+        pParam->setParamAfter( m_tValues.m_zAfter.toStdString(), true );
+        pParam->setParamBefore( m_tValues.m_zBefore.toStdString(), true );
+        pParam->setParamUlink( m_tValues.m_zUlink.toStdString(), true );
+        pParam->setParamUname( m_tValues.m_zUname.toStdString(), true );
+        pParam->setParamMulti( m_tValues.m_zMulti.toStdString(), true );
+
+        pParam->setParamType( m_tValues.m_uType, true );
+        pParam->setParamMin( m_tValues.m_uMin, true );
+        pParam->setParamMax( m_tValues.m_uMax, true );
+*/
+    }
 
 //    setParamList( m_tValues.m_vList, true );
+
+    need_to_add = false;
 }
 
 //------------------------------------------------------------------------------

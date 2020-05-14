@@ -13,6 +13,9 @@ TCategory::TCategory( TGoods  *pAncestor )
     // диалог
     m_ptDialog = new TDialog( false, "Category", this );
 
+    // ловим сигнал от диалога об отмене
+    connect( m_ptDialog, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+
     // ловим сигнал от диалога с данными
     connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
 
@@ -45,15 +48,7 @@ TCategory::TCategory( TGoods  *pAncestor )
 
 TCategory::~TCategory()
 {
-    /*
-    QLayoutItem *child;
 
-    while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
-    {
-        delete child->widget();
-        delete child;
-    }
-    */
 }
 
 //------------------------------------------------------------------------------
@@ -70,13 +65,87 @@ void  TCategory::onBtnName()
 void  TCategory::onBtnInc()
 {
     qDebug() << getCategoryName() << "inc button";
+
+    // признак что хотим создать новый набор параметров
+    need_to_add = true;
+
+    // диалог с пустыми параметрами
+    m_ptDialog->setDlgEmpty();
+
+    m_ptDialog->open();
+}
+
+void  TCategory::onSendCancel()
+{
+    need_to_add = false;
 }
 
 void  TCategory::onSendValues( TValues& a_tValues )
 {
     m_tValues = a_tValues;
 
-    setCategoryName( m_tValues.m_zName.toStdString(), true );
+    if( false == need_to_add )
+    {
+        // редактируем текущий набор параметров
+
+        setCategoryName( m_tValues.m_zName.toStdString(), true );
+    }
+
+    if( true == need_to_add )
+    {
+        // создаем новый набор параметров
+
+        TParam  *pParam;
+        pParam = new TParam( this, Q_NULLPTR, m_depth );
+        //pParam->setNode( m_node[GoodsParametersSection] );
+
+        // добавляемся к родителю
+        m_vlayout->insertWidget( 1, pParam, 0, Qt::AlignLeft | Qt::AlignTop );
+        m_apParamList.append( pParam );
+
+        m_node[GoodsParametersSection].push_back( "newparam" );
+
+        std::string  str;
+        for( auto it : m_node[ GoodsParametersSection ] )
+        {
+            if( __yaml_IsScalar( it ) )
+            {
+                qDebug() << "scalar";
+                pParam->setNode( it );
+            }
+
+            if( __yaml_IsSequence( it ) )
+                qDebug() << "sequence";
+
+            if( __yaml_IsMap( it ) )
+                qDebug() << "map";
+
+            // str = __yaml_GetString( it, "newparam" );
+//            qDebug() << QString::fromStdString(str);
+        }
+
+        // ставим значения параметров и пишем их в ямл
+        pParam->setParamName( m_tValues.m_zName.toStdString(), true );
+//        m_node[GoodsParametersSection].push_back( m_tValues.m_zName.toStdString() );
+        pParam->setParamPlaceholder( "test", true );
+//        m_node[GoodsParametersSection].push_back( "test" );
+
+        /*
+        pParam->setParamPlaceholder( m_tValues.m_zPlaceholder.toStdString(), true );
+        pParam->setParamNew( m_tValues.m_zNew.toStdString(), true );
+        pParam->setParamAfter( m_tValues.m_zAfter.toStdString(), true );
+        pParam->setParamBefore( m_tValues.m_zBefore.toStdString(), true );
+        pParam->setParamUlink( m_tValues.m_zUlink.toStdString(), true );
+        pParam->setParamUname( m_tValues.m_zUname.toStdString(), true );
+        pParam->setParamMulti( m_tValues.m_zMulti.toStdString(), true );
+
+        pParam->setParamType( m_tValues.m_uType, true );
+        pParam->setParamMin( m_tValues.m_uMin, true );
+        pParam->setParamMax( m_tValues.m_uMax, true );
+        */
+    }
+
+    need_to_add = false;
 }
 
 //------------------------------------------------------------------------------
@@ -272,6 +341,14 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
 }
 
 //------------------------------------------------------------------------------
+
+void  TCategory::drawParam( TParam  *pParam )
+{
+    if( Q_NULLPTR != pParam )
+    {
+        m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
+    }
+}
 
 void  TCategory::setCategoryName( const std::string&  name, bool  set_to_node )
 {

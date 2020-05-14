@@ -35,11 +35,14 @@ public:
 
     void           CategoryDelete();
 
+    void           drawParam( TParam *pParam );
+
     QList<TParam*> m_apParamList;
 
 protected Q_SLOTS :
     void           onBtnName();
     void           onBtnInc();
+    void           onSendCancel();
     void           onSendValues( TValues& );
 
 private:
@@ -60,6 +63,8 @@ private:
     TValues        m_tValues;
 
     TGoods        *m_pAncestor;
+
+    bool           need_to_add; // необходимость создать новый набор параметров в ямле
 };
 
 //------------------------------------------------------------------------------
