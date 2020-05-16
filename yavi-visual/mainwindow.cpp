@@ -239,11 +239,27 @@ bool  MainWindow::fini( const QString&  filename )
     QTextStream out( &fp );
 
     // открываем файл на запись
-    if( !fp.open( QIODevice::ReadWrite | QIODevice::Text ) )
+    if( !fp.open( QIODevice::WriteOnly | QIODevice::Text ) )
     {
         zFailReason = "cannot create file";
         return false;
     }
+
+/*
+    YAML::Node node;
+
+    node["prostoslovo1"] = "prostoznachenie1";
+    node["prostoslovo2"] = "prostoznachenie2";
+    node["prostoslovo3"] = "prostoznachenie3";
+    node["prostoslovo4"] = "prostoznachenie4";
+
+    YAML::Node node1;
+
+    node1["parameters"].push_back("first");
+    node1["parameters"].push_back("second");
+
+    node1["parameters"].push_back( node );
+*/
 
     // пробуем выгрузить ямл в строку
     try {

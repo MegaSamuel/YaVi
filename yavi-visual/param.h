@@ -79,7 +79,7 @@ public:
     ~TParam();
 
     void           setNode( const YAML::Node&  node );
-    YAML::Node     getNode();
+    YAML::Node&    getNode();
 
     void           setParamName( const std::string&  name, bool  set_to_node = false );
     void           setParamPlaceholder( const std::string&  name, bool  set_to_node = false );

@@ -397,6 +397,7 @@ void  TParam::onSendValues( TValues& a_tValues )
         // редактируем текущий набор параметров
 
         setParamName( m_tValues.m_zName.toStdString(), true );
+        setParamType( m_tValues.m_uType, true );
         setParamPlaceholder( m_tValues.m_zPlaceholder.toStdString(), true );
         setParamNew( m_tValues.m_zNew.toStdString(), true );
         setParamAfter( m_tValues.m_zAfter.toStdString(), true );
@@ -404,8 +405,6 @@ void  TParam::onSendValues( TValues& a_tValues )
         setParamUlink( m_tValues.m_zUlink.toStdString(), true );
         setParamUname( m_tValues.m_zUname.toStdString(), true );
         setParamMulti( m_tValues.m_zMulti.toStdString(), true );
-
-        setParamType( m_tValues.m_uType, true );
         setParamMin( m_tValues.m_uMin, true );
         setParamMax( m_tValues.m_uMax, true );
     }
@@ -565,7 +564,7 @@ void  TParam::setNode( const YAML::Node&  node )
     m_node = node;
 }
 
-YAML::Node  TParam::getNode()
+YAML::Node&  TParam::getNode()
 {
     return m_node;
 }

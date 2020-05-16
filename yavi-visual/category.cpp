@@ -97,52 +97,43 @@ void  TCategory::onSendValues( TValues& a_tValues )
 
         TParam  *pParam;
         pParam = new TParam( this, Q_NULLPTR, m_depth );
-        //pParam->setNode( m_node[GoodsParametersSection] );
+        pParam->setNode( m_node[ GoodsParametersSection ] );
 
         // добавляемся к родителю
-        m_vlayout->insertWidget( 1, pParam, 0, Qt::AlignLeft | Qt::AlignTop );
+        //m_vlayout->insertWidget( 1, pParam, 0, Qt::AlignLeft | Qt::AlignTop );
+        m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
         m_apParamList.append( pParam );
 
-        m_node[GoodsParametersSection].push_back( "newparam" );
+        // ставим значения параметров
+        pParam->setParamName( m_tValues.m_zName.toStdString(), false );
+        pParam->setParamType( m_tValues.m_uType, false );
+        pParam->setParamPlaceholder( m_tValues.m_zPlaceholder.toStdString(), false );
+        pParam->setParamNew( m_tValues.m_zNew.toStdString(), false );
+        pParam->setParamAfter( m_tValues.m_zAfter.toStdString(), false );
+        pParam->setParamBefore( m_tValues.m_zBefore.toStdString(), false );
+        pParam->setParamUlink( m_tValues.m_zUlink.toStdString(), false );
+        pParam->setParamUname( m_tValues.m_zUname.toStdString(), false );
+        pParam->setParamMulti( m_tValues.m_zMulti.toStdString(), false );
+        pParam->setParamMin( m_tValues.m_uMin, false );
+        pParam->setParamMax( m_tValues.m_uMax, false );
 
-        std::string  str;
-        for( auto it : m_node[ GoodsParametersSection ] )
-        {
-            if( __yaml_IsScalar( it ) )
-            {
-                qDebug() << "scalar";
-                pParam->setNode( it );
-            }
+        YAML::Node  node;
+        node.reset();
 
-            if( __yaml_IsSequence( it ) )
-                qDebug() << "sequence";
+        // пишем их в ямл
+        __yaml_SetString( node, GoodsNameSection, m_tValues.m_zName.toStdString() );
+        __yaml_SetScalar( node, GoodsTypeSection, m_tValues.m_uType );
+        __yaml_SetString( node, GoodsPlaceholderSection, m_tValues.m_zPlaceholder.toStdString() );
+        __yaml_SetString( node, GoodsNewSection, m_tValues.m_zNew.toStdString() );
+        __yaml_SetString( node, GoodsAfterSection, m_tValues.m_zAfter.toStdString() );
+        __yaml_SetString( node, GoodsBeforeSection, m_tValues.m_zBefore.toStdString() );
+        __yaml_SetString( node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
+        __yaml_SetString( node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
+        __yaml_SetString( node, GoodsMultiSection, m_tValues.m_zMulti.toStdString() );
+        __yaml_SetScalar( node, GoodsMinSection, m_tValues.m_uMin );
+        __yaml_SetScalar( node, GoodsMaxSection, m_tValues.m_uMax );
 
-            if( __yaml_IsMap( it ) )
-                qDebug() << "map";
-
-            // str = __yaml_GetString( it, "newparam" );
-//            qDebug() << QString::fromStdString(str);
-        }
-
-        // ставим значения параметров и пишем их в ямл
-        pParam->setParamName( m_tValues.m_zName.toStdString(), true );
-//        m_node[GoodsParametersSection].push_back( m_tValues.m_zName.toStdString() );
-        pParam->setParamPlaceholder( "test", true );
-//        m_node[GoodsParametersSection].push_back( "test" );
-
-        /*
-        pParam->setParamPlaceholder( m_tValues.m_zPlaceholder.toStdString(), true );
-        pParam->setParamNew( m_tValues.m_zNew.toStdString(), true );
-        pParam->setParamAfter( m_tValues.m_zAfter.toStdString(), true );
-        pParam->setParamBefore( m_tValues.m_zBefore.toStdString(), true );
-        pParam->setParamUlink( m_tValues.m_zUlink.toStdString(), true );
-        pParam->setParamUname( m_tValues.m_zUname.toStdString(), true );
-        pParam->setParamMulti( m_tValues.m_zMulti.toStdString(), true );
-
-        pParam->setParamType( m_tValues.m_uType, true );
-        pParam->setParamMin( m_tValues.m_uMin, true );
-        pParam->setParamMax( m_tValues.m_uMax, true );
-        */
+        m_node[ GoodsParametersSection ].push_back( node );
     }
 
     need_to_add = false;
