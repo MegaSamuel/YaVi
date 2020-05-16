@@ -16,7 +16,7 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 
     m_pMentor = pMentor;
 
-    m_depth = depth + 1;
+    m_depth = depth;
 
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
@@ -50,6 +50,7 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     m_ptBtnInc = new QPushButton( "+", this );
     m_ptBtnInc->setToolTip( "Добавить параметр" );
     m_ptBtnInc->setFixedWidth( 93 );
+    setIncBtnVisible( false );
     connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
     hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
 
@@ -239,6 +240,11 @@ int  TCategories::getCategoriesDepth()
     return m_depth;
 }
 
+void  TCategories::setIncBtnVisible( bool visible )
+{
+    m_ptBtnInc->setVisible( visible );
+}
+
 //------------------------------------------------------------------------------
 
 //------------------------------------------------------------------------------
@@ -297,6 +303,7 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     m_ptBtnInc = new QPushButton( "+", this );
     m_ptBtnInc->setToolTip( "Добавить параметр" );
     m_ptBtnInc->setFixedWidth( 93 );
+    setIncBtnVisible( false );  // по умолчанию кнопка невидимая
     connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
     hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
 
@@ -670,6 +677,11 @@ void  TParam::setParamType( unsigned  val, bool  set_to_node )
 {
     m_uType = val;
 
+    if( ( 4 == m_uType ) || ( 5 == m_uType ) )
+    {
+        setIncBtnVisible( true );
+    }
+
     if( set_to_node )
     {
         bool res = __yaml_SetScalar( m_node, GoodsTypeSection, val );
@@ -775,6 +787,13 @@ unsigned  TParam::getParamMax()
 QStringList  TParam::getParamList()
 {
     return m_vList;
+}
+
+//------------------------------------------------------------------------------
+
+void  TParam::setIncBtnVisible( bool visible )
+{
+    m_ptBtnInc->setVisible( visible );
 }
 
 //------------------------------------------------------------------------------

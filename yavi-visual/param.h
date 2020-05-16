@@ -45,6 +45,8 @@ private:
 
     void           clearNodeSequence();
 
+    void           setIncBtnVisible( bool visible );
+
     YAML::Node     m_node;      // текущий уровнь дерева ямла
 
     QVBoxLayout   *m_vlayout;
@@ -127,6 +129,8 @@ private:
     void           clear();
 
     void           clearNodeSequence();
+
+    void           setIncBtnVisible( bool visible );
 
     YAML::Node     m_node;      // текущий уровнь дерева ямла
 

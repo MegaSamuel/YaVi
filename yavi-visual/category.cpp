@@ -236,13 +236,13 @@ void  TCategory::getCategories( const YAML::Node&  node, TParam  *a_pParam, int 
         for( auto& par : node[ GoodsParametersSection ] )
         {
             TParam  *pParam;
-            pParam = new TParam( Q_NULLPTR, pCategories, pCategories->getCategoriesDepth() + 1 );
+            pParam = new TParam( Q_NULLPTR, pCategories, pCategories->getCategoriesDepth()+1 );
             pParam->setNode( par );
 
             // добавляем Parameters в список класса TCategories
             pCategories->m_apParamList.append(pParam);
 
-            getParameters( par, pParam, pCategories->getCategoriesDepth() );
+            getParameters( par, pParam, pCategories->getCategoriesDepth()+1 );
         }
     }
 }
@@ -334,7 +334,7 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
 
             for( auto& cat : node[ GoodsCategoriesSection ] )
             {
-                getCategories( cat, a_pParam, depth );
+                getCategories( cat, a_pParam, depth+1 );
             }
         }
     }

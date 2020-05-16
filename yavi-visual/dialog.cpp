@@ -209,6 +209,8 @@ void  TDialog::setDlgMulti( const QString&  name )
 
 void  TDialog::setDlgCombo( QStringList  list )
 {
+    priv__->m_ptComboList->clear();
+
     for( auto& it : list )
     {
         priv__->m_ptComboList->addItem( it );
