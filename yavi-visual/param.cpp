@@ -285,7 +285,7 @@ void  TCategories::setCategoriesName( const std::string&  name, bool  set_to_nod
     m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );  // убираем подряд идущие пробелы на один
     m_zBtnName.replace( " ", "\n" );                // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );             // правленное имя кнопки
-    m_ptBtnName->setToolTip( m_zName );             // подсказка с оригинальным именем
+    m_ptBtnName->setToolTip( "Категория: " + m_zName );             // подсказка с оригинальным именем
 
     if( set_to_node )
     {
@@ -394,7 +394,7 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+" );
-    m_ptBtnInc->setToolTip( "Добавить параметр" );
+    m_ptBtnInc->setToolTip( "Добавить категорию" );
     m_ptBtnInc->setFixedWidth( 93 );
     setIncBtnVisible( false );  // по умолчанию кнопка невидимая
     connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
@@ -522,43 +522,35 @@ void  TParam::onSendValues( TValues& a_tValues )
 
         qDebug() << getParamName() << "add param";
 
-        //if( 0 == m_zList.lenght() )
-
+        // добавляем новое поле в values
         addParamList( m_tValues.m_zName, true );
 
-        /*
-        TParam  *pParam;
-        pParam = new TParam( m_pAncestor, m_pMentor, m_depth );
-        pParam->setNode( m_node );
+        // добавляем категорию
+        TCategories  *pCategories;
+        pCategories = new TCategories( this, m_depth+1 );
+        pCategories->setNode( m_node[ GoodsCategoriesSection ] );
 
+        //!bug  надо перерисовывать все layout-ы
         // добавляемся к родителю
-        if( Q_NULLPTR != m_pAncestor )
-        {
-            m_pAncestor->drawParam( pParam );
-            m_pAncestor->m_apParamList.append( pParam );
-        }
-        else if( Q_NULLPTR != m_pMentor )
-        {
-            m_pMentor->m_apParamList.append( pParam );
-        }
+        //m_vlayout->insertWidget( 1, pParam, 0, Qt::AlignLeft | Qt::AlignTop );
+        m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
+        m_apCategoriesList.append( pCategories );
 
-        // ставим значения параметров и пишем их в ямл
-        pParam->setParamName( m_tValues.m_zName.toStdString(), true );
-        pParam->setParamPlaceholder( m_tValues.m_zPlaceholder.toStdString(), true );
-        pParam->setParamNew( m_tValues.m_zNew.toStdString(), true );
-        pParam->setParamAfter( m_tValues.m_zAfter.toStdString(), true );
-        pParam->setParamBefore( m_tValues.m_zBefore.toStdString(), true );
-        pParam->setParamUlink( m_tValues.m_zUlink.toStdString(), true );
-        pParam->setParamUname( m_tValues.m_zUname.toStdString(), true );
-        pParam->setParamMulti( m_tValues.m_zMulti.toStdString(), true );
+        // ставим значения параметров
+        pCategories->setCategoriesName( m_tValues.m_zName.toStdString() );
+        pCategories->setCategoriesUlink( m_tValues.m_zUlink.toStdString() );
+        pCategories->setCategoriesUname( m_tValues.m_zUname.toStdString() );
 
-        pParam->setParamType( m_tValues.m_uType, true );
-        pParam->setParamMin( m_tValues.m_uMin, true );
-        pParam->setParamMax( m_tValues.m_uMax, true );
-*/
+        YAML::Node  node;
+        node.reset();
+
+        // пишем их в ямл
+        __yaml_SetString( node, GoodsNameSection, m_tValues.m_zName.toStdString() );
+        __yaml_SetString( node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
+        __yaml_SetString( node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
+
+        m_node[ GoodsCategoriesSection ].push_back( node );
     }
-
-//    setParamList( m_tValues.m_vList, true );
 
     need_to_add = false;
 }
@@ -683,7 +675,7 @@ void  TParam::setParamName( const std::string&  name, bool  set_to_node )
     m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );  // убираем подряд идущие пробелы на один
     m_zBtnName.replace( " ", "\n" );                // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );             // правленное имя кнопки
-    m_ptBtnName->setToolTip( m_zName );             // подсказка с оригинальным именем
+    m_ptBtnName->setToolTip( "Параметр: " +  m_zName );             // подсказка с оригинальным именем
 
     if( set_to_node )
     {

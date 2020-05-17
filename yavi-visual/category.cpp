@@ -344,7 +344,7 @@ void  TCategory::setCategoryName( const std::string&  name, bool  set_to_node )
     m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );  // убираем подряд идущие пробелы на один
     m_zBtnName.replace( " ", "\n" );                // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );             // правленное имя кнопки
-    m_ptBtnName->setToolTip( m_zName );             // подсказка с оригинальным именем
+    m_ptBtnName->setToolTip( "Категория: " + m_zName );             // подсказка с оригинальным именем
 
     if( set_to_node )
     {
