@@ -143,6 +143,7 @@ void  TCategories::clearNode()
 void  TCategories::CategoriesDelete()
 {
     QLayoutItem *child;
+    QString  item = getCategoriesName();
 
     // уничтожаем диалог
     m_ptDialog->~TDialog();
@@ -181,6 +182,8 @@ void  TCategories::CategoriesDelete()
                 m_pMentor->m_apCategoriesList.removeAt(i);
             }
         }
+
+        m_pMentor->remParamList( item, true );
 
         m_pMentor->clearNode();
     }
@@ -515,6 +518,7 @@ void  TParam::clearNodeCategories()
 
 void  TParam::clearNode()
 {
+    /*
     std::string  str;
     QStringList  list;
 
@@ -522,6 +526,7 @@ void  TParam::clearNode()
     list.clear();
 
     setParamList( list, str, true );
+    */
 
     clearNodeCategories();
 }
