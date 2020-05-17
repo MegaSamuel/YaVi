@@ -11,7 +11,7 @@ TCategory::TCategory( TGoods  *pAncestor )
     m_depth = 0;
 
     // диалог
-    m_ptDialog = new TDialog( false, "Category", this );
+    m_ptDialog = new TDialog( true, "Category", this );
 
     // ловим сигнал от диалога об отмене
     connect( m_ptDialog, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
@@ -29,13 +29,13 @@ TCategory::TCategory( TGoods  *pAncestor )
     hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
     // кнопка с именем
-    m_ptBtnName = new QPushButton( "button", this );
+    m_ptBtnName = new QPushButton( "button" );
     m_ptBtnName->setFixedWidth( 93 );
     connect( m_ptBtnName, SIGNAL(clicked()), this, SLOT(onBtnName()) );
     hlayout->addWidget( m_ptBtnName, 0, Qt::AlignLeft );
 
     // кнопка плюс
-    m_ptBtnInc = new QPushButton( "+", this );
+    m_ptBtnInc = new QPushButton( "+" );
     m_ptBtnInc->setToolTip( "Добавить параметр" );
     m_ptBtnInc->setFixedWidth( 93 );
     connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
@@ -43,7 +43,7 @@ TCategory::TCategory( TGoods  *pAncestor )
 
     m_vlayout->addLayout( hlayout, 0 );
 
-    this->setLayout( m_vlayout );
+    setLayout( m_vlayout );
 }
 
 TCategory::~TCategory()
@@ -56,6 +56,11 @@ TCategory::~TCategory()
 void  TCategory::onBtnName()
 {
     qDebug() << getCategoryName() << "button";
+
+    // диалог с пустыми параметрами
+    m_ptDialog->setDlgEmpty();
+
+    m_ptDialog->setDlgEnabled( false );
 
     m_ptDialog->setDlgName( getCategoryName() );
 
@@ -71,6 +76,10 @@ void  TCategory::onBtnInc()
 
     // диалог с пустыми параметрами
     m_ptDialog->setDlgEmpty();
+
+    m_ptDialog->setDlgEnabled( true );
+
+    m_ptDialog->setDlgName( "NewParam" );
 
     m_ptDialog->open();
 }

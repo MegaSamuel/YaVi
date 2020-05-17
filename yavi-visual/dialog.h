@@ -37,7 +37,20 @@ public :
     void    setDlgCombo( QStringList  list );
 
     void    setDlgEmpty();
+
+    void    setDlgEnabled( bool  enabled );
+
     void    setDlgTypeEnabled( bool  enabled );
+    void    setDlgPlaceholderEnabled( bool  enabled );
+    void    setDlgNewEnabled( bool  enabled );
+    void    setDlgAfterEnabled( bool  enabled );
+    void    setDlgBeforeEnabled( bool  enabled );
+    void    setDlgUlinkEnabled( bool  enabled );
+    void    setDlgUnameEnabled( bool  enabled );
+    void    setDlgMultiEnabled( bool  enabled );
+    void    setDlgMinEnabled( bool  enabled );
+    void    setDlgMaxEnabled( bool  enabled );
+    void    setDlgComboEnabled( bool  enabled );
 
 Q_SIGNALS:
     void    sendCancel();

@@ -120,6 +120,7 @@ public:
 
 protected Q_SLOTS :
     void           onBtnDec();
+    void           onBtnValDec();
     void           onBtnInc();
     void           onBtnName();
     void           onSendCancel();
@@ -131,6 +132,11 @@ private:
     void           clearNodeSequence();
 
     void           setIncBtnVisible( bool visible );
+
+    void           setParamValueAdd();
+    void           setParamValueDel();
+    void           setParamValueMin( int  min );
+    void           setParamValueMax( int  max );
 
     YAML::Node     m_node;      // текущий уровнь дерева ямла
 
@@ -149,13 +155,18 @@ private:
 
     QStringList    m_vList;
 
-    QVBoxLayout   *m_vlayout;
+    QVBoxLayout   *m_vlayout; // главный layout класса
+    QHBoxLayout   *m_hlayout; // layout для второй строки
 
     QPushButton   *m_ptBtnDec;
     QPushButton   *m_ptBtnInc;
     QPushButton   *m_ptBtnName;
 
     QString        m_zBtnName;  // текст на кнопке
+
+    bool           m_second_row_exist = false;
+    QPushButton   *m_ptBtnValDec;
+    QSpinBox      *m_ptSpinValue;
 
     TDialog       *m_ptDialog;
 

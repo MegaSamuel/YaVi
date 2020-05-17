@@ -9,7 +9,7 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     clear();
 
     // диалог
-    m_ptDialog = new TDialog( false, "Categories",  this );
+    m_ptDialog = new TDialog( true, "Categories",  this );
 
     // ловим сигнал от диалога с данными
     connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
@@ -28,26 +28,26 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     // отступ
     for( int i = 0; i < m_depth; i++ )
     {
-        QLabel *label = new QLabel( this, Q_NULLPTR );
+        QLabel *label = new QLabel();
         label->setMinimumWidth( 93 );
         hlayout->addWidget( label, 0, Qt::AlignLeft );
     }
 
     // кнопка минус
-    m_ptBtnDec = new QPushButton( "-", this );
+    m_ptBtnDec = new QPushButton( "-");
     m_ptBtnDec->setToolTip( "Удалить параметр" );
     m_ptBtnDec->setFixedWidth( 93 );
     connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
     hlayout->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
 
     // кнопка с именем
-    m_ptBtnName = new QPushButton( "button", this );
+    m_ptBtnName = new QPushButton( "button" );
     m_ptBtnName->setFixedWidth( 93 );
     connect( m_ptBtnName, SIGNAL(clicked()), this, SLOT(onBtnName()) );
     hlayout->addWidget( m_ptBtnName, 0, Qt::AlignLeft );
 
     // кнопка плюс
-    m_ptBtnInc = new QPushButton( "+", this );
+    m_ptBtnInc = new QPushButton( "+" );
     m_ptBtnInc->setToolTip( "Добавить параметр" );
     m_ptBtnInc->setFixedWidth( 93 );
     setIncBtnVisible( false );
@@ -56,27 +56,12 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 
     m_vlayout->addLayout( hlayout, 0 );
 
-    this->setLayout( m_vlayout );
+    setLayout( m_vlayout );
 }
 
 TCategories::~TCategories()
 {
-    /*
-    QLayoutItem *child;
 
-    while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
-    {
-        delete child->widget();
-        delete child;
-    }
-
-    for( auto& it : m_apParamList )
-    {
-        it->~TParam();
-    }
-    */
-
-//    clear();
 }
 
 void TCategories::clear()
@@ -104,6 +89,11 @@ void  TCategories::onBtnInc()
 void  TCategories::onBtnName()
 {
 //    qDebug() << getCategoriesName() << "button";
+
+    // диалог с пустыми параметрами
+    m_ptDialog->setDlgEmpty();
+
+    m_ptDialog->setDlgEnabled( false );
 
     m_ptDialog->setDlgName( getCategoriesName() );
 
@@ -281,26 +271,26 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     // отступ
     for( int i = 0; i < m_depth; i++ )
     {
-        QLabel *label = new QLabel( this, Q_NULLPTR );
+        QLabel *label = new QLabel();
         label->setMinimumWidth( 93 );
         hlayout->addWidget( label, 0, Qt::AlignLeft );
     }
 
     // кнопка минус
-    m_ptBtnDec = new QPushButton( "-", this );
+    m_ptBtnDec = new QPushButton( "-" );
     m_ptBtnDec->setToolTip( "Удалить параметр" );
     m_ptBtnDec->setFixedWidth( 93 );
     connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
     hlayout->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
 
     // кнопка с именем
-    m_ptBtnName = new QPushButton( "button", this );
+    m_ptBtnName = new QPushButton( "button" );
     m_ptBtnName->setFixedWidth( 93 );
     connect( m_ptBtnName, SIGNAL(clicked()), this, SLOT(onBtnName()) );
     hlayout->addWidget( m_ptBtnName, 0, Qt::AlignLeft );
 
     // кнопка плюс
-    m_ptBtnInc = new QPushButton( "+", this );
+    m_ptBtnInc = new QPushButton( "+" );
     m_ptBtnInc->setToolTip( "Добавить параметр" );
     m_ptBtnInc->setFixedWidth( 93 );
     setIncBtnVisible( false );  // по умолчанию кнопка невидимая
@@ -309,7 +299,7 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
 
     m_vlayout->addLayout( hlayout, 0 );
 
-    this->setLayout( m_vlayout );
+    setLayout( m_vlayout );
 }
 
 TParam::~TParam()
@@ -346,6 +336,13 @@ void  TParam::onBtnDec()
 //    qDebug() << getParamName() << "dec button";
 
     ParamDelete();
+}
+
+void  TParam::onBtnValDec()
+{
+    qDebug() << getParamName() << "dec val button";
+
+    setParamType( 0, true );
 }
 
 void  TParam::onBtnInc()
@@ -581,9 +578,7 @@ void  TParam::setParamName( const std::string&  name, bool  set_to_node )
 
     if( set_to_node )
     {
-        bool res = __yaml_SetString( m_node, GoodsNameSection, name );
-
-        qDebug() << "set" << GoodsNameSection << m_zName << res;
+        __yaml_SetString( m_node, GoodsNameSection, name );
     }
 }
 
@@ -593,9 +588,7 @@ void  TParam::setParamPlaceholder( const std::string&  name, bool  set_to_node )
 
     if( set_to_node )
     {
-        bool res = __yaml_SetString( m_node, GoodsPlaceholderSection, name );
-
-        qDebug() << "set" << GoodsPlaceholderSection << m_zPlaceholder << res;
+        __yaml_SetString( m_node, GoodsPlaceholderSection, name );
     }
 }
 
@@ -605,9 +598,7 @@ void  TParam::setParamNew( const std::string&  name, bool  set_to_node )
 
     if( set_to_node )
     {
-        bool res = __yaml_SetString( m_node, GoodsNewSection, name );
-
-        qDebug() << "set" << GoodsNewSection << m_zNew << res;
+        __yaml_SetString( m_node, GoodsNewSection, name );
     }
 }
 
@@ -617,9 +608,7 @@ void  TParam::setParamAfter( const std::string&  name, bool  set_to_node )
 
     if( set_to_node )
     {
-        bool res = __yaml_SetString( m_node, GoodsAfterSection, name );
-
-        qDebug() << "set" << GoodsAfterSection << m_zAfter << res;
+        __yaml_SetString( m_node, GoodsAfterSection, name );
     }
 }
 
@@ -629,9 +618,7 @@ void  TParam::setParamBefore( const std::string&  name, bool  set_to_node )
 
     if( set_to_node )
     {
-        bool res = __yaml_SetString( m_node, GoodsBeforeSection, name );
-
-        qDebug() << "set" << GoodsBeforeSection << m_zBefore << res;
+        __yaml_SetString( m_node, GoodsBeforeSection, name );
     }
 }
 
@@ -641,9 +628,7 @@ void  TParam::setParamUlink( const std::string&  name, bool  set_to_node )
 
     if( set_to_node )
     {
-        bool res = __yaml_SetString( m_node, GoodsUlinkSection, name );
-
-        qDebug() << "set" << GoodsUlinkSection << m_zUlink << res;
+        __yaml_SetString( m_node, GoodsUlinkSection, name );
     }
 }
 
@@ -653,9 +638,7 @@ void  TParam::setParamUname( const std::string&  name, bool  set_to_node )
 
     if( set_to_node )
     {
-        bool res = __yaml_SetString( m_node, GoodsUnameSection, name );
-
-        qDebug() << "set" << GoodsUnameSection << m_zUname << res;
+        __yaml_SetString( m_node, GoodsUnameSection, name );
     }
 }
 
@@ -665,9 +648,7 @@ void  TParam::setParamMulti( const std::string&  name, bool  set_to_node )
 
     if( set_to_node )
     {
-        bool res = __yaml_SetString( m_node, GoodsMultiSection, name );
-
-        qDebug() << "set" << GoodsMultiSection << m_zMulti << res;
+        __yaml_SetString( m_node, GoodsMultiSection, name );
     }
 }
 
@@ -676,16 +657,29 @@ void  TParam::setParamType( unsigned  val, bool  set_to_node )
 {
     m_uType = val;
 
+    qDebug() << getParamName() << "set param" << m_uType << m_second_row_exist;
+
+    if( ( 1 == m_uType ) || ( 2 == m_uType ) || ( 3 == m_uType ) )
+    {
+        setParamValueAdd();
+    }
+    else
+    {
+        setParamValueDel();
+    }
+
     if( ( 4 == m_uType ) || ( 5 == m_uType ) )
     {
         setIncBtnVisible( true );
     }
+    else
+    {
+        setIncBtnVisible( false );
+    }
 
     if( set_to_node )
     {
-        bool res = __yaml_SetScalar( m_node, GoodsTypeSection, val );
-
-        qDebug() << "set" << GoodsTypeSection << m_uType << res;
+        __yaml_SetScalar( m_node, GoodsTypeSection, val );
     }
 }
 
@@ -693,11 +687,11 @@ void  TParam::setParamMin( unsigned  val, bool  set_to_node )
 {
     m_uMin = val;
 
+    setParamValueMin( static_cast<int>(m_uMin) );
+
     if( set_to_node )
     {
-        bool res = __yaml_SetScalar( m_node, GoodsMinSection, val );
-
-        qDebug() << "set" << GoodsMinSection << m_uMin << res;
+        __yaml_SetScalar( m_node, GoodsMinSection, val );
     }
 }
 
@@ -705,11 +699,11 @@ void  TParam::setParamMax( unsigned  val, bool  set_to_node )
 {
     m_uMax = val;
 
+    setParamValueMax( static_cast<int>(m_uMax) );
+
     if( set_to_node )
     {
-        bool res = __yaml_SetScalar( m_node, GoodsMaxSection, val );
-
-        qDebug() << "set" << GoodsMaxSection << m_uMax << res;
+        __yaml_SetScalar( m_node, GoodsMaxSection, val );
     }
 }
 
@@ -793,6 +787,78 @@ QStringList  TParam::getParamList()
 void  TParam::setIncBtnVisible( bool visible )
 {
     m_ptBtnInc->setVisible( visible );
+}
+
+//------------------------------------------------------------------------------
+
+void  TParam::setParamValueAdd()
+{
+    if( m_second_row_exist )
+        return;
+
+    m_hlayout = new QHBoxLayout();
+    m_hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+
+    // отступ
+    for( int i = 0; i < m_depth+1; i++ )
+    {
+        QLabel *label = new QLabel();
+        label->setMinimumWidth( 93 );
+        m_hlayout->addWidget( label, 0, Qt::AlignLeft );
+    }
+
+    // кнопка минус
+    m_ptBtnValDec = new QPushButton( "-" );
+    m_ptBtnValDec->setToolTip( "Удалить значение" );
+    m_ptBtnValDec->setFixedWidth( 93 );
+    connect( m_ptBtnValDec, SIGNAL(clicked()), this, SLOT(onBtnValDec()) );
+    m_hlayout->addWidget( m_ptBtnValDec, 0, Qt::AlignLeft );
+
+    // спин со значением
+    m_ptSpinValue = new QSpinBox();
+    m_ptSpinValue->setToolTip( "Значение" );
+    m_ptSpinValue->setFixedWidth( 93 );
+    m_hlayout->addWidget( m_ptSpinValue, 0, Qt::AlignLeft );
+
+    m_vlayout->addLayout( m_hlayout );
+
+    m_second_row_exist = true;
+}
+
+void  TParam::setParamValueDel()
+{
+    if( !m_second_row_exist )
+        return;
+
+    QLayoutItem *child;
+
+    // уничтожаем виджеты
+    while( ( child = m_hlayout->takeAt(0) ) != Q_NULLPTR )
+    {
+        delete child->widget();
+        delete child;
+    }
+
+    // уничтожаем layout
+    m_hlayout->deleteLater();
+
+    m_second_row_exist = false;
+}
+
+void  TParam::setParamValueMin( int  min )
+{
+    if( m_second_row_exist )
+    {
+        m_ptSpinValue->setMinimum( min );
+    }
+}
+
+void  TParam::setParamValueMax( int  max )
+{
+    if( m_second_row_exist )
+    {
+        m_ptSpinValue->setMaximum( max );
+    }
 }
 
 //------------------------------------------------------------------------------

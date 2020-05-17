@@ -71,14 +71,16 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
     priv__ = std::unique_ptr<TPrivDialog>(new TPrivDialog);
 
     QLabel *title = new QLabel( name, this );
-    priv__->m_grid->addWidget( title, row, 0, 1, 2 );
+    title->setMinimumWidth( 93 );
+    priv__->m_grid->addWidget( title, row, 0, 1, 1 );
     row++;
 
     QLabel *lblName = new QLabel( QString( "%1%2" ).arg("Name").arg(":"), this );
-    lblName->setMinimumWidth( 93 );
     priv__->m_grid->addWidget( lblName, row, 0, 1, 1 );
     priv__->m_grid->addWidget( priv__->m_ptLineName, row, 1, 1, 1 );
     row++;
+
+    //priv__->m_ptLineName->setFocus();
 
     if( fullsize )
     {
@@ -258,9 +260,74 @@ void  TDialog::setDlgEmpty()
     priv__->m_ptComboList->clear();
 }
 
+void  TDialog::setDlgEnabled( bool enabled )
+{
+    setDlgTypeEnabled( enabled );
+    setDlgPlaceholderEnabled( enabled );
+    setDlgNewEnabled( enabled );
+    setDlgAfterEnabled( enabled );
+    setDlgBeforeEnabled( enabled );
+    setDlgUlinkEnabled( enabled );
+    setDlgUnameEnabled( enabled );
+    setDlgMultiEnabled( enabled );
+    setDlgMinEnabled( enabled );
+    setDlgMaxEnabled( enabled );
+    setDlgComboEnabled( enabled );
+}
+
 void  TDialog::setDlgTypeEnabled( bool enabled )
 {
     priv__->m_ptSpinType->setEnabled( enabled );
+}
+
+void  TDialog::setDlgPlaceholderEnabled( bool  enabled )
+{
+    priv__->m_ptLinePlaceholder->setEnabled( enabled );
+}
+
+void  TDialog::setDlgNewEnabled( bool  enabled )
+{
+    priv__->m_ptLineNew->setEnabled( enabled );
+}
+
+void  TDialog::setDlgAfterEnabled( bool  enabled )
+{
+    priv__->m_ptLineAfter->setEnabled( enabled );
+}
+
+void  TDialog::setDlgBeforeEnabled( bool  enabled )
+{
+    priv__->m_ptLineBefore->setEnabled( enabled );
+}
+
+void  TDialog::setDlgUlinkEnabled( bool  enabled )
+{
+    priv__->m_ptLineUlink->setEnabled( enabled );
+}
+
+void  TDialog::setDlgUnameEnabled( bool  enabled )
+{
+    priv__->m_ptLineUname->setEnabled( enabled );
+}
+
+void  TDialog::setDlgMultiEnabled( bool  enabled )
+{
+    priv__->m_ptLineMulti->setEnabled( enabled );
+}
+
+void  TDialog::setDlgMinEnabled( bool  enabled )
+{
+    priv__->m_ptSpinMin->setEnabled( enabled );
+}
+
+void  TDialog::setDlgMaxEnabled( bool  enabled )
+{
+    priv__->m_ptSpinMax->setEnabled( enabled );
+}
+
+void  TDialog::setDlgComboEnabled( bool  enabled )
+{
+    priv__->m_ptComboList->setEnabled( enabled );
 }
 
 //------------------------------------------------------------------------------
