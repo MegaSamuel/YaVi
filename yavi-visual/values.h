@@ -24,6 +24,8 @@ public:
         m_uMax = 0;
         m_zMulti.clear();
 
+        m_uValue = 0;
+
         m_vList.clear();
     }
     ~TValues()
@@ -61,6 +63,7 @@ public:
     #define  GoodsMultiSection       "multi"
     #define  GoodsValuesSection      "values"
 
+    // набор параметров
     QString      m_zName;
     unsigned     m_uType;
     QString      m_zPlaceholder;
@@ -73,6 +76,10 @@ public:
     unsigned     m_uMax;
     QString      m_zMulti;
 
+    // значение (для type 1,2,3)
+    unsigned     m_uValue;
+
+    // список для combobox (для type 4,5)
     QStringList  m_vList;
 };
 

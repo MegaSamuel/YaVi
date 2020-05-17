@@ -26,10 +26,16 @@ public:
     YAML::Node&    getNode();
 
     void           setCategoriesName( const std::string&  name, bool  set_to_node = false );
+    void           setCategoriesUlink( const std::string&  name, bool  set_to_node = false );
+    void           setCategoriesUname( const std::string&  name, bool  set_to_node = false );
+
     QString        getCategoriesName();
+    QString        getCategoriesUlink();
+    QString        getCategoriesUname();
 
     int            getCategoriesDepth();
 
+    void           clearNode();
     void           CategoriesDelete();
 
     QList<TParam*> m_apParamList;
@@ -44,6 +50,7 @@ private:
     void           clear();
 
     void           clearNodeSequence();
+    void           clearNodeParameters();
 
     void           setIncBtnVisible( bool visible );
 
@@ -57,6 +64,9 @@ private:
 
     QString        m_zName;     // categories Name
     QString        m_zBtnName;  // текст на кнопке
+
+    QString        m_zUlink;
+    QString        m_zUname;
 
     int            m_depth;
 
@@ -94,7 +104,12 @@ public:
     void           setParamMin( unsigned  val, bool  set_to_node = false );
     void           setParamMax( unsigned  val, bool  set_to_node = false );
 
-    void           setParamList( QStringList  list, bool  set_to_node = false );
+    // убрать запись из поля values
+    void           remParamList( QString&  item, bool  set_to_node = false );
+    // добавить запись в поле values
+    void           addParamList( QString&  item, bool  set_to_node = false );
+    // установить поле values
+    void           setParamList( QStringList  vlist, const std::string&  list, bool  set_to_node = false );
 
     QString        getParamName();
     QString        getParamPlaceholder();
@@ -114,6 +129,7 @@ public:
     int            getParamWidth();
     int            getParamHeight();
 
+    void           clearNode();
     void           ParamDelete();
 
     QList<TCategories*>  m_apCategoriesList;
@@ -125,11 +141,13 @@ protected Q_SLOTS :
     void           onBtnName();
     void           onSendCancel();
     void           onSendValues( TValues& );
+    void           onSendValue( int );
 
 private:
     void           clear();
 
     void           clearNodeSequence();
+    void           clearNodeCategories();
 
     void           setIncBtnVisible( bool visible );
 
@@ -153,6 +171,7 @@ private:
     unsigned       m_uMin;
     unsigned       m_uMax;
 
+    std::string    m_zList;
     QStringList    m_vList;
 
     QVBoxLayout   *m_vlayout; // главный layout класса

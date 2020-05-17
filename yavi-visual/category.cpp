@@ -229,6 +229,12 @@ void  TCategory::getCategories( const YAML::Node&  node, TParam  *a_pParam, int 
     pCategories->setCategoriesName( str );
 //    qDebug() << "name" << QString::fromStdString(str);
 
+    str = __yaml_GetString( node, GoodsUlinkSection );
+    pCategories->setCategoriesUlink( str );
+
+    str = __yaml_GetString( node, GoodsUnameSection );
+    pCategories->setCategoriesUname( str );
+
     if( __yaml_IsSequence( node[ GoodsParametersSection ] ) )
     {
 //        qDebug() << GoodsParametersSection << "is a sequence";
@@ -322,7 +328,7 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
     // значение
     str = __yaml_GetString( node, GoodsValuesSection );
     QStringList list = QString::fromStdString(str).split( '\n', QString::SkipEmptyParts );
-    a_pParam->setParamList( list );
+    a_pParam->setParamList( list, str );
 
     if( 0 != QString::fromStdString(str).length() )
     {

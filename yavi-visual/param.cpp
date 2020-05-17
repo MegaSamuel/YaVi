@@ -69,6 +69,9 @@ void TCategories::clear()
     m_zName.clear();
     m_zBtnName.clear();
 
+    m_zUlink.clear();
+    m_zUname.clear();
+
     m_apParamList.clear();
 }
 
@@ -96,6 +99,8 @@ void  TCategories::onBtnName()
     m_ptDialog->setDlgEnabled( false );
 
     m_ptDialog->setDlgName( getCategoriesName() );
+    m_ptDialog->setDlgUlink( getCategoriesUlink() );
+    m_ptDialog->setDlgUname( getCategoriesUname() );
 
     m_ptDialog->open();
 }
@@ -108,7 +113,6 @@ void  TCategories::onSendValues( TValues& a_tValues )
 }
 
 //------------------------------------------------------------------------------
-
 
 void  TCategories::clearNodeSequence()
 {
@@ -124,8 +128,16 @@ void  TCategories::clearNodeSequence()
     m_node.remove( GoodsMaxSection );
     m_node.remove( GoodsMultiSection );
     m_node.remove( GoodsValuesSection );
+}
 
+void  TCategories::clearNodeParameters()
+{
     m_node.remove( GoodsParametersSection );
+}
+
+void  TCategories::clearNode()
+{
+    clearNodeParameters();
 }
 
 void  TCategories::CategoriesDelete()
@@ -135,29 +147,15 @@ void  TCategories::CategoriesDelete()
     // уничтожаем диалог
     m_ptDialog->~TDialog();
 
-//    qDebug() << getCategoriesName() << "del dialog";
-
     // для всех вложенных Parameters вызываем очистку
     for( auto& it : m_apParamList )
     {
-//        qDebug() << getCategoriesName() << "del param" << it->getParamName();
-        // удаляем ветку из ямла
-//        bool res = __yaml_DelNode( m_node, it->getNode() );
-
-//        qDebug() << getCategoriesName() << "del node" << res;
-
-//        m_node.remove( GoodsParametersSection );
-//        bool res = m_node.remove( it->getNode() );
-//        qDebug() << getCategoriesName() << it->getParamName()  << "del node" << res;
-
         // очищаем
         it->ParamDelete();
 
         // уничтожаем
         it->~TParam();
     }
-
-//    qDebug() << getCategoriesName() << "del param";
 
     // уничтожаем виджеты
     while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
@@ -166,12 +164,8 @@ void  TCategories::CategoriesDelete()
         delete child;
     }
 
-//    qDebug() << getCategoriesName() << "del widgets";
-
     // уничтожаем layout
     m_vlayout->deleteLater();
-
-//    qDebug() << getCategoriesName() << "del layout";
 
     // удаляем себя из списка родителя
     if( Q_NULLPTR != m_pMentor )
@@ -182,11 +176,13 @@ void  TCategories::CategoriesDelete()
         {
             if( this == m_pMentor->m_apCategoriesList.at(i) )
             {
-//                qDebug() << m_pMentor->m_apCategoriesList.at(i)->getCategoriesName() << "obsolete";
+                qDebug() << m_pMentor->m_apCategoriesList.at(i)->getCategoriesName() << "obsolete";
 
                 m_pMentor->m_apCategoriesList.removeAt(i);
             }
         }
+
+        m_pMentor->clearNode();
     }
 }
 
@@ -214,15 +210,43 @@ void  TCategories::setCategoriesName( const std::string&  name, bool  set_to_nod
 
     if( set_to_node )
     {
-        bool res = __yaml_SetString( m_node, GoodsNameSection, name );
+        __yaml_SetString( m_node, GoodsNameSection, name );
+    }
+}
 
-        qDebug() << "set" << GoodsNameSection << m_zName << res;
+void  TCategories::setCategoriesUlink( const std::string&  name, bool  set_to_node )
+{
+    m_zUlink = QString::fromStdString(name);
+
+    if( set_to_node )
+    {
+        __yaml_SetString( m_node, GoodsUlinkSection, name );
+    }
+}
+
+void  TCategories::setCategoriesUname( const std::string&  name, bool  set_to_node )
+{
+    m_zUname = QString::fromStdString(name);
+
+    if( set_to_node )
+    {
+        __yaml_SetString( m_node, GoodsUnameSection, name );
     }
 }
 
 QString  TCategories::getCategoriesName()
 {
     return m_zName;
+}
+
+QString  TCategories::getCategoriesUlink()
+{
+    return m_zUlink;
+}
+
+QString  TCategories::getCategoriesUname()
+{
+    return m_zUname;
 }
 
 int  TCategories::getCategoriesDepth()
@@ -340,7 +364,7 @@ void  TParam::onBtnDec()
 
 void  TParam::onBtnValDec()
 {
-    qDebug() << getParamName() << "dec val button";
+//    qDebug() << getParamName() << "dec val button";
 
     setParamType( 0, true );
 }
@@ -354,6 +378,8 @@ void  TParam::onBtnInc()
 
     // диалог с пустыми параметрами
     m_ptDialog->setDlgEmpty();
+
+    m_ptDialog->setDlgName( "NewValue" );
 
     m_ptDialog->open();
 }
@@ -393,6 +419,8 @@ void  TParam::onSendValues( TValues& a_tValues )
     {
         // редактируем текущий набор параметров
 
+        qDebug() << getParamName() << "fix param";
+
         setParamName( m_tValues.m_zName.toStdString(), true );
         setParamType( m_tValues.m_uType, true );
         setParamPlaceholder( m_tValues.m_zPlaceholder.toStdString(), true );
@@ -409,7 +437,17 @@ void  TParam::onSendValues( TValues& a_tValues )
     if( true == need_to_add )
     {
         // создаем новый набор параметров
-/*
+
+        // тут мы должны добавить поле field в values
+        // создать categories и в нем параметры для field
+
+        qDebug() << getParamName() << "add param";
+
+        //if( 0 == m_zList.lenght() )
+
+        addParamList( m_tValues.m_zName, true );
+
+        /*
         TParam  *pParam;
         pParam = new TParam( m_pAncestor, m_pMentor, m_depth );
         pParam->setNode( m_node );
@@ -446,6 +484,12 @@ void  TParam::onSendValues( TValues& a_tValues )
     need_to_add = false;
 }
 
+void  TParam::onSendValue( int  val )
+{
+//    qDebug() << "new value" << val;
+    m_tValues.m_uValue = static_cast<unsigned>(val);
+}
+
 //------------------------------------------------------------------------------
 
 void  TParam::clearNodeSequence()
@@ -462,8 +506,24 @@ void  TParam::clearNodeSequence()
     m_node.remove( GoodsMaxSection );
     m_node.remove( GoodsMultiSection );
     m_node.remove( GoodsValuesSection );
+}
 
+void  TParam::clearNodeCategories()
+{
     m_node.remove( GoodsCategoriesSection );
+}
+
+void  TParam::clearNode()
+{
+    std::string  str;
+    QStringList  list;
+
+    str.clear();
+    list.clear();
+
+    setParamList( list, str, true );
+
+    clearNodeCategories();
 }
 
 void  TParam::ParamDelete()
@@ -473,24 +533,15 @@ void  TParam::ParamDelete()
     // уничтожаем диалог
     m_ptDialog->~TDialog();
 
-    qDebug() << getParamName() << "del dialog";
-
     // для всех вложенных Categories вызываем очистку
     for( auto& it : m_apCategoriesList )
     {
-        // удаляем ветку из ямла
-//        bool res = __yaml_DelNode( m_node, it->getNode() );
-
-//        qDebug() << getParamName() << "del node" << res;
-
         // очищаем
         it->CategoriesDelete();
 
         // уничтожаем
         it->~TCategories();
     }
-
-    qDebug() << getParamName() << "del categories";
 
     // уничтожаем виджеты
     while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
@@ -499,18 +550,15 @@ void  TParam::ParamDelete()
         delete child;
     }
 
-    qDebug() << getParamName() << "del widgets";
-
     // уничтожаем layout
     m_vlayout->deleteLater();
-
-    qDebug() << getParamName() << "del layout";
 
     // удаляем себя из списка родителя
     if( Q_NULLPTR != m_pMentor )
     {
         // родитель
 
+        // очищаем ветку в ямле
         clearNodeSequence();
 
         for( int i = 0; i < m_pMentor->m_apParamList.count(); i++ )
@@ -522,25 +570,16 @@ void  TParam::ParamDelete()
                 m_pMentor->m_apParamList.removeAt(i);
             }
         }
+
+        // удаляем ветку Categories и очищаем поле Values
+        m_pMentor->clearNode();
     }
     else if( Q_NULLPTR != m_pAncestor )
     {
         // прародитель
 
-        // удаляем ветку из ямла
-//        bool res = __yaml_DelNode( m_pAncestor->getNode(), m_node );
-
-//        bool res = m_pAncestor->getNode().remove( 1 );
-
-//        bool res = m_node.remove( "type" );
-
-//        qDebug() << getParamName() << "del node (ancestor)" << res;
-
+        // очищаем ветку в ямле
         clearNodeSequence();
-
-//        y.remove(y["b"]);
-
-//        m_pAncestor->getNode().remove( m_node );
 
         for( int i = 0; i < m_pAncestor->m_apParamList.count(); i++ )
         {
@@ -657,7 +696,7 @@ void  TParam::setParamType( unsigned  val, bool  set_to_node )
 {
     m_uType = val;
 
-    qDebug() << getParamName() << "set param" << m_uType << m_second_row_exist;
+//    qDebug() << getParamName() << "set param" << m_uType << m_second_row_exist;
 
     if( ( 1 == m_uType ) || ( 2 == m_uType ) || ( 3 == m_uType ) )
     {
@@ -707,14 +746,73 @@ void  TParam::setParamMax( unsigned  val, bool  set_to_node )
     }
 }
 
-
-void  TParam::setParamList( QStringList  list, bool  set_to_node )
+void  TParam::remParamList( QString& item, bool  set_to_node )
 {
-    m_vList = list;
+    // убираем запись из списка
+    for( auto& it : m_vList )
+    {
+        if( item.simplified() == it.simplified() )
+        {
+            m_vList.removeAt( m_vList.indexOf(it) );
+            break;
+        }
+    }
+
+    int  ind = 0;
+    m_zList.clear();
+
+    // формируем новую строку
+    for( auto& it : m_vList )
+    {
+        if( 0 != ind )
+            m_zList.append( "\n" );
+
+        m_zList.append( it.toStdString() );
+
+        ind++;
+    }
+
+    qDebug() << "values:" << QString::fromStdString(m_zList);
 
     if( set_to_node )
     {
+        __yaml_SetString( m_node, GoodsValuesSection, m_zList );
+    }
+}
 
+void  TParam::addParamList( QString& item, bool  set_to_node )
+{
+    // добавляем запись в строку
+    if( 0 == m_zList.length() )
+    {
+        // если строка списка пустая, то просто добавляем
+        m_zList.append( item.toStdString() );
+    }
+    else
+    {
+        // если строка списка не пустая, то добавляем с префиксом
+        m_zList.append( "\n" );
+        m_zList.append( item.toStdString() );
+    }
+
+    // добавляем запись в список
+    m_vList.append( item );
+
+    if( set_to_node )
+    {
+        __yaml_SetString( m_node, GoodsValuesSection, m_zList );
+    }
+}
+
+void  TParam::setParamList( QStringList  vlist, const std::string&  zlist, bool  set_to_node )
+{
+    m_vList = vlist;
+
+    m_zList = zlist;
+
+    if( set_to_node )
+    {
+        __yaml_SetString( m_node, GoodsValuesSection, m_zList );
     }
 }
 
@@ -818,6 +916,7 @@ void  TParam::setParamValueAdd()
     m_ptSpinValue = new QSpinBox();
     m_ptSpinValue->setToolTip( "Значение" );
     m_ptSpinValue->setFixedWidth( 93 );
+    connect( m_ptSpinValue, SIGNAL(valueChanged(int)), this, SLOT(onSendValue(int)) );
     m_hlayout->addWidget( m_ptSpinValue, 0, Qt::AlignLeft );
 
     m_vlayout->addLayout( m_hlayout );
