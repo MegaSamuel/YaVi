@@ -55,7 +55,7 @@ TCategory::~TCategory()
 
 void  TCategory::onBtnName()
 {
-    qDebug() << getCategoryName() << "button";
+//    qDebug() << getCategoryName() << "button";
 
     // диалог с пустыми параметрами
     m_ptDialog->setDlgEmpty();
@@ -69,7 +69,7 @@ void  TCategory::onBtnName()
 
 void  TCategory::onBtnInc()
 {
-    qDebug() << getCategoryName() << "inc button";
+//    qDebug() << getCategoryName() << "inc button";
 
     // признак что хотим создать новый набор параметров
     need_to_add = true;
@@ -109,6 +109,7 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setNode( m_node[ GoodsParametersSection ] );
 
         // добавляемся к родителю
+        // в ямле новые параметры добавляются в конец, делаем так же
         //m_vlayout->insertWidget( 1, pParam, 0, Qt::AlignLeft | Qt::AlignTop );
         m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
         m_apParamList.append( pParam );
@@ -157,8 +158,6 @@ void  TCategory::CategoryDelete()
     // уничтожаем диалог
     m_ptDialog->~TDialog();
 
-//    qDebug() << getCategoryName() << "del dialog";
-
 /* тут падает
     // для всех вложенных Parameters вызываем очистку
     for( auto& it : m_apParamList )
@@ -179,12 +178,8 @@ void  TCategory::CategoryDelete()
         delete child;
     }
 
-//    qDebug() << getCategoryName() << "del widgets";
-
     // уничтожаем layout
     m_vlayout->deleteLater();
-
-//    qDebug() << getCategoryName() << "del layout";
 
     // удаляем себя из списка родителя
     if( Q_NULLPTR != m_pAncestor )
@@ -193,7 +188,7 @@ void  TCategory::CategoryDelete()
         {
             if( this == m_pAncestor->m_apCategoryList.at(i) )
             {
-                qDebug() << m_pAncestor->m_apCategoryList.at(i)->getCategoryName() << "obsolete";
+//                qDebug() << m_pAncestor->m_apCategoryList.at(i)->getCategoryName() << "obsolete";
 
                 m_pAncestor->m_apCategoryList.removeAt(i);
             }
@@ -213,7 +208,6 @@ YAML::Node&  TCategory::getNode()
 
 void  TCategory::getCategories( const YAML::Node&  node, TParam  *a_pParam, int  depth )
 {
-//    unsigned  val;
     std::string  str;
 
     TCategories  *pCategories;
@@ -227,18 +221,17 @@ void  TCategory::getCategories( const YAML::Node&  node, TParam  *a_pParam, int 
     // имя
     str = __yaml_GetString( node, GoodsNameSection );
     pCategories->setCategoriesName( str );
-//    qDebug() << "name" << QString::fromStdString(str);
 
+    //
     str = __yaml_GetString( node, GoodsUlinkSection );
     pCategories->setCategoriesUlink( str );
 
+    //
     str = __yaml_GetString( node, GoodsUnameSection );
     pCategories->setCategoriesUname( str );
 
     if( __yaml_IsSequence( node[ GoodsParametersSection ] ) )
     {
-//        qDebug() << GoodsParametersSection << "is a sequence";
-
         for( auto& par : node[ GoodsParametersSection ] )
         {
             TParam  *pParam;
@@ -264,52 +257,43 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
     // имя
     str = __yaml_GetString( node, GoodsNameSection );
     a_pParam->setParamName( str );
-//    qDebug() << "name" << QString::fromStdString(str);
 
     // тип
     if( __yaml_IsScalar( node[ GoodsTypeSection ] ) )
     {
         val = node[ GoodsTypeSection ].as<unsigned>();
         a_pParam->setParamType( val );
-//        qDebug() << "type" << val;
     }
 
     //
     str = __yaml_GetString( node, GoodsPlaceholderSection );
     a_pParam->setParamPlaceholder( str );
-//    qDebug() << "placeholder" << QString::fromStdString(str);
 
     //
     str = __yaml_GetString( node, GoodsNewSection );
     a_pParam->setParamNew( str );
-//    qDebug() << "new" << QString::fromStdString(str);
 
     //
     str = __yaml_GetString( node, GoodsAfterSection );
     a_pParam->setParamAfter( str );
-//    qDebug() << "after" << QString::fromStdString(str);
 
     //
     str = __yaml_GetString( node, GoodsBeforeSection );
     a_pParam->setParamBefore( str );
-//    qDebug() << "before" << QString::fromStdString(str);
 
     //
     str = __yaml_GetString( node, GoodsUlinkSection );
     a_pParam->setParamUlink( str );
-//    qDebug() << "ulink" << QString::fromStdString(str);
 
     //
     str = __yaml_GetString( node, GoodsUnameSection );
     a_pParam->setParamUname( str );
-//    qDebug() << "umane" << QString::fromStdString(str);
 
     // мин
     if( __yaml_IsScalar( node[ GoodsMinSection ] ) )
     {
         val = node[ GoodsMinSection ].as<unsigned>();
         a_pParam->setParamMin( val );
-//        qDebug() << "min" << val;
     }
 
     // макс
@@ -317,13 +301,11 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
     {
         val = node[ GoodsMaxSection ].as<unsigned>();
         a_pParam->setParamMax( val );
-//        qDebug() << "max" << val;
     }
 
     //
     str = __yaml_GetString( node, GoodsMultiSection );
     a_pParam->setParamMulti( str );
-//    qDebug() << "multi" << QString::fromStdString(str);
 
     // значение
     str = __yaml_GetString( node, GoodsValuesSection );
@@ -332,12 +314,8 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
 
     if( 0 != QString::fromStdString(str).length() )
     {
-//        qDebug() << "values" << QString::fromStdString(str);
-
         if( __yaml_IsSequence( node[ GoodsCategoriesSection ] ) )
         {
-//            qDebug() << GoodsCategoriesSection << "is a sequence";
-
             for( auto& cat : node[ GoodsCategoriesSection ] )
             {
                 getCategories( cat, a_pParam, depth+1 );
@@ -348,6 +326,7 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
 
 //------------------------------------------------------------------------------
 
+/*
 void  TCategory::drawParam( TParam  *pParam )
 {
     if( Q_NULLPTR != pParam )
@@ -355,6 +334,7 @@ void  TCategory::drawParam( TParam  *pParam )
         m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
     }
 }
+*/
 
 void  TCategory::setCategoryName( const std::string&  name, bool  set_to_node )
 {

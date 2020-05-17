@@ -35,7 +35,6 @@ public:
 
     int            getCategoriesDepth();
 
-    void           clearNode();
     void           CategoriesDelete();
 
     QList<TParam*> m_apParamList;
@@ -44,6 +43,7 @@ protected Q_SLOTS :
     void           onBtnDec();
     void           onBtnInc();
     void           onBtnName();
+    void           onSendCancel();
     void           onSendValues( TValues& );
 
 private:
@@ -75,6 +75,8 @@ private:
     TValues        m_tValues;
 
     TParam        *m_pMentor;
+
+    bool           need_to_add; // необходимость создать новый набор параметров в ямле
 };
 
 //------------------------------------------------------------------------------
@@ -129,7 +131,7 @@ public:
     int            getParamWidth();
     int            getParamHeight();
 
-    void           clearNode();
+    void           ParamDraw( TParam  *pParam );
     void           ParamDelete();
 
     QList<TCategories*>  m_apCategoriesList;

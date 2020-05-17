@@ -35,7 +35,7 @@ public:
 
     void           CategoryDelete();
 
-    void           drawParam( TParam *pParam );
+//    void           drawParam( TParam *pParam );
 
     QList<TParam*> m_apParamList;
 
