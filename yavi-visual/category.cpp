@@ -25,6 +25,9 @@ TCategory::TCategory( TGoods  *pAncestor )
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
+    // ставим начальный размер себя
+    widget_size_reset();
+
     QHBoxLayout *hlayout = new QHBoxLayout;
     hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
@@ -242,8 +245,14 @@ void  TCategory::getCategories( const YAML::Node&  node, TParam  *a_pParam, int 
             pCategories->m_apParamList.append(pParam);
 
             getParameters( par, pParam, pCategories->getCategoriesDepth()+1 );
+
+            // подгоняем размер виджета под содержимое для корректной работы скролла
+            widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
         }
     }
+
+    // подгоняем размер виджета под содержимое для корректной работы скролла
+    widget_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
 }
 
 void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  depth )
@@ -326,31 +335,19 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
 
 //------------------------------------------------------------------------------
 
-/*
-void  TCategory::drawParam( TParam  *pParam )
-{
-    if( Q_NULLPTR != pParam )
-    {
-        m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
-    }
-}
-*/
-
 void  TCategory::setCategoryName( const std::string&  name, bool  set_to_node )
 {
     m_zName = QString::fromStdString(name);
 
     m_zBtnName = QString::fromStdString(name);
-    m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );  // убираем подряд идущие пробелы на один
-    m_zBtnName.replace( " ", "\n" );                // заменяем пробелы на перевод строки
-    m_ptBtnName->setText( m_zBtnName );             // правленное имя кнопки
-    m_ptBtnName->setToolTip( "Категория: " + m_zName );             // подсказка с оригинальным именем
+    m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );       // убираем подряд идущие пробелы на один
+    m_zBtnName.replace( " ", "\n" );                     // заменяем пробелы на перевод строки
+    m_ptBtnName->setText( m_zBtnName );                  // правленное имя кнопки
+    m_ptBtnName->setToolTip( "Категория: " + m_zName );  // подсказка с оригинальным именем
 
     if( set_to_node )
     {
-        bool res = __yaml_SetString( m_node, GoodsCategoryName, name );
-
-        qDebug() << "set" << GoodsCategoryName << m_zName << "result" << res;
+        __yaml_SetString( m_node, GoodsCategoryName, name );
     }
 }
 
@@ -360,6 +357,61 @@ const QString TCategory::getCategoryName()
 }
 
 //------------------------------------------------------------------------------
+
+void  TCategory::widget_size_reset() noexcept
+{
+    m_width = 0;
+    m_height = 0;
+
+    // ставим размер самого себя
+    setMinimumWidth( m_width );
+    setMinimumHeight( m_height );
+}
+
+void  TCategory::widget_stretch( int width, int height ) noexcept
+{
+    // ширину выбираем максимальную из элементов
+    if( width > m_width )
+        m_width = width;
+
+    // высоту увеличиваем на каждый элемент
+    m_height += height;
+
+//    qDebug() << "category" << getCategoryName() << m_width << m_height;
+
+    // ставим размер самого себя
+    setMinimumWidth( m_width );
+    setMinimumHeight( m_height );
+}
+
+void  TCategory::widget_parent_stretch( int width, int height ) noexcept
+{
+    if( Q_NULLPTR != m_pAncestor )
+    {
+        m_pAncestor->widget_stretch( width, height );
+    }
+}
+
+void  TCategory::widget_shrink( int width, int height ) noexcept
+{
+    Q_UNUSED( width );
+
+    m_height -= height;
+
+    if( m_height < 0 )
+        m_height = 0;
+
+    // ставим размер самого себя
+    setMinimumHeight( m_height );
+}
+
+void  TCategory::widget_parent_shrink( int width, int height ) noexcept
+{
+    if( Q_NULLPTR != m_pAncestor )
+    {
+        m_pAncestor->widget_shrink( width, height );
+    }
+}
 
 int TCategory::getCategoryWidth()
 {

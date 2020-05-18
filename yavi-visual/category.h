@@ -35,7 +35,11 @@ public:
 
     void           CategoryDelete();
 
-//    void           drawParam( TParam *pParam );
+    void           widget_stretch( int width, int height ) noexcept;         // растягиваем виджет
+    void           widget_parent_stretch( int width, int height ) noexcept;  // растягиваем виджет
+
+    void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
+    void           widget_parent_shrink( int width, int height ) noexcept;   // сжимаем виджет
 
     QList<TParam*> m_apParamList;
 
@@ -63,6 +67,11 @@ private:
     TValues        m_tValues;
 
     TGoods        *m_pAncestor;
+
+    int            m_width;     // ширина виджета
+    int            m_height;    // высота виджета
+
+    void           widget_size_reset() noexcept;  // сброс размера виджета
 
     bool           need_to_add; // необходимость создать новый набор параметров в ямле
 };

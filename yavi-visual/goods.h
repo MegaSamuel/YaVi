@@ -31,15 +31,19 @@ class TGoods : public QWidget
 
         void           GoodsDelete();
 
+        void           widget_stretch( int width, int height ) noexcept;  // растягиваем виджет
+        void           widget_shrink( int width, int height ) noexcept;   // сжимаем виджет
+
         QList<TTable*>     m_apTableList;
         QList<TCategory*>  m_apCategoryList;
 
 private :
         std::unique_ptr<TGoodsPrivate> 	priv__;
 
-        int            m_w, m_h;  // текущие размеры виджета
+        int            m_width;     // ширина виджета
+        int            m_height;    // высота виджета
+
         void           widget_size_reset() noexcept; // сброс размера виджета
-        void           widget_stretch( int w, int h ) noexcept; // растягиваем виджет
 };
 
 //! тип - указатель на протокол, описанный в файле

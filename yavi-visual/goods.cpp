@@ -57,29 +57,7 @@ static inline void trim( std::string& s ) {
     rtrim( s );
 }
 */
-/*
-static bool __yaml_IsScalar( const YAML::Node&  node )
-{
-	return ( node.IsDefined() ? ( node.IsScalar() ? true : false ) : false );
-}
 
-static bool __yaml_IsSequence( const YAML::Node&  node )
-{
-	return ( node.IsDefined() ? ( node.IsSequence() ? true : false ) : false );
-}
-
-static bool __yaml_IsMap( const YAML::Node&  node )
-{
-	return ( node.IsDefined() ? ( node.IsMap() ? true : false ) : false );
-}
-
-static const std::string __yaml_GetString( const YAML::Node&  node, const std::string&  name, const std::string  def = GoodsDefName )
-{
-	if( __yaml_IsScalar( node[ name ] ) )
-		return node[ name ].as<std::string>();
-	return def;
-}
-*/
 //------------------------------------------------------------------------------
 
 class TGoodsPrivate
@@ -121,8 +99,6 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
         // файл не пуст
         priv__->m_bEmpty = false;
 
-//        qDebug() << GoodsCategorySection << "is a sequence";
-
         // по заданию в ини-файле только одна Category, но на всякий случай ищем все
         for( auto& cat : config[ GoodsCategorySection ] )
         {
@@ -130,12 +106,10 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             pCategory = new TCategory( this );
             pCategory->setNode( cat );
             m_vlayout->addWidget( pCategory );
-//            priv__->m_apCategoryList.append(pCategory);
             m_apCategoryList.append(pCategory);
 
             // ищем имя
             std::string cat_name = __yaml_GetString( cat, GoodsCategoryName );
-//            qDebug() << GoodsCategorySection << "name is" << QString::fromStdString(cat_name);
             pCategory->setCategoryName( cat_name );
 
             if( __yaml_IsSequence( cat[ GoodsParametersSection ] ) )
@@ -161,8 +135,6 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
         // файл не пуст
         priv__->m_bEmpty = false;
 
-//        qDebug() << GoodsTableSection << "is a sequence";
-
         for( auto& tab : config[ GoodsTableSection ] )
         {
             bool  table_fill = false; // признак что таблица не заполнена
@@ -170,17 +142,14 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             TTable  *pTable;
             pTable = new TTable( this );
             m_vlayout->addWidget( pTable );
-//            priv__->m_apTableList.append(pTable);
             m_apTableList.append(pTable);
 
             // ищем секцию id
             std::string  id = __yaml_GetString( tab, GoodsTableId );
-//            qDebug() << GoodsTableSection <<  GoodsTableId << "is a" << QString::fromStdString(id);
             pTable->setTableId( id );
 
             // ищем имя секции id
             std::string  id_name = __yaml_GetString( tab, GoodsTableName );
-//            qDebug() << GoodsTableSection <<  GoodsTableId << "is a" << QString::fromStdString(id) << "name" << QString::fromStdString(id_name) ;
             pTable->setTableName( id_name );
 
             // ищем столбцы
@@ -193,12 +162,10 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
                     // имя
                     std::string  col_name = __yaml_GetString( col, GoodsTableName );
-//                    qDebug() << GoodsTableColumn << "name" << QString::fromStdString(col_name) ;
                     col_list.append( QString::fromStdString(col_name) );
 
                     // значение
                     const std::string  col_val = __yaml_GetString( col, GoodsTableValue );
-//                    qDebug() << GoodsTableColumn << GoodsTableValue << QString::fromStdString(col_val);
                     priv__->m_vValues.clear();
                     priv__->m_vValues = QString::fromStdString(col_val).split( '\n', QString::SkipEmptyParts );
 
@@ -225,12 +192,10 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
                     // имя
                     std::string  row_name = __yaml_GetString( row, GoodsTableName );
-//                    qDebug() << GoodsTableRow << "name" << QString::fromStdString(row_name) ;
                     row_list.append( QString::fromStdString(row_name) );
 
                     // значение
                     const std::string  row_val = __yaml_GetString( row, GoodsTableValue );
-//                    qDebug() << GoodsTableRow << GoodsTableValue << QString::fromStdString(row_val);
                     priv__->m_vValues.clear();
                     priv__->m_vValues = QString::fromStdString(row_val).split( '\n', QString::SkipEmptyParts );
 
@@ -249,7 +214,6 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             if( !table_fill )
             {
                 std::string  link = __yaml_GetString( tab, GoodsTableLink );
-//                qDebug() << GoodsTableSection <<  GoodsTableId << "is a" << QString::fromStdString(id) << "link" << QString::fromStdString(link) ;
                 pTable->setTableLink( link );
             }
 
@@ -257,8 +221,6 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             widget_stretch( pTable->getTableWidth(), pTable->getTableHeight() );
         }
     }
-
-//    qDebug() << "TableList size" << priv__->m_apTableList.size();
 
 	return true;
 }
@@ -277,7 +239,7 @@ TGoods::TGoods()
     // ставим начальный размер себя
     widget_size_reset();
 
-    this->setLayout( m_vlayout );
+    setLayout( m_vlayout );
 }
 
 TGoods::TGoods( const YAML::Node&  config )
@@ -338,26 +300,41 @@ bool  TGoods::empty() const noexcept
 
 void  TGoods::widget_size_reset() noexcept
 {
-    m_w = 100;
-    m_h = 100;
+    m_width = 0;
+    m_height = 0;
 
     // ставим размер самого себя
-    this->setMinimumWidth( m_w );
-    this->setMinimumHeight( m_h );
+    setMinimumWidth( m_width );
+    setMinimumHeight( m_height );
 }
 
-void  TGoods::widget_stretch( int w, int h ) noexcept
+void  TGoods::widget_stretch( int width, int height ) noexcept
 {
     // ширину выбираем максимальную из элементов
-    if( w > m_w )
-        m_w = w;
+    if( width > m_width )
+        m_width = width;
 
     // высоту увеличиваем на каждый элемент
-    m_h += h;
+    m_height += height;
+
+//    qDebug() << m_width << m_height;
 
     // ставим размер самого себя
-    this->setMinimumWidth( m_w );
-    this->setMinimumHeight( m_h );
+    setMinimumWidth( m_width );
+    setMinimumHeight( m_height );
+}
+
+void  TGoods::widget_shrink( int width, int height ) noexcept
+{
+    Q_UNUSED( width );
+
+    m_height -= height;
+
+    if( m_height < 0 )
+        m_height = 0;
+
+    // ставим размер самого себя
+    setMinimumHeight( m_height );
 }
 
 //------------------------------------------------------------------------------
