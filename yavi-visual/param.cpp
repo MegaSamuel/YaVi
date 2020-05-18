@@ -37,7 +37,7 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     }
 
     // кнопка минус
-    m_ptBtnDec = new QPushButton( "-");
+    m_ptBtnDec = new QPushButton( "-" );
     m_ptBtnDec->setToolTip( "Удалить параметр" );
     m_ptBtnDec->setFixedWidth( 93 );
     connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
@@ -99,7 +99,7 @@ void  TCategories::onBtnInc()
     // диалог с пустыми параметрами
     m_ptDialog->setDlgEmpty();
 
-    m_ptDialog->setDlgName( "NewParam" );
+    m_ptDialog->setDlgName( "NewParameter" );
 
     m_ptDialog->open();
 }
@@ -185,6 +185,8 @@ void  TCategories::onSendValues( TValues& a_tValues )
         __yaml_SetScalar( node, GoodsMaxSection, m_tValues.m_uMax );
 
         m_node[ GoodsParametersSection ].push_back( node );
+
+        qDebug() << pParam->getParamName() << "add parameter";
     }
 
     need_to_add = false;
@@ -452,13 +454,18 @@ void  TParam::onBtnInc()
 {
 //    qDebug() << getParamName() << "inc button";
 
-    // признак что хотим создать новый набор параметров
+    // признак что хотим создать новую категорию
     need_to_add = true;
 
     // диалог с пустыми параметрами
     m_ptDialog->setDlgEmpty();
 
-    m_ptDialog->setDlgName( "NewValue" );
+    m_ptDialog->setDlgEnabled( false );
+
+    m_ptDialog->setDlgUlinkEnabled( true );
+    m_ptDialog->setDlgUnameEnabled( true );
+
+    m_ptDialog->setDlgName( "NewCategory" );
 
     m_ptDialog->open();
 }
@@ -517,10 +524,7 @@ void  TParam::onSendValues( TValues& a_tValues )
     {
         // создаем новый набор параметров
 
-        // тут мы должны добавить поле field в values
-        // создать categories и в нем параметры для field
-
-        qDebug() << getParamName() << "add param";
+        // тут мы должны добавить поле field в values и создать categories
 
         // добавляем новое поле в values
         addParamList( m_tValues.m_zName, true );
@@ -550,6 +554,8 @@ void  TParam::onSendValues( TValues& a_tValues )
         __yaml_SetString( node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
 
         m_node[ GoodsCategoriesSection ].push_back( node );
+
+        qDebug() << pCategories->getCategoriesName() << "add categories";
     }
 
     need_to_add = false;
