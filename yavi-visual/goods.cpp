@@ -239,7 +239,7 @@ TGoods::TGoods()
     // ставим начальный размер себя
     widget_size_reset();
 
-    this->setLayout( m_vlayout );
+    setLayout( m_vlayout );
 }
 
 TGoods::TGoods( const YAML::Node&  config )
@@ -304,8 +304,8 @@ void  TGoods::widget_size_reset() noexcept
     m_height = 0;
 
     // ставим размер самого себя
-    this->setMinimumWidth( m_width );
-    this->setMinimumHeight( m_height );
+    setMinimumWidth( m_width );
+    setMinimumHeight( m_height );
 }
 
 void  TGoods::widget_stretch( int width, int height ) noexcept
@@ -317,9 +317,11 @@ void  TGoods::widget_stretch( int width, int height ) noexcept
     // высоту увеличиваем на каждый элемент
     m_height += height;
 
+    qDebug() << "wgt stretch" << width << height << "size" << m_width << m_height;
+
     // ставим размер самого себя
-    this->setMinimumWidth( m_width );
-    this->setMinimumHeight( m_height );
+    setMinimumWidth( m_width );
+    setMinimumHeight( m_height );
 }
 
 void  TGoods::widget_shrink( int width, int height ) noexcept
@@ -331,8 +333,10 @@ void  TGoods::widget_shrink( int width, int height ) noexcept
     if( m_height < 0 )
         m_height = 0;
 
+    qDebug() << "wgt shrink" << height << "height" << m_height;
+
     // ставим размер самого себя
-    this->setMinimumHeight( m_height );
+    setMinimumHeight( m_height );
 }
 
 //------------------------------------------------------------------------------

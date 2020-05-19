@@ -130,6 +130,9 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setParamMin( m_tValues.m_uMin, false );
         pParam->setParamMax( m_tValues.m_uMax, false );
 
+        widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
+        widget_parent_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
+
         YAML::Node  node;
         node.reset();
 
@@ -377,7 +380,9 @@ void  TCategory::widget_stretch( int width, int height ) noexcept
     // высоту увеличиваем на каждый элемент
     m_height += height;
 
-//    qDebug() << "category" << getCategoryName() << m_width << m_height;
+    qDebug() << "cat stretch" << width << height << "size" << m_width << m_height;
+
+    //    qDebug() << "category" << getCategoryName() << m_width << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );

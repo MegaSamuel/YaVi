@@ -65,7 +65,8 @@ private:
 
     YAML::Node     m_node;      // текущий уровнь дерева ямла
 
-    QVBoxLayout   *m_vlayout;
+    QVBoxLayout   *m_vlayout;   // главный layout класса
+    QHBoxLayout   *m_hlayout;   // вложенный layout
 
     QPushButton   *m_ptBtnDec;
     QPushButton   *m_ptBtnInc;
@@ -196,8 +197,9 @@ private:
     std::string    m_zList;
     QStringList    m_vList;
 
-    QVBoxLayout   *m_vlayout; // главный layout класса
-    QHBoxLayout   *m_hlayout; // layout для второй строки
+    QVBoxLayout   *m_vlayout;   // главный layout класса
+    QHBoxLayout   *m_hlayout1;  // вложенный layout
+    QHBoxLayout   *m_hlayout2;  // вложенный layout для второй строки
 
     QPushButton   *m_ptBtnDec;
     QPushButton   *m_ptBtnInc;

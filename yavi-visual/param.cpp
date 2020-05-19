@@ -28,20 +28,15 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     // ставим начальный размер себя
     widget_size_reset();
 
-    QHBoxLayout *hlayout = new QHBoxLayout;
-    hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-
-    int  width = 2*hlayout->margin();
-    int  height = 2*hlayout->margin();
+    m_hlayout = new QHBoxLayout;
+    m_hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
     // отступ
     for( int i = 0; i < m_depth; i++ )
     {
         QLabel *label = new QLabel();
         label->setFixedWidth( 93 );
-        hlayout->addWidget( label, 0, Qt::AlignLeft );
-
-        width += label->width();
+        m_hlayout->addWidget( label, 0, Qt::AlignLeft );
     }
 
     // кнопка минус
@@ -49,17 +44,13 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     m_ptBtnDec->setToolTip( "Удалить параметр" );
     m_ptBtnDec->setFixedWidth( 93 );
     connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
-    hlayout->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
-
-    width += m_ptBtnDec->width();
+    m_hlayout->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
 
     // кнопка с именем
     m_ptBtnName = new QPushButton( "button" );
     m_ptBtnName->setFixedWidth( 93 );
     connect( m_ptBtnName, SIGNAL(clicked()), this, SLOT(onBtnName()) );
-    hlayout->addWidget( m_ptBtnName, 0, Qt::AlignLeft );
-
-    width += m_ptBtnName->width();
+    m_hlayout->addWidget( m_ptBtnName, 0, Qt::AlignLeft );
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+" );
@@ -67,14 +58,9 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     m_ptBtnInc->setFixedWidth( 93 );
     //setIncBtnVisible( false );
     connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
-    hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
+    m_hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
 
-    width += m_ptBtnInc->width();
-    height += 30;
-
-    m_vlayout->addLayout( hlayout, 0 );
-
-    //widget_stretch( width, height );
+    m_vlayout->addLayout( m_hlayout, 0 );
 
     setLayout( m_vlayout );
 
@@ -246,6 +232,8 @@ void  TCategories::CategoriesDelete()
     QLayoutItem *child;
     QString  item = getCategoriesName();
 
+    qDebug() << "categories" << item << "delete";
+
     // уничтожаем диалог
     m_ptDialog->~TDialog();
 
@@ -257,6 +245,15 @@ void  TCategories::CategoriesDelete()
 
         // уничтожаем
         it->~TParam();
+    }
+
+    widget_parent_shrink( 0, getCategoriesHeight() );
+
+    // удаляем виджеты на первой строке
+    while( ( child = m_hlayout->takeAt(0) ) != Q_NULLPTR )
+    {
+        delete child->widget();
+        delete child;
     }
 
     // уничтожаем виджеты
@@ -433,20 +430,12 @@ void  TCategories::widget_parent_shrink( int width, int height ) noexcept
 
 int TCategories::getCategoriesWidth()
 {
-    QSize size = m_vlayout->minimumSize();
-
-    return size.width();
-
-    //return minimumSize().width();
+    return m_vlayout->minimumSize().width();
 }
 
 int TCategories::getCategoriesHeight()
 {
-    QSize size = m_vlayout->minimumSize();
-
-    return size.height();
-
-    //return minimumSize().height();
+    return m_vlayout->minimumSize().height();
 }
 
 //------------------------------------------------------------------------------
@@ -482,20 +471,15 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     // ставим начальный размер себя
     widget_size_reset();
 
-    QHBoxLayout *hlayout = new QHBoxLayout;
-    hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-
-    int  width = 2*hlayout->margin();
-    int  height = 2*hlayout->margin();
+    m_hlayout1 = new QHBoxLayout;
+    m_hlayout1->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
     // отступ
     for( int i = 0; i < m_depth; i++ )
     {
         QLabel *label = new QLabel();
         label->setFixedWidth( 93 );
-        hlayout->addWidget( label, 0, Qt::AlignLeft );
-
-        width += label->width();
+        m_hlayout1->addWidget( label, 0, Qt::AlignLeft );
     }
 
     // кнопка минус
@@ -503,17 +487,13 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     m_ptBtnDec->setToolTip( "Удалить параметр" );
     m_ptBtnDec->setFixedWidth( 93 );
     connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
-    hlayout->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
-
-    width += m_ptBtnDec->width();
+    m_hlayout1->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
 
     // кнопка с именем
     m_ptBtnName = new QPushButton( "button" );
     m_ptBtnName->setFixedWidth( 93 );
     connect( m_ptBtnName, SIGNAL(clicked()), this, SLOT(onBtnName()) );
-    hlayout->addWidget( m_ptBtnName, 0, Qt::AlignLeft );
-
-    width += m_ptBtnName->width();
+    m_hlayout1->addWidget( m_ptBtnName, 0, Qt::AlignLeft );
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+" );
@@ -521,18 +501,11 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     m_ptBtnInc->setFixedWidth( 93 );
     setIncBtnVisible( false );  // по умолчанию кнопка невидимая
     connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
-    hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
+    m_hlayout1->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
 
-    width += m_ptBtnInc->width();
-    height += 30;
-
-    m_vlayout->addLayout( hlayout, 0 );
-
-    //widget_stretch( width, height );
+    m_vlayout->addLayout( m_hlayout1, 0 );
 
     setLayout( m_vlayout );
-
-    qDebug() << "param" << m_vlayout->minimumSize().width() << m_vlayout->minimumSize().height();
 
     widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
 }
@@ -728,7 +701,7 @@ void  TParam::ParamDelete()
 {
     QLayoutItem *child;
 
-    //qDebug() << getParamName() << "delete";
+    qDebug() << "parameter" << getParamName() << "delete";
 
     // уничтожаем диалог
     m_ptDialog->~TDialog();
@@ -741,6 +714,25 @@ void  TParam::ParamDelete()
 
         // уничтожаем
         it->~TCategories();
+    }
+
+    widget_parent_shrink( 0, getParamHeight() );
+
+    // удаляем виджеты на второй строке
+    if( m_second_row_exist )
+    {
+        while( ( child = m_hlayout2->takeAt(0) ) != Q_NULLPTR )
+        {
+            delete child->widget();
+            delete child;
+        }
+    }
+
+    // удаляем виджеты на первой строке
+    while( ( child = m_hlayout1->takeAt(0) ) != Q_NULLPTR )
+    {
+        delete child->widget();
+        delete child;
     }
 
     // уничтожаем виджеты
@@ -762,7 +754,7 @@ void  TParam::ParamDelete()
         {
             if( this == m_pMentor->m_apParamList.at(i) )
             {
-                //qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete (mentor)";
+                qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete (mentor)";
 
                 m_pMentor->m_apParamList.removeAt(i);
             }
@@ -776,7 +768,7 @@ void  TParam::ParamDelete()
         {
             if( this == m_pAncestor->m_apParamList.at(i) )
             {
-                //qDebug() << m_pAncestor->m_apParamList.at(i)->getParamName() << "obsolete (ancestor)";
+                qDebug() << m_pAncestor->m_apParamList.at(i)->getParamName() << "obsolete (ancestor)";
 
                 m_pAncestor->m_apParamList.removeAt(i);
             }
@@ -1106,15 +1098,15 @@ void  TParam::setParamValueAdd()
     if( m_second_row_exist )
         return;
 
-    m_hlayout = new QHBoxLayout();
-    m_hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    m_hlayout2 = new QHBoxLayout();
+    m_hlayout2->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
     // отступ
     for( int i = 0; i < m_depth+1; i++ )
     {
         QLabel *label = new QLabel();
         label->setFixedWidth( 93 );
-        m_hlayout->addWidget( label, 0, Qt::AlignLeft );
+        m_hlayout2->addWidget( label, 0, Qt::AlignLeft );
     }
 
     // кнопка минус
@@ -1122,21 +1114,21 @@ void  TParam::setParamValueAdd()
     m_ptBtnValDec->setToolTip( "Удалить значение" );
     m_ptBtnValDec->setFixedWidth( 93 );
     connect( m_ptBtnValDec, SIGNAL(clicked()), this, SLOT(onBtnValDec()) );
-    m_hlayout->addWidget( m_ptBtnValDec, 0, Qt::AlignLeft );
+    m_hlayout2->addWidget( m_ptBtnValDec, 0, Qt::AlignLeft );
 
     // спин со значением
     m_ptSpinValue = new QSpinBox();
     m_ptSpinValue->setToolTip( "Значение" );
     m_ptSpinValue->setFixedWidth( 93 );
     connect( m_ptSpinValue, SIGNAL(valueChanged(int)), this, SLOT(onSendValue(int)) );
-    m_hlayout->addWidget( m_ptSpinValue, 0, Qt::AlignLeft );
+    m_hlayout2->addWidget( m_ptSpinValue, 0, Qt::AlignLeft );
 
-    m_vlayout->addLayout( m_hlayout );
+    m_vlayout->addLayout( m_hlayout2 );
 
-    qDebug() << "add value" << m_hlayout->minimumSize().width() << m_hlayout->minimumSize().height();
+    //qDebug() << "add value" << m_hlayout->minimumSize().width() << m_hlayout->minimumSize().height();
 
-    widget_stretch( m_hlayout->minimumSize().width(), m_hlayout->minimumSize().height() );
-    widget_parent_stretch( m_hlayout->minimumSize().width(), m_hlayout->minimumSize().height() );
+    widget_stretch( m_hlayout2->minimumSize().width(), m_hlayout2->minimumSize().height() );
+    widget_parent_stretch( m_hlayout2->minimumSize().width(), m_hlayout2->minimumSize().height() );
 
     m_second_row_exist = true;
 }
@@ -1149,19 +1141,19 @@ void  TParam::setParamValueDel()
     QLayoutItem *child;
 
     // уничтожаем виджеты
-    while( ( child = m_hlayout->takeAt(0) ) != Q_NULLPTR )
+    while( ( child = m_hlayout2->takeAt(0) ) != Q_NULLPTR )
     {
         delete child->widget();
         delete child;
     }
 
-    qDebug() << "del value" << m_hlayout->minimumSize().width() << m_hlayout->minimumSize().height();
+    //qDebug() << "del value" << m_hlayout->minimumSize().width() << m_hlayout->minimumSize().height();
 
-    widget_shrink( 0, m_hlayout->minimumSize().height() );
-    widget_parent_shrink( 0, m_hlayout->minimumSize().height() );
+    widget_shrink( 0, m_hlayout2->minimumSize().height() );
+    widget_parent_shrink( 0, m_hlayout2->minimumSize().height() );
 
     // уничтожаем layout
-    m_hlayout->deleteLater();
+    m_hlayout2->deleteLater();
 
     m_second_row_exist = false;
 }
@@ -1251,20 +1243,12 @@ void  TParam::widget_parent_shrink( int width, int height ) noexcept
 
 int TParam::getParamWidth()
 {
-    QSize size = m_vlayout->minimumSize();
-
-    return size.width();
-
-    //return minimumSize().width();
+    return m_vlayout->minimumSize().width();
 }
 
 int TParam::getParamHeight()
 {
-    QSize size = m_vlayout->minimumSize();
-
-    return size.height();
-
-    //return minimumSize().height();
+    return m_vlayout->minimumSize().height();
 }
 
 //------------------------------------------------------------------------------
