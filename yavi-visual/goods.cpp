@@ -105,25 +105,41 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             TCategory  *pCategory;
             pCategory = new TCategory( this );
             pCategory->setNode( cat );
+
             m_vlayout->addWidget( pCategory );
             m_apCategoryList.append(pCategory);
 
             // ищем имя
             std::string cat_name = __yaml_GetString( cat, GoodsCategoryName );
             pCategory->setCategoryName( cat_name );
-            qDebug() << QString::fromStdString(cat_name);
 
             if( __yaml_IsSequence( cat[ GoodsParametersSection ] ) )
             {
+                /*
                 qDebug() << "sequence size" << cat[ GoodsParametersSection ].size();
 
-                for( auto par : cat[ GoodsParametersSection ] )
+                YAML::Node param;
+                std::string name;
+
+                for( size_t i = 0; i < cat[ GoodsParametersSection ].size(); i++ )
+                {
+                    param = cat[ GoodsParametersSection ][i];
+                    name = __yaml_GetString( param, "name" );
+
+                    qDebug() << i << QString::fromStdString(name);
+                }
+                */
+
+                for( auto& par : cat[ GoodsParametersSection ] )
                 {
                     TParam  *pParam;
                     pParam = new TParam( pCategory, Q_NULLPTR, 0 );
                     pParam->setNode( par );
 
                     pCategory->getParameters( par, pParam, 0 );
+
+                    // подгоняем размер виджета под содержимое для корректной работы скролла
+                    widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
                 }
             }
 
@@ -322,7 +338,7 @@ void  TGoods::widget_stretch( int width, int height ) noexcept
     // высоту увеличиваем на каждый элемент
     m_height += height;
 
-    qDebug() << "wgt stretch" << width << height << "size" << m_width << m_height;
+    //qDebug() << "wgt stretch" << width << height << "size" << m_width << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );
