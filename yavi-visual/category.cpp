@@ -121,7 +121,7 @@ void  TCategory::onSendValues( TValues& a_tValues )
 
         TParam  *pParam;
         pParam = new TParam( this, Q_NULLPTR, m_depth );
-        pParam->setNode( m_node[ GoodsParametersSection ], -1 );
+        pParam->setNode( m_node[ GoodsParametersSection ] );
 
         // добавляемся к родителю
         // в ямле новые параметры добавляются в конец, делаем так же
@@ -258,7 +258,7 @@ void  TCategory::getCategories( const YAML::Node&  node, TParam  *a_pParam, int 
         {
             TParam  *pParam;
             pParam = new TParam( Q_NULLPTR, pCategories, pCategories->getCategoriesDepth()+1 );
-            pParam->setNode( par, -1 );
+            pParam->setNode( par );
 
             // добавляем Parameters в список класса TCategories
             pCategories->m_apParamList.append(pParam);

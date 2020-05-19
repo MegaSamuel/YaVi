@@ -154,7 +154,7 @@ void  TCategories::onSendValues( TValues& a_tValues )
 
         TParam  *pParam;
         pParam = new TParam( Q_NULLPTR, this, m_depth+1 );
-        pParam->setNode( m_node[ GoodsParametersSection ], -1 );
+        pParam->setNode( m_node[ GoodsParametersSection ] );
 
         //!bug  надо перерисовывать все layout-ы
         // добавляемся к родителю
@@ -463,6 +463,8 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     // глубина вложения
     m_depth = depth;
 
+    m_node_index = -1;
+
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
     m_vlayout->setMargin( 0 );
@@ -677,21 +679,28 @@ void  TParam::onSendValue( int  val )
 
 void  TParam::clearNodeSequence()
 {
-    // удаляем поля в parameters
-    m_node.remove( GoodsNameSection );
-    m_node.remove( GoodsTypeSection );
-    m_node.remove( GoodsPlaceholderSection );
-    m_node.remove( GoodsNewSection );
-    m_node.remove( GoodsAfterSection );
-    m_node.remove( GoodsBeforeSection );
-    m_node.remove( GoodsUlinkSection );
-    m_node.remove( GoodsUnameSection );
-    m_node.remove( GoodsMinSection );
-    m_node.remove( GoodsMaxSection );
-    m_node.remove( GoodsMultiSection );
-    m_node.remove( GoodsValuesSection );
+    // если не знаем индекс, то удаляем удаляем поля
+    if( -1 == m_node_index )
+    {
+        m_node.remove( GoodsNameSection );
+        m_node.remove( GoodsTypeSection );
+        m_node.remove( GoodsPlaceholderSection );
+        m_node.remove( GoodsNewSection );
+        m_node.remove( GoodsAfterSection );
+        m_node.remove( GoodsBeforeSection );
+        m_node.remove( GoodsUlinkSection );
+        m_node.remove( GoodsUnameSection );
+        m_node.remove( GoodsMinSection );
+        m_node.remove( GoodsMaxSection );
+        m_node.remove( GoodsMultiSection );
+        m_node.remove( GoodsValuesSection );
+    }
 
-    m_parent_node.remove( m_index );
+    // если знаем индекс, то удаляем всю ветку
+    if( -1 != m_node_index )
+    {
+        m_node_parent.remove( m_node_index );
+    }
 }
 
 void  TParam::clearNodeCategories()
@@ -792,15 +801,19 @@ void  TParam::ParamDraw( TParam  *a_pParam )
 
 //------------------------------------------------------------------------------
 
-void  TParam::setParentNode( const YAML::Node&  node )
-{
-    m_parent_node = node;
-}
-
-void  TParam::setNode( const YAML::Node&  node, int  index )
+void  TParam::setNode( const YAML::Node&  node )
 {
     m_node = node;
-    m_index = index;
+}
+
+void  TParam::setNodeParent( const YAML::Node&  node )
+{
+    m_node_parent = node;
+}
+
+void  TParam::setNodeIndex( int  index )
+{
+    m_node_index = index;
 }
 
 YAML::Node&  TParam::getNode()

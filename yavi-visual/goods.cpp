@@ -120,25 +120,12 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                 for( int i = 0; i < static_cast<int>(cat[ GoodsParametersSection ].size()); i++ )
                 {
                     pParam = new TParam( pCategory, Q_NULLPTR, 0 );
-                    pParam->setParentNode( cat[ GoodsParametersSection ] );
-                    pParam->setNode( cat[ GoodsParametersSection ][i], i );
+                    pParam->setNode( cat[ GoodsParametersSection ][i] );
+                    pParam->setNodeParent( cat[ GoodsParametersSection ] );
+                    pParam->setNodeIndex( i );
 
                     pCategory->getParameters( cat[ GoodsParametersSection ][i], pParam, 0 );
                 }
-
-/*
-                for( auto& par : cat[ GoodsParametersSection ] )
-                {
-
-                    pParam = new TParam( pCategory, Q_NULLPTR, 0 );
-                    pParam->setNode( par );
-
-                    pCategory->getParameters( par, pParam, 0 );
-
-                    // подгоняем размер виджета под содержимое для корректной работы скролла
-                    //widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
-                }
-*/
             }
 
             // подгоняем размер виджета под содержимое для корректной работы скролла
