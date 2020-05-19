@@ -28,25 +28,27 @@ TCategory::TCategory( TGoods  *pAncestor )
     // ставим начальный размер себя
     widget_size_reset();
 
-    QHBoxLayout *hlayout = new QHBoxLayout;
-    hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    m_hlayout = new QHBoxLayout;
+    m_hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
     // кнопка с именем
     m_ptBtnName = new QPushButton( "button" );
     m_ptBtnName->setFixedWidth( 93 );
     connect( m_ptBtnName, SIGNAL(clicked()), this, SLOT(onBtnName()) );
-    hlayout->addWidget( m_ptBtnName, 0, Qt::AlignLeft );
+    m_hlayout->addWidget( m_ptBtnName, 0, Qt::AlignLeft );
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+" );
     m_ptBtnInc->setToolTip( "Добавить параметр" );
     m_ptBtnInc->setFixedWidth( 93 );
     connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
-    hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
+    m_hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
 
-    m_vlayout->addLayout( hlayout, 0 );
+    m_vlayout->addLayout( m_hlayout, 0 );
 
     setLayout( m_vlayout );
+
+    widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
 }
 
 TCategory::~TCategory()
@@ -164,7 +166,6 @@ void  TCategory::CategoryDelete()
     // уничтожаем диалог
     m_ptDialog->~TDialog();
 
-/* тут падает
     // для всех вложенных Parameters вызываем очистку
     for( auto& it : m_apParamList )
     {
@@ -174,8 +175,13 @@ void  TCategory::CategoryDelete()
         // уничтожаем
         it->~TParam();
     }
-*/
-//    qDebug() << getCategoryName() << "del param";
+
+    // уничтожаем виджеты
+    while( ( child = m_hlayout->takeAt(0) ) != Q_NULLPTR )
+    {
+        delete child->widget();
+        delete child;
+    }
 
     // уничтожаем виджеты
     while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )

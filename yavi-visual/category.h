@@ -52,7 +52,8 @@ protected Q_SLOTS :
 private:
     YAML::Node     m_node;      // текущий уровнь дерева ямла
 
-    QVBoxLayout   *m_vlayout;
+    QVBoxLayout   *m_vlayout;   // главный layout класса
+    QHBoxLayout   *m_hlayout;   // вложенный layout
 
     QPushButton   *m_ptBtnName; // кнопка "Имя"
     QPushButton   *m_ptBtnInc;  // кнопка "+"

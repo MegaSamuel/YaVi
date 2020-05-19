@@ -111,6 +111,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             // ищем имя
             std::string cat_name = __yaml_GetString( cat, GoodsCategoryName );
             pCategory->setCategoryName( cat_name );
+            qDebug() << QString::fromStdString(cat_name);
 
             if( __yaml_IsSequence( cat[ GoodsParametersSection ] ) )
             {
@@ -242,6 +243,8 @@ TGoods::TGoods()
     widget_size_reset();
 
     setLayout( m_vlayout );
+
+    widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
 }
 
 TGoods::TGoods( const YAML::Node&  config )
