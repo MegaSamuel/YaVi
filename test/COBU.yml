@@ -1,0 +1,205 @@
+category:
+  - name: Одежда
+    parameters:
+      - name: Размер
+        type: 3
+        placeholder: Размер
+        new: +Добавить размер
+        min: 36
+        max: 76
+        ulink: table-2
+        uname: Таблица соответствия размеров одежды
+      - name: Сезон
+        type: 5
+        placeholder: Сезон
+        values: |-
+          лето
+          зима
+          демисезон
+      - name: Пол и возраст
+        type: 4
+        values: |-
+          Для мужчин
+          Для женщин
+          Для мальчиков
+          Для девочек
+        categories:
+          - name: Для мужчин
+            parameters:
+              - name: Тип
+                type: 4
+                values: |-
+                  Брюки
+                  Верхняя одежда
+                categories:
+                  - name: Брюки
+                    parameters: 
+                      - name: Стиль
+                        type: 4
+                        values: |- 
+                          зауженные
+                          джинсы
+                          прямые
+                        placeholder: стиль
+                        new: +новый стиль
+                      - name: Размер
+                        type: 3
+                        placeholder: размер брюк
+                        new: +добавить размер
+                        min: 44
+                        max: 84
+                  - name: Верхняя одежда
+                    parameters: 
+                      - name: Стиль
+                        type: 4
+                        placeholder: стиль
+                        before: Размер
+                        new: +новый стиль
+                        values: |-
+                          куртка
+                          пальто
+                          плащ
+                          джемпер
+                      - name: Капюшон
+                        type: 4
+                        placeholder: капюшон
+                        after: Размер
+                        ulink: table-hood
+                        uname: Виды капюшонов
+                        values: |-
+                          нет
+                          съемный
+                          несъемный
+          - name: Для женщин
+            parameters:
+              - name: Тип
+                type: 4
+                values: |-
+                  Нижнее белье
+                  Верхняя одежда
+                categories:
+                  - name: Нижнее белье
+                    parameters:
+                      - name: Виды
+                        type: 4
+                        placeholder: Виды белья
+                        values: |- 
+                          Бюстгалтеры
+                          Майки
+                        categories:
+                          - name: Бюстгалтеры
+                            ulink: table-bra
+                            uname: Как выбрать
+                            parameters: 
+                              - name: Размер
+                                type: 4
+                                placeholder: размер бюстгалтера
+                                new: +добавить размер
+                                values: |- 
+                                  60
+                                  70
+                                  75
+                                  80
+                                  85
+                                  90
+                                  95
+                                  100
+                                ulink: table-1
+                                uname: Таблица соответствия размеров
+                              - name: Чашка
+                                type: 4
+                                after: Размер
+                                placeholder: чашка
+                                values: |- 
+                                  A
+                                  B
+                                  C
+                                  D
+                                  E
+                                  F
+  - id: category-2
+    name: Книги
+    parameters:
+      - name: Размер
+        type: 3
+  - id: category-3
+    name: Посуда
+    parameters:
+      - name: Размер
+        type: 3
+
+tables: 
+  - id: table-1
+    name: Размеры бюстгалтеров
+    colums:
+      - name: Россия
+        values: |- 
+          65
+          70
+          75
+          80
+          85
+          90
+          95
+          100
+      - name: Франция
+        values: |-
+          80
+          85
+          90
+          95
+          100
+          105
+          110
+          115
+      - name: США и Англия
+        values: |-
+          32
+          34
+          36
+          38
+          40
+          42
+          44
+      - name: Италия
+        values: |-
+          1
+          2
+          3
+          4
+          5
+          6
+          7
+          8 
+  - id: table-2
+    name: Размеры мужской одежды
+    rows: 
+      - name: Международный размер
+        values: |-
+          XS
+          S
+          M
+          L
+          XL
+          XXL
+      - name: Россия
+        values: |-
+          44
+          46
+          48
+          50
+          52
+          54
+  - id: table-hood  
+    name: Виды капюшонов
+    link: https://sun9-67.userapi.com/zX4MVDFRpnsvMMWJClDmxU4365CT48EDC1p5WQ/iXy07NaY9FE.jpg
+  - id: table-bra
+    name: Шпаргалка
+    link: https://www.adme.ru/tvorchestvo-dizajn/shpargalka-kak-vybrat-idealnyj-byustgalter-1408265
+  - id: table-bra
+    name: Шпаргалка
+    link: https://www.adme.ru/tvorchestvo-dizajn/shpargalka-kak-vybrat-idealnyj-byustgalter-1408265
+  - id: table-bra
+    name: Шпаргалка
+    link: https://www.adme.ru/tvorchestvo-dizajn/shpargalka-kak-vybrat-idealnyj-byustgalter-1408265
+
