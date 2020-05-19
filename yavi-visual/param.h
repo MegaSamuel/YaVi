@@ -105,7 +105,8 @@ public:
     TParam( TCategory  *pAncestor = Q_NULLPTR, TCategories  *pMentor = Q_NULLPTR, int  depth = 0 );
     ~TParam();
 
-    void           setNode( const YAML::Node&  node );
+    void           setParentNode( const YAML::Node&  node );
+    void           setNode( const YAML::Node&  node, int  index );
     YAML::Node&    getNode();
 
     void           setParamName( const std::string&  name, bool  set_to_node = false );
@@ -179,7 +180,9 @@ private:
     void           setParamValueMin( int  min );
     void           setParamValueMax( int  max );
 
+    YAML::Node     m_parent_node;      // текущий уровнь дерева ямла
     YAML::Node     m_node;      // текущий уровнь дерева ямла
+    int            m_index;     // номер перечисления
 
     QString        m_zName;
     QString        m_zPlaceholder;

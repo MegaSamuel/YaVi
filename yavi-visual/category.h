@@ -53,6 +53,7 @@ private:
     void           clear();
 
     YAML::Node     m_node;      // текущий уровнь дерева ямла
+    int            m_index;     // номер перечисления
 
     QVBoxLayout   *m_vlayout;   // главный layout класса
     QHBoxLayout   *m_hlayout;   // вложенный layout

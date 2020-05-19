@@ -25,9 +25,6 @@ TCategory::TCategory( TGoods  *pAncestor )
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
-    // ставим начальный размер себя
-    widget_size_reset();
-
     m_hlayout = new QHBoxLayout;
     m_hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
@@ -47,6 +44,9 @@ TCategory::TCategory( TGoods  *pAncestor )
     m_vlayout->addLayout( m_hlayout, 0 );
 
     setLayout( m_vlayout );
+
+    // ставим начальный размер себя
+    widget_size_reset();
 
     widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
 }
@@ -121,7 +121,7 @@ void  TCategory::onSendValues( TValues& a_tValues )
 
         TParam  *pParam;
         pParam = new TParam( this, Q_NULLPTR, m_depth );
-        pParam->setNode( m_node[ GoodsParametersSection ] );
+        pParam->setNode( m_node[ GoodsParametersSection ], -1 );
 
         // добавляемся к родителю
         // в ямле новые параметры добавляются в конец, делаем так же
@@ -258,7 +258,7 @@ void  TCategory::getCategories( const YAML::Node&  node, TParam  *a_pParam, int 
         {
             TParam  *pParam;
             pParam = new TParam( Q_NULLPTR, pCategories, pCategories->getCategoriesDepth()+1 );
-            pParam->setNode( par );
+            pParam->setNode( par, -1 );
 
             // добавляем Parameters в список класса TCategories
             pCategories->m_apParamList.append(pParam);
@@ -382,9 +382,10 @@ void  TCategory::widget_size_reset() noexcept
     m_width = 0;
     m_height = 0;
 
-    // ставим размер самого себя
-    setMinimumWidth( m_width );
-    setMinimumHeight( m_height );
+    m_width = 2 * m_vlayout->margin();
+    m_height = 2 * m_vlayout->margin();
+
+    qDebug() << "init category size" << m_width << m_height;
 }
 
 void  TCategory::widget_stretch( int width, int height ) noexcept
@@ -394,11 +395,9 @@ void  TCategory::widget_stretch( int width, int height ) noexcept
         m_width = width;
 
     // высоту увеличиваем на каждый элемент
-    m_height += height;
+    m_height = height;
 
-    //qDebug() << "cat stretch" << width << height << "size" << m_width << m_height;
-
-    //    qDebug() << "category" << getCategoryName() << m_width << m_height;
+    qDebug() << "cat stretch" << width << height << m_width << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );

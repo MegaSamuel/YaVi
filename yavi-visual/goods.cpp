@@ -115,32 +115,30 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
             if( __yaml_IsSequence( cat[ GoodsParametersSection ] ) )
             {
-                /*
-                qDebug() << "sequence size" << cat[ GoodsParametersSection ].size();
+                TParam  *pParam;
 
-                YAML::Node param;
-                std::string name;
-
-                for( size_t i = 0; i < cat[ GoodsParametersSection ].size(); i++ )
+                for( int i = 0; i < static_cast<int>(cat[ GoodsParametersSection ].size()); i++ )
                 {
-                    param = cat[ GoodsParametersSection ][i];
-                    name = __yaml_GetString( param, "name" );
+                    pParam = new TParam( pCategory, Q_NULLPTR, 0 );
+                    pParam->setParentNode( cat[ GoodsParametersSection ] );
+                    pParam->setNode( cat[ GoodsParametersSection ][i], i );
 
-                    qDebug() << i << QString::fromStdString(name);
+                    pCategory->getParameters( cat[ GoodsParametersSection ][i], pParam, 0 );
                 }
-                */
 
+/*
                 for( auto& par : cat[ GoodsParametersSection ] )
                 {
-                    TParam  *pParam;
+
                     pParam = new TParam( pCategory, Q_NULLPTR, 0 );
                     pParam->setNode( par );
 
                     pCategory->getParameters( par, pParam, 0 );
 
                     // подгоняем размер виджета под содержимое для корректной работы скролла
-                    widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
+                    //widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
                 }
+*/
             }
 
             // подгоняем размер виджета под содержимое для корректной работы скролла
@@ -255,10 +253,10 @@ TGoods::TGoods()
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
+    setLayout( m_vlayout );
+
     // ставим начальный размер себя
     widget_size_reset();
-
-    setLayout( m_vlayout );
 
     widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
 }
@@ -324,9 +322,14 @@ void  TGoods::widget_size_reset() noexcept
     m_width = 0;
     m_height = 0;
 
+    m_width = 2 * m_vlayout->margin();
+    m_height = 2 * m_vlayout->margin();
+
+    qDebug() << "init goods size" << m_width << m_height;
+
     // ставим размер самого себя
-    setMinimumWidth( m_width );
-    setMinimumHeight( m_height );
+    //setMinimumWidth( m_width );
+    //setMinimumHeight( m_height );
 }
 
 void  TGoods::widget_stretch( int width, int height ) noexcept
@@ -338,7 +341,7 @@ void  TGoods::widget_stretch( int width, int height ) noexcept
     // высоту увеличиваем на каждый элемент
     m_height += height;
 
-    //qDebug() << "wgt stretch" << width << height << "size" << m_width << m_height;
+    qDebug() << "wgt stretch" << width << height << "size" << m_width << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );
@@ -354,7 +357,7 @@ void  TGoods::widget_shrink( int width, int height ) noexcept
     if( m_height < 0 )
         m_height = 0;
 
-    //qDebug() << "wgt shrink" << height << "height" << m_height;
+    qDebug() << "wgt shrink" << height << "height" << m_height;
 
     // ставим размер самого себя
     setMinimumHeight( m_height );

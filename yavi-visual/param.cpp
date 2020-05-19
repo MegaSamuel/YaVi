@@ -25,9 +25,6 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
     m_vlayout->setMargin( 0 );
 
-    // ставим начальный размер себя
-    widget_size_reset();
-
     m_hlayout = new QHBoxLayout;
     m_hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
@@ -63,6 +60,9 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     m_vlayout->addLayout( m_hlayout, 0 );
 
     setLayout( m_vlayout );
+
+    // ставим начальный размер себя
+    widget_size_reset();
 
     widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
 }
@@ -154,7 +154,7 @@ void  TCategories::onSendValues( TValues& a_tValues )
 
         TParam  *pParam;
         pParam = new TParam( Q_NULLPTR, this, m_depth+1 );
-        pParam->setNode( m_node[ GoodsParametersSection ] );
+        pParam->setNode( m_node[ GoodsParametersSection ], -1 );
 
         //!bug  надо перерисовывать все layout-ы
         // добавляемся к родителю
@@ -306,17 +306,11 @@ void  TCategories::setCategoriesName( const std::string&  name, bool  set_to_nod
 {
     m_zName = QString::fromStdString(name);
 
-    // уменьшаем на старую высоту кнопки
-    //widget_shrink( 0, m_ptBtnName->height() );
-
     m_zBtnName = QString::fromStdString(name);
     m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );       // убираем подряд идущие пробелы на один
     m_zBtnName.replace( " ", "\n" );                     // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );                  // правленное имя кнопки
     m_ptBtnName->setToolTip( "Категория: " + m_zName );  // подсказка с оригинальным именем
-
-    // растягиваем на новую высоту кнопки
-    //widget_stretch( 0, m_ptBtnName->height() );
 
     if( set_to_node )
     {
@@ -376,9 +370,14 @@ void  TCategories::widget_size_reset() noexcept
     m_width = 0;
     m_height = 0;
 
+    m_width = 2 * m_vlayout->margin();
+    m_height = 2 * m_vlayout->margin();
+
+    qDebug() << "init categories size" << m_width << m_height;
+
     // ставим размер самого себя
-    setMinimumWidth( m_width );
-    setMinimumHeight( m_height );
+//    setMinimumWidth( m_width );
+//    setMinimumHeight( m_height );
 }
 
 void  TCategories::widget_stretch( int width, int height ) noexcept
@@ -390,7 +389,7 @@ void  TCategories::widget_stretch( int width, int height ) noexcept
     // высоту увеличиваем на каждый элемент
     m_height += height;
 
-    //qDebug() << "categories" << m_width << m_height << "set" << width << height ;
+    qDebug() << "categories"  << width << height << m_width << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );
@@ -468,9 +467,6 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
     m_vlayout->setMargin( 0 );
 
-    // ставим начальный размер себя
-    widget_size_reset();
-
     m_hlayout1 = new QHBoxLayout;
     m_hlayout1->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
@@ -506,6 +502,9 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     m_vlayout->addLayout( m_hlayout1, 0 );
 
     setLayout( m_vlayout );
+
+    // ставим начальный размер себя
+    widget_size_reset();
 
     widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
 }
@@ -691,6 +690,8 @@ void  TParam::clearNodeSequence()
     m_node.remove( GoodsMaxSection );
     m_node.remove( GoodsMultiSection );
     m_node.remove( GoodsValuesSection );
+
+    m_parent_node.remove( m_index );
 }
 
 void  TParam::clearNodeCategories()
@@ -703,7 +704,7 @@ void  TParam::ParamDelete()
 {
     QLayoutItem *child;
 
-    //qDebug() << "parameter" << getParamName() << "delete";
+    qDebug() << "parameter" << getParamName() << "delete";
 
     // уничтожаем диалог
     m_ptDialog->~TDialog();
@@ -791,9 +792,15 @@ void  TParam::ParamDraw( TParam  *a_pParam )
 
 //------------------------------------------------------------------------------
 
-void  TParam::setNode( const YAML::Node&  node )
+void  TParam::setParentNode( const YAML::Node&  node )
+{
+    m_parent_node = node;
+}
+
+void  TParam::setNode( const YAML::Node&  node, int  index )
 {
     m_node = node;
+    m_index = index;
 }
 
 YAML::Node&  TParam::getNode()
@@ -805,21 +812,11 @@ void  TParam::setParamName( const std::string&  name, bool  set_to_node )
 {
     m_zName = QString::fromStdString(name);
 
-    //qDebug() << "shrink button" << m_ptBtnName->height();
-
-    // уменьшаем на старую высоту кнопки
-    //widget_shrink( 0, m_ptBtnName->height() );
-
     m_zBtnName = QString::fromStdString(name);
     m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );       // убираем подряд идущие пробелы на один
     m_zBtnName.replace( " ", "\n" );                     // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );                  // правленное имя кнопки
     m_ptBtnName->setToolTip( "Параметр: " +  m_zName );  // подсказка с оригинальным именем
-
-    //qDebug() << "stretch button" << m_ptBtnName->height();
-
-    // растягиваем на новую высоту кнопки
-    //widget_stretch( 0, m_ptBtnName->height() );
 
     if( set_to_node )
     {
@@ -1183,9 +1180,14 @@ void  TParam::widget_size_reset() noexcept
     m_width = 0;
     m_height = 0;
 
+    m_width = 2 * m_vlayout->margin();
+    m_height = 2 * m_vlayout->margin();
+
+    qDebug() << "init param size" << m_width << m_height;
+
     // ставим размер самого себя
-    setMinimumWidth( m_width );
-    setMinimumHeight( m_height );
+    //setMinimumWidth( m_width );
+    //setMinimumHeight( m_height );
 }
 
 void  TParam::widget_stretch( int width, int height ) noexcept
@@ -1234,10 +1236,13 @@ void  TParam::widget_parent_shrink( int width, int height ) noexcept
 {
     if( Q_NULLPTR != m_pAncestor )
     {
+        qDebug() << "ancestor shrink";
         m_pAncestor->widget_shrink( width, height );
+        m_pAncestor->widget_parent_shrink( width, height );
     }
     else if( Q_NULLPTR != m_pMentor )
     {
+        qDebug() << "mentor shrink";
         m_pMentor->widget_shrink( width, height );
         m_pMentor->widget_parent_shrink( width, height );
     }
