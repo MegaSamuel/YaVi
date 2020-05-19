@@ -232,7 +232,7 @@ void  TCategories::CategoriesDelete()
     QLayoutItem *child;
     QString  item = getCategoriesName();
 
-    qDebug() << "categories" << item << "delete";
+    //qDebug() << "categories" << item << "delete";
 
     // уничтожаем диалог
     m_ptDialog->~TDialog();
@@ -678,6 +678,9 @@ void  TParam::onSendValue( int  val )
 
 void  TParam::clearNodeSequence()
 {
+    qDebug() << "size" << m_node.size();
+
+    // удаляем поля в parameters
     m_node.remove( GoodsNameSection );
     m_node.remove( GoodsTypeSection );
     m_node.remove( GoodsPlaceholderSection );
@@ -690,10 +693,22 @@ void  TParam::clearNodeSequence()
     m_node.remove( GoodsMaxSection );
     m_node.remove( GoodsMultiSection );
     m_node.remove( GoodsValuesSection );
+
+    qDebug() << "size" << m_node.size();
+
+//    qDebug() << "node" << m_node;
+
+    // удаляем ветку parameters
+    //bool res = m_node.remove( GoodsParametersSection );
+
+    bool res = m_pAncestor->getNode().remove( 1 );
+
+    qDebug() << "del" << GoodsParametersSection << res;
 }
 
 void  TParam::clearNodeCategories()
 {
+    // удаляем ветку categories
     m_node.remove( GoodsCategoriesSection );
 }
 
@@ -701,7 +716,7 @@ void  TParam::ParamDelete()
 {
     QLayoutItem *child;
 
-    qDebug() << "parameter" << getParamName() << "delete";
+    //qDebug() << "parameter" << getParamName() << "delete";
 
     // уничтожаем диалог
     m_ptDialog->~TDialog();
@@ -754,7 +769,7 @@ void  TParam::ParamDelete()
         {
             if( this == m_pMentor->m_apParamList.at(i) )
             {
-                qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete (mentor)";
+                //qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete (mentor)";
 
                 m_pMentor->m_apParamList.removeAt(i);
             }
@@ -768,7 +783,7 @@ void  TParam::ParamDelete()
         {
             if( this == m_pAncestor->m_apParamList.at(i) )
             {
-                qDebug() << m_pAncestor->m_apParamList.at(i)->getParamName() << "obsolete (ancestor)";
+                //qDebug() << m_pAncestor->m_apParamList.at(i)->getParamName() << "obsolete (ancestor)";
 
                 m_pAncestor->m_apParamList.removeAt(i);
             }

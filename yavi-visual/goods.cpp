@@ -114,7 +114,9 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
             if( __yaml_IsSequence( cat[ GoodsParametersSection ] ) )
             {
-                for( auto& par : cat[ GoodsParametersSection ] )
+                qDebug() << "sequence size" << cat[ GoodsParametersSection ].size();
+
+                for( auto par : cat[ GoodsParametersSection ] )
                 {
                     TParam  *pParam;
                     pParam = new TParam( pCategory, Q_NULLPTR, 0 );
@@ -333,7 +335,7 @@ void  TGoods::widget_shrink( int width, int height ) noexcept
     if( m_height < 0 )
         m_height = 0;
 
-    qDebug() << "wgt shrink" << height << "height" << m_height;
+    //qDebug() << "wgt shrink" << height << "height" << m_height;
 
     // ставим размер самого себя
     setMinimumHeight( m_height );

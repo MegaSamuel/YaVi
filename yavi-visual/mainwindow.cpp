@@ -246,24 +246,56 @@ bool  MainWindow::fini( const QString&  filename )
     }
 
 /*
-    YAML::Node node;
-
-    node["prostoslovo1"] = "prostoznachenie1";
-    node["prostoslovo2"] = "prostoznachenie2";
-    node["prostoslovo3"] = "prostoznachenie3";
-    node["prostoslovo4"] = "prostoznachenie4";
-
     YAML::Node node1;
+    node1["name"] = "node 1";
+    node1["type"] = 0;
+    node1["prostoslovo11"] = "prostoznachenie11";
+    node1["prostoslovo12"] = "prostoznachenie12";
+    node1["prostoslovo13"] = "prostoznachenie13";
+    node1["prostoslovo14"] = "prostoznachenie14";
 
-    node1["parameters"].push_back("first");
-    node1["parameters"].push_back("second");
+    YAML::Node node2;
+    node2["name"] = "node 2";
+    node2["type"] = 0;
+    node2["prostoslovo21"] = "prostoznachenie21";
+    node2["prostoslovo22"] = "prostoznachenie22";
+    node2["prostoslovo23"] = "prostoznachenie23";
+    node2["prostoslovo24"] = "prostoznachenie24";
 
-    node1["parameters"].push_back( node );
+    YAML::Node node3;
+    node3["name"] = "node 3";
+    node3["type"] = 0;
+    node3["prostoslovo31"] = "prostoznachenie31";
+    node3["prostoslovo32"] = "prostoznachenie32";
+    node3["prostoslovo33"] = "prostoznachenie33";
+    node3["prostoslovo34"] = "prostoznachenie34";
+
+    YAML::Node node_name;
+    node_name[ "name" ] = "NameStr";
+    node_name[ "parameters" ].push_back(node1);
+    node_name[ "parameters" ].push_back(node2);
+    node_name[ "parameters" ].push_back(node3);
+
+    YAML::Node node_main;
+    node_main["category"].push_back( node_name );
+*/
+/*
+    YAML::Node param = m_config["category"]["parameters"];
+
+    for( size_t i = 0; i < param.size(); i++ )
+    {
+        qDebug() << i;
+//        if( param[i]["name"].as<string>() == id) {
+//            param.remove(i);
+//            break;
+//        }
+    }
 */
 
     // пробуем выгрузить ямл в строку
     try {
         str = YAML::Dump( m_config );
+//        str = YAML::Dump( node_main );
     } catch ( const YAML::Exception&  e ) {
         // что-то пошло не так, а что смотрим в e.what()
         zFailReason = QString::fromStdString( e.what() );

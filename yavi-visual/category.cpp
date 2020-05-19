@@ -380,7 +380,7 @@ void  TCategory::widget_stretch( int width, int height ) noexcept
     // высоту увеличиваем на каждый элемент
     m_height += height;
 
-    qDebug() << "cat stretch" << width << height << "size" << m_width << m_height;
+    //qDebug() << "cat stretch" << width << height << "size" << m_width << m_height;
 
     //    qDebug() << "category" << getCategoryName() << m_width << m_height;
 
@@ -408,6 +408,8 @@ void  TCategory::widget_shrink( int width, int height ) noexcept
 
     // ставим размер самого себя
     setMinimumHeight( m_height );
+
+    widget_parent_shrink( m_width, m_height );
 }
 
 void  TCategory::widget_parent_shrink( int width, int height ) noexcept
@@ -420,16 +422,12 @@ void  TCategory::widget_parent_shrink( int width, int height ) noexcept
 
 int TCategory::getCategoryWidth()
 {
-    QSize size = m_vlayout->minimumSize();
-
-    return size.width();
+    return m_vlayout->minimumSize().width();
 }
 
 int TCategory::getCategoryHeight()
 {
-    QSize size = m_vlayout->minimumSize();
-
-    return size.height();
+    return m_vlayout->minimumSize().height();
 }
 
 //------------------------------------------------------------------------------
