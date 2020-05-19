@@ -337,7 +337,7 @@ void TDialog::onBtnAction( QAbstractButton*  btn )
     // нажали Ok
     if( QDialogButtonBox::AcceptRole == priv__->m_ptBtnBox->buttonRole( btn ) )
     {
-        qDebug() << "dialog Ok" << priv__->m_ptLineName->text();
+        //qDebug() << "dialog Ok" << priv__->m_ptLineName->text();
 
         priv__->m_tValues.m_zName = priv__->m_ptLineName->text();
         priv__->m_tValues.m_zPlaceholder = priv__->m_ptLinePlaceholder->text();
@@ -359,13 +359,13 @@ void TDialog::onBtnAction( QAbstractButton*  btn )
     // нажали Reset
     if( QDialogButtonBox::ResetRole == priv__->m_ptBtnBox->buttonRole( btn ) )
     {
-        qDebug() << "dialog Reset" << priv__->m_ptLineName->text();
+        //qDebug() << "dialog Reset" << priv__->m_ptLineName->text();
     }
 
     // нажали Cancel
     if( QDialogButtonBox::RejectRole == priv__->m_ptBtnBox->buttonRole( btn ) )
     {
-        qDebug() << "dialog Cancel" << priv__->m_ptLineName->text();
+        //qDebug() << "dialog Cancel" << priv__->m_ptLineName->text();
 
         // шлем сигнал с данными
         Q_EMIT sendCancel();

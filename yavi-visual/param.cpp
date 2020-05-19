@@ -74,9 +74,11 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 
     m_vlayout->addLayout( hlayout, 0 );
 
-    widget_stretch( width, height );
+    //widget_stretch( width, height );
 
     setLayout( m_vlayout );
+
+    widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
 }
 
 TCategories::~TCategories()
@@ -157,7 +159,7 @@ void  TCategories::onSendValues( TValues& a_tValues )
         setCategoriesName( m_tValues.m_zUlink.toStdString(), true );
         setCategoriesName( m_tValues.m_zUname.toStdString(), true );
 
-        qDebug() << getCategoriesName() << "fix categories";
+        //qDebug() << getCategoriesName() << "fix categories";
     }
 
     if( true == need_to_add )
@@ -174,9 +176,6 @@ void  TCategories::onSendValues( TValues& a_tValues )
         m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
         m_apParamList.append( pParam );
 
-        widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
-        widget_parent_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
-
         // ставим значения параметров
         pParam->setParamName( m_tValues.m_zName.toStdString() );
         pParam->setParamType( m_tValues.m_uType );
@@ -189,6 +188,9 @@ void  TCategories::onSendValues( TValues& a_tValues )
         pParam->setParamMulti( m_tValues.m_zMulti.toStdString() );
         pParam->setParamMin( m_tValues.m_uMin );
         pParam->setParamMax( m_tValues.m_uMax );
+
+        widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
+        widget_parent_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
 
         // создаем пустой узел
         YAML::Node  node;
@@ -210,7 +212,7 @@ void  TCategories::onSendValues( TValues& a_tValues )
         // добалляем узел в ямл
         m_node[ GoodsParametersSection ].push_back( node );
 
-        qDebug() << pParam->getParamName() << "add parameter";
+        //qDebug() << pParam->getParamName() << "add parameter";
     }
 
     need_to_add = false;
@@ -274,7 +276,7 @@ void  TCategories::CategoriesDelete()
         {
             if( this == m_pMentor->m_apCategoriesList.at(i) )
             {
-                qDebug() << m_pMentor->m_apCategoriesList.at(i)->getCategoriesName() << "obsolete";
+                //qDebug() << m_pMentor->m_apCategoriesList.at(i)->getCategoriesName() << "obsolete";
 
                 m_pMentor->m_apCategoriesList.removeAt(i);
             }
@@ -307,11 +309,17 @@ void  TCategories::setCategoriesName( const std::string&  name, bool  set_to_nod
 {
     m_zName = QString::fromStdString(name);
 
+    // уменьшаем на старую высоту кнопки
+    //widget_shrink( 0, m_ptBtnName->height() );
+
     m_zBtnName = QString::fromStdString(name);
     m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );       // убираем подряд идущие пробелы на один
     m_zBtnName.replace( " ", "\n" );                     // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );                  // правленное имя кнопки
     m_ptBtnName->setToolTip( "Категория: " + m_zName );  // подсказка с оригинальным именем
+
+    // растягиваем на новую высоту кнопки
+    //widget_stretch( 0, m_ptBtnName->height() );
 
     if( set_to_node )
     {
@@ -385,7 +393,7 @@ void  TCategories::widget_stretch( int width, int height ) noexcept
     // высоту увеличиваем на каждый элемент
     m_height += height;
 
-    qDebug() << "categories" << m_width << m_height << "set" << width << height ;
+    //qDebug() << "categories" << m_width << m_height << "set" << width << height ;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );
@@ -428,6 +436,8 @@ int TCategories::getCategoriesWidth()
     QSize size = m_vlayout->minimumSize();
 
     return size.width();
+
+    //return minimumSize().width();
 }
 
 int TCategories::getCategoriesHeight()
@@ -435,6 +445,8 @@ int TCategories::getCategoriesHeight()
     QSize size = m_vlayout->minimumSize();
 
     return size.height();
+
+    //return minimumSize().height();
 }
 
 //------------------------------------------------------------------------------
@@ -516,9 +528,13 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
 
     m_vlayout->addLayout( hlayout, 0 );
 
-    widget_stretch( width, height );
+    //widget_stretch( width, height );
 
     setLayout( m_vlayout );
+
+    qDebug() << "param" << m_vlayout->minimumSize().width() << m_vlayout->minimumSize().height();
+
+    widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
 }
 
 TParam::~TParam()
@@ -631,7 +647,7 @@ void  TParam::onSendValues( TValues& a_tValues )
         setParamMin( m_tValues.m_uMin, true );
         setParamMax( m_tValues.m_uMax, true );
 
-        qDebug() << getParamName() << "fix parameter";
+        //qDebug() << getParamName() << "fix parameter";
     }
 
     if( true == need_to_add )
@@ -654,13 +670,13 @@ void  TParam::onSendValues( TValues& a_tValues )
         m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
         m_apCategoriesList.append( pCategories );
 
-        widget_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
-        widget_parent_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
-
         // ставим значения параметров
         pCategories->setCategoriesName( m_tValues.m_zName.toStdString() );
         pCategories->setCategoriesUlink( m_tValues.m_zUlink.toStdString() );
         pCategories->setCategoriesUname( m_tValues.m_zUname.toStdString() );
+
+        widget_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
+        widget_parent_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
 
         // создаем пустой узел
         YAML::Node  node;
@@ -674,7 +690,7 @@ void  TParam::onSendValues( TValues& a_tValues )
         // добаляем узел в ямл
         m_node[ GoodsCategoriesSection ].push_back( node );
 
-        qDebug() << pCategories->getCategoriesName() << "add categories";
+        //qDebug() << pCategories->getCategoriesName() << "add categories";
     }
 
     need_to_add = false;
@@ -682,7 +698,6 @@ void  TParam::onSendValues( TValues& a_tValues )
 
 void  TParam::onSendValue( int  val )
 {
-//    qDebug() << "new value" << val;
     m_tValues.m_uValue = static_cast<unsigned>(val);
 }
 
@@ -713,7 +728,7 @@ void  TParam::ParamDelete()
 {
     QLayoutItem *child;
 
-    qDebug() << getParamName() << "delete";
+    //qDebug() << getParamName() << "delete";
 
     // уничтожаем диалог
     m_ptDialog->~TDialog();
@@ -747,7 +762,7 @@ void  TParam::ParamDelete()
         {
             if( this == m_pMentor->m_apParamList.at(i) )
             {
-                qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete (mentor)";
+                //qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete (mentor)";
 
                 m_pMentor->m_apParamList.removeAt(i);
             }
@@ -761,7 +776,7 @@ void  TParam::ParamDelete()
         {
             if( this == m_pAncestor->m_apParamList.at(i) )
             {
-                qDebug() << m_pAncestor->m_apParamList.at(i)->getParamName() << "obsolete (ancestor)";
+                //qDebug() << m_pAncestor->m_apParamList.at(i)->getParamName() << "obsolete (ancestor)";
 
                 m_pAncestor->m_apParamList.removeAt(i);
             }
@@ -796,11 +811,21 @@ void  TParam::setParamName( const std::string&  name, bool  set_to_node )
 {
     m_zName = QString::fromStdString(name);
 
+    //qDebug() << "shrink button" << m_ptBtnName->height();
+
+    // уменьшаем на старую высоту кнопки
+    //widget_shrink( 0, m_ptBtnName->height() );
+
     m_zBtnName = QString::fromStdString(name);
     m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );       // убираем подряд идущие пробелы на один
     m_zBtnName.replace( " ", "\n" );                     // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );                  // правленное имя кнопки
     m_ptBtnName->setToolTip( "Параметр: " +  m_zName );  // подсказка с оригинальным именем
+
+    //qDebug() << "stretch button" << m_ptBtnName->height();
+
+    // растягиваем на новую высоту кнопки
+    //widget_stretch( 0, m_ptBtnName->height() );
 
     if( set_to_node )
     {
@@ -959,7 +984,7 @@ void  TParam::remParamList( QString& item, bool  set_to_node )
         ind++;
     }
 
-    qDebug() << "новая строка values:" << QString::fromStdString(m_zList);
+    //qDebug() << "новая строка values:" << QString::fromStdString(m_zList);
 
     if( set_to_node )
     {
@@ -1084,17 +1109,12 @@ void  TParam::setParamValueAdd()
     m_hlayout = new QHBoxLayout();
     m_hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
-    int width = 2*m_hlayout->margin();
-    int height = 2*m_hlayout->margin();
-
     // отступ
     for( int i = 0; i < m_depth+1; i++ )
     {
         QLabel *label = new QLabel();
         label->setFixedWidth( 93 );
         m_hlayout->addWidget( label, 0, Qt::AlignLeft );
-
-        width += label->width();
     }
 
     // кнопка минус
@@ -1104,8 +1124,6 @@ void  TParam::setParamValueAdd()
     connect( m_ptBtnValDec, SIGNAL(clicked()), this, SLOT(onBtnValDec()) );
     m_hlayout->addWidget( m_ptBtnValDec, 0, Qt::AlignLeft );
 
-    width += m_ptBtnValDec->width();
-
     // спин со значением
     m_ptSpinValue = new QSpinBox();
     m_ptSpinValue->setToolTip( "Значение" );
@@ -1113,13 +1131,12 @@ void  TParam::setParamValueAdd()
     connect( m_ptSpinValue, SIGNAL(valueChanged(int)), this, SLOT(onSendValue(int)) );
     m_hlayout->addWidget( m_ptSpinValue, 0, Qt::AlignLeft );
 
-    width += m_ptSpinValue->width();
-    height += 30;
-
     m_vlayout->addLayout( m_hlayout );
 
-    widget_stretch( width, height );
-    widget_parent_stretch( width, height );
+    qDebug() << "add value" << m_hlayout->minimumSize().width() << m_hlayout->minimumSize().height();
+
+    widget_stretch( m_hlayout->minimumSize().width(), m_hlayout->minimumSize().height() );
+    widget_parent_stretch( m_hlayout->minimumSize().width(), m_hlayout->minimumSize().height() );
 
     m_second_row_exist = true;
 }
@@ -1138,8 +1155,10 @@ void  TParam::setParamValueDel()
         delete child;
     }
 
-    widget_shrink( 0, 30 );
-    widget_parent_shrink( 0, 30 );
+    qDebug() << "del value" << m_hlayout->minimumSize().width() << m_hlayout->minimumSize().height();
+
+    widget_shrink( 0, m_hlayout->minimumSize().height() );
+    widget_parent_shrink( 0, m_hlayout->minimumSize().height() );
 
     // уничтожаем layout
     m_hlayout->deleteLater();
@@ -1235,6 +1254,8 @@ int TParam::getParamWidth()
     QSize size = m_vlayout->minimumSize();
 
     return size.width();
+
+    //return minimumSize().width();
 }
 
 int TParam::getParamHeight()
@@ -1242,6 +1263,8 @@ int TParam::getParamHeight()
     QSize size = m_vlayout->minimumSize();
 
     return size.height();
+
+    //return minimumSize().height();
 }
 
 //------------------------------------------------------------------------------
