@@ -678,8 +678,6 @@ void  TParam::onSendValue( int  val )
 
 void  TParam::clearNodeSequence()
 {
-    qDebug() << "size" << m_node.size();
-
     // удаляем поля в parameters
     m_node.remove( GoodsNameSection );
     m_node.remove( GoodsTypeSection );
@@ -693,17 +691,6 @@ void  TParam::clearNodeSequence()
     m_node.remove( GoodsMaxSection );
     m_node.remove( GoodsMultiSection );
     m_node.remove( GoodsValuesSection );
-
-    qDebug() << "size" << m_node.size();
-
-//    qDebug() << "node" << m_node;
-
-    // удаляем ветку parameters
-    //bool res = m_node.remove( GoodsParametersSection );
-
-    bool res = m_pAncestor->getNode().remove( 1 );
-
-    qDebug() << "del" << GoodsParametersSection << res;
 }
 
 void  TParam::clearNodeCategories()

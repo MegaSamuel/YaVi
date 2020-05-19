@@ -6,9 +6,7 @@
 
 TCategory::TCategory( TGoods  *pAncestor )
 {
-    m_zName.clear();
-
-    m_depth = 0;
+    clear();
 
     // диалог
     m_ptDialog = new TDialog( true, "Category", this );
@@ -21,6 +19,8 @@ TCategory::TCategory( TGoods  *pAncestor )
 
     // указатель на родителя
     m_pAncestor = pAncestor;
+
+    m_depth = 0;
 
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
@@ -54,6 +54,16 @@ TCategory::TCategory( TGoods  *pAncestor )
 TCategory::~TCategory()
 {
 
+}
+
+void TCategory::clear()
+{
+    m_zName.clear();
+    m_zBtnName.clear();
+
+    m_apParamList.clear();
+
+    need_to_add = false;
 }
 
 //------------------------------------------------------------------------------

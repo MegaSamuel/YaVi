@@ -50,6 +50,8 @@ protected Q_SLOTS :
     void           onSendValues( TValues& );
 
 private:
+    void           clear();
+
     YAML::Node     m_node;      // текущий уровнь дерева ямла
 
     QVBoxLayout   *m_vlayout;   // главный layout класса
