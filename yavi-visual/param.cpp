@@ -283,6 +283,7 @@ void  TCategories::CategoriesDelete()
     // удаляем себя из списка родителя
     if( Q_NULLPTR != m_pMentor )
     {
+        // удаляемся из списка детей
         for( int i = 0; i < m_pMentor->m_apCategoriesList.count(); i++ )
         {
             if( this == m_pMentor->m_apCategoriesList.at(i) )
@@ -290,11 +291,28 @@ void  TCategories::CategoriesDelete()
                 //qDebug() << m_pMentor->m_apCategoriesList.at(i)->getCategoriesName() << "obsolete";
 
                 m_pMentor->m_apCategoriesList.removeAt(i);
+
+                break;
             }
         }
 
         // удаляем запись в values родителя
         m_pMentor->remParamList( item, true );
+
+        int  index;
+
+        // делаем переиндексацию оставшихся детей
+        for( int i = 0; i < m_pMentor->m_apCategoriesList.count(); i++ )
+        {
+            index = m_pMentor->m_apCategoriesList.at(i)->getNodeIndex();
+
+            if( index > m_node_index )
+            {
+                index -= 1;
+
+                m_pMentor->m_apCategoriesList.at(i)->setNodeIndex( index );
+            }
+        }
     }
 
     // очищаем вложения
@@ -318,6 +336,7 @@ void  TCategories::setNodeParent( const YAML::Node&  node )
 
 void  TCategories::setNodeIndex( int  index )
 {
+    qDebug() << "categories set index" << index;
     m_node_index = index;
 }
 
@@ -325,6 +344,18 @@ YAML::Node&  TCategories::getNode()
 {
     return m_node;
 }
+
+YAML::Node&  TCategories::getNodeParent()
+{
+    return m_node_parent;
+}
+
+int  TCategories::getNodeIndex()
+{
+    return m_node_index;
+}
+
+//------------------------------------------------------------------------------
 
 void  TCategories::setCategoriesName( const std::string&  name, bool  set_to_node )
 {
@@ -793,6 +824,7 @@ void  TParam::ParamDelete()
     {
         // родитель
 
+        // удаляемся из списка детей
         for( int i = 0; i < m_pMentor->m_apParamList.count(); i++ )
         {
             if( this == m_pMentor->m_apParamList.at(i) )
@@ -800,6 +832,23 @@ void  TParam::ParamDelete()
                 //qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete (mentor)";
 
                 m_pMentor->m_apParamList.removeAt(i);
+
+                break;
+            }
+        }
+
+        int  index;
+
+        // делаем переиндексацию оставшихся детей
+        for( int i = 0; i < m_pMentor->m_apParamList.count(); i++ )
+        {
+            index = m_pMentor->m_apParamList.at(i)->getNodeIndex();
+
+            if( index > m_node_index )
+            {
+                index -= 1;
+
+                m_pMentor->m_apParamList.at(i)->setNodeIndex( index );
             }
         }
     }
@@ -807,6 +856,7 @@ void  TParam::ParamDelete()
     {
         // прародитель
 
+        // удаляемся из списка детей
         for( int i = 0; i < m_pAncestor->m_apParamList.count(); i++ )
         {
             if( this == m_pAncestor->m_apParamList.at(i) )
@@ -814,6 +864,23 @@ void  TParam::ParamDelete()
                 //qDebug() << m_pAncestor->m_apParamList.at(i)->getParamName() << "obsolete (ancestor)";
 
                 m_pAncestor->m_apParamList.removeAt(i);
+
+                break;
+            }
+        }
+
+        int  index;
+
+        // делаем переиндексацию оставшихся детей
+        for( int i = 0; i < m_pAncestor->m_apParamList.count(); i++ )
+        {
+            index = m_pAncestor->m_apParamList.at(i)->getNodeIndex();
+
+            if( index > m_node_index )
+            {
+                index -= 1;
+
+                m_pAncestor->m_apParamList.at(i)->setNodeIndex( index );
             }
         }
     }
@@ -844,6 +911,7 @@ void  TParam::setNodeParent( const YAML::Node&  node )
 
 void  TParam::setNodeIndex( int  index )
 {
+    qDebug() << "parameters set index" << index;
     m_node_index = index;
 }
 
@@ -851,6 +919,18 @@ YAML::Node&  TParam::getNode()
 {
     return m_node;
 }
+
+YAML::Node&  TParam::getNodeParent()
+{
+    return m_node_parent;
+}
+
+int  TParam::getNodeIndex()
+{
+    return m_node_index;
+}
+
+//------------------------------------------------------------------------------
 
 void  TParam::setParamName( const std::string&  name, bool  set_to_node )
 {

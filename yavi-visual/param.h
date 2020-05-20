@@ -27,6 +27,8 @@ public:
     void           setNodeIndex( int  index );
 
     YAML::Node&    getNode();
+    YAML::Node&    getNodeParent();
+    int            getNodeIndex();
 
     void           setCategoriesName( const std::string&  name, bool  set_to_node = false );
     void           setCategoriesUlink( const std::string&  name, bool  set_to_node = false );
@@ -117,6 +119,8 @@ public:
     void           setNodeIndex( int  index );
 
     YAML::Node&    getNode();
+    YAML::Node&    getNodeParent();
+    int            getNodeIndex();
 
     void           setParamName( const std::string&  name, bool  set_to_node = false );
     void           setParamPlaceholder( const std::string&  name, bool  set_to_node = false );

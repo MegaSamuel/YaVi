@@ -26,6 +26,8 @@ public:
     void           setNodeIndex( int  index );
 
     YAML::Node&    getNode();
+    YAML::Node&    getNodeParent();
+    int            getNodeIndex();
 
     void           getCategories( const YAML::Node&  node, TCategories  *a_pCategories, int  depth );
     void           getParameters( const YAML::Node&  node, TParam  *a_pParam, int  depth );

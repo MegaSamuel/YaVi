@@ -221,6 +221,7 @@ void  TCategory::CategoryDelete()
     // удаляем себя из списка родителя
     if( Q_NULLPTR != m_pAncestor )
     {
+        // удаляемся из списка детей
         for( int i = 0; i < m_pAncestor->m_apCategoryList.count(); i++ )
         {
             if( this == m_pAncestor->m_apCategoryList.at(i) )
@@ -228,10 +229,29 @@ void  TCategory::CategoryDelete()
 //                qDebug() << m_pAncestor->m_apCategoryList.at(i)->getCategoryName() << "obsolete";
 
                 m_pAncestor->m_apCategoryList.removeAt(i);
+
+                break;
+            }
+        }
+
+        int  index;
+
+        // делаем переиндексацию оставшихся детей
+        for( int i = 0; i < m_pAncestor->m_apCategoryList.count(); i++ )
+        {
+            index = m_pAncestor->m_apCategoryList.at(i)->getNodeIndex();
+
+            if( index > m_node_index )
+            {
+                index -= 1;
+
+                m_pAncestor->m_apCategoryList.at(i)->setNodeIndex( index );
             }
         }
     }
 }
+
+//------------------------------------------------------------------------------
 
 void  TCategory::setNode( const YAML::Node&  node )
 {
@@ -252,6 +272,18 @@ YAML::Node&  TCategory::getNode()
 {
     return m_node;
 }
+
+YAML::Node&  TCategory::getNodeParent()
+{
+    return m_node_parent;
+}
+
+int  TCategory::getNodeIndex()
+{
+    return m_node_index;
+}
+
+//------------------------------------------------------------------------------
 
 void  TCategory::getCategories( const YAML::Node&  node, TCategories  *a_pCategories, int  depth )
 {
