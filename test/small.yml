@@ -1,9 +1,0 @@
-category:
-  - name: NameStr
-    parameters:
-      - name: node 1
-        type: 0
-      - name: node 2
-        type: 0
-      - name: node 3
-        type: 0
