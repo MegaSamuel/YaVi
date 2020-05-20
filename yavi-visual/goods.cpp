@@ -103,14 +103,11 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
         // по заданию в ини-файле только одна Category, но на всякий случай ищем все
         for( int j = 0; j < static_cast<int>(config[ GoodsCategorySection ].size()); j++ )
-//        for( auto& cat : config[ GoodsCategorySection ] )
         {
             pCategory = new TCategory( this );
             pCategory->setNode( config[ GoodsCategorySection ][j] );
             pCategory->setNodeParent( config[ GoodsCategorySection ] );
             pCategory->setNodeIndex( j );
-
-            qDebug() << "index j" << j;
 
             m_vlayout->addWidget( pCategory );
             m_apCategoryList.append(pCategory);
@@ -130,15 +127,13 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     pParam->setNodeParent( config[ GoodsCategorySection ][j][ GoodsParametersSection ] );
                     pParam->setNodeIndex( i );
 
-                    qDebug() << "index i" << i;
-
                     pCategory->m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
                     pCategory->m_apParamList.append( pParam );
 
                     pCategory->getParameters( config[ GoodsCategorySection ][j][ GoodsParametersSection ][i], pParam, pParam->getParamDepth() );
 
                     // подгоняем размер виджета под содержимое для корректной работы скролла
-                    //widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
+                    widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
                 }
             }
 
@@ -253,6 +248,7 @@ TGoods::TGoods()
     // в вертикальный layout будем складывать элементы из ямла
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    //m_vlayout->setMargin(0);
 
     setLayout( m_vlayout );
 
