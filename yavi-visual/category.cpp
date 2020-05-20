@@ -315,7 +315,7 @@ void  TCategory::getCategories( const YAML::Node&  node, TCategories  *a_pCatego
             a_pCategories->m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
             a_pCategories->m_apParamList.append( pParam );
 
-            getParameters( node[ GoodsParametersSection ][i], pParam, depth+1 );
+            getParameters( node[ GoodsParametersSection ][i], pParam, pParam->getParamDepth() );
 
             // подгоняем размер виджета под содержимое для корректной работы скролла
             widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
@@ -398,7 +398,7 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
 
             for( int i = 0; i < static_cast<int>(node[ GoodsCategoriesSection ].size()); i++ )
             {
-                pCategories = new TCategories( a_pParam, depth );
+                pCategories = new TCategories( a_pParam, depth+1 );
                 pCategories->setNode( node[ GoodsCategoriesSection ][i] );
                 pCategories->setNodeParent( node[ GoodsCategoriesSection ] );
                 pCategories->setNodeIndex( i );
@@ -406,7 +406,7 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
                 a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
                 a_pParam->m_apCategoriesList.append( pCategories );
 
-                getCategories( node[ GoodsCategoriesSection ][i], pCategories, depth+1 );
+                getCategories( node[ GoodsCategoriesSection ][i], pCategories, pCategories->getCategoriesDepth() );
 
                 // подгоняем размер виджета под содержимое для корректной работы скролла
                 widget_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
