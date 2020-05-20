@@ -661,6 +661,8 @@ void  TParam::onBtnName()
 
     m_ptDialog->setDlgCombo( getParamList() );
 
+    m_ptDialog->setDlgTypeEnabled( isChildrenAbsent() );
+
     m_ptDialog->open();
 }
 
@@ -912,6 +914,11 @@ void  TParam::ParamDraw( TParam  *a_pParam )
 }
 
 //------------------------------------------------------------------------------
+
+bool  TParam::isChildrenAbsent()
+{
+    return m_apCategoriesList.isEmpty();
+}
 
 void  TParam::setNode( const YAML::Node&  node )
 {
