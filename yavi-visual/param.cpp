@@ -149,7 +149,7 @@ void  TCategories::onSendValues( TValues& a_tValues )
         setCategoriesUlink( m_tValues.m_zUlink.toStdString(), true );
         setCategoriesUname( m_tValues.m_zUname.toStdString(), true );
 
-        qDebug() << getCategoriesName() << "fix categories";
+        //qDebug() << getCategoriesName() << "fix categories";
     }
 
     if( true == need_to_add )
@@ -207,7 +207,7 @@ void  TCategories::onSendValues( TValues& a_tValues )
         pParam->setNodeParent( m_node[ GoodsParametersSection ] );
         pParam->setNodeIndex( index );
 
-        qDebug() << pParam->getParamName() << "index" << index;
+        //qDebug() << pParam->getParamName() << "index" << index;
     }
 
     need_to_add = false;
@@ -342,7 +342,6 @@ void  TCategories::setNodeParent( const YAML::Node&  node )
 
 void  TCategories::setNodeIndex( int  index )
 {
-    qDebug() << "categories set index" << index;
     m_node_index = index;
 }
 
@@ -439,11 +438,7 @@ void  TCategories::widget_size_reset() noexcept
     m_width = 2 * m_vlayout->margin();
     m_height = 2 * m_vlayout->margin();
 
-    //qDebug() << "init categories size" << m_width << m_height;
-
-    // ставим размер самого себя
-//    setMinimumWidth( m_width );
-//    setMinimumHeight( m_height );
+    qDebug() << "init categories size" << m_width << m_height;
 }
 
 void  TCategories::widget_stretch( int width, int height ) noexcept
@@ -689,7 +684,7 @@ void  TParam::onSendValues( TValues& a_tValues )
         setParamMin( m_tValues.m_uMin, true );
         setParamMax( m_tValues.m_uMax, true );
 
-        qDebug() << getParamName() << "fix parameter";
+        //qDebug() << getParamName() << "fix parameter";
     }
 
     if( true == need_to_add )
@@ -737,7 +732,7 @@ void  TParam::onSendValues( TValues& a_tValues )
         pCategories->setNodeParent( m_node[ GoodsCategoriesSection ] );
         pCategories->setNodeIndex( index );
 
-        qDebug() << pCategories->getCategoriesName() << "index" << index;
+        //qDebug() << pCategories->getCategoriesName() << "index" << index;
     }
 
     need_to_add = false;
@@ -780,7 +775,7 @@ void  TParam::ParamDelete()
 {
     QLayoutItem *child;
 
-    qDebug() << "parameter" << getParamName() << "delete";
+    //qDebug() << "parameter" << getParamName() << "delete";
 
     // уничтожаем диалог
     m_ptDialog->~TDialog();
@@ -925,7 +920,6 @@ void  TParam::setNodeParent( const YAML::Node&  node )
 
 void  TParam::setNodeIndex( int  index )
 {
-    qDebug() << "parameters set index" << index;
     m_node_index = index;
 }
 
@@ -1333,11 +1327,7 @@ void  TParam::widget_size_reset() noexcept
     m_width = 2 * m_vlayout->margin();
     m_height = 2 * m_vlayout->margin();
 
-    //qDebug() << "init param size" << m_width << m_height;
-
-    // ставим размер самого себя
-    //setMinimumWidth( m_width );
-    //setMinimumHeight( m_height );
+    qDebug() << "init param size" << m_width << m_height;
 }
 
 void  TParam::widget_stretch( int width, int height ) noexcept

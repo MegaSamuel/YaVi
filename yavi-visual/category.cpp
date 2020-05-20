@@ -176,7 +176,7 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setNodeParent( m_node[ GoodsParametersSection ] );
         pParam->setNodeIndex( index );
 
-        qDebug() << pParam->getParamName() << "index" << index;
+        //qDebug() << pParam->getParamName() << "index" << index;
     }
 
     need_to_add = false;
@@ -452,7 +452,7 @@ void  TCategory::widget_size_reset() noexcept
     m_width = 2 * m_vlayout->margin();
     m_height = 2 * m_vlayout->margin();
 
-    //qDebug() << "init category size" << m_width << m_height;
+    qDebug() << "init category size" << m_width << m_height;
 }
 
 void  TCategory::widget_stretch( int width, int height ) noexcept

@@ -323,10 +323,6 @@ void  TGoods::widget_size_reset() noexcept
     m_height = 2 * m_vlayout->margin();
 
     qDebug() << "init goods size" << m_width << m_height;
-
-    // ставим размер самого себя
-    //setMinimumWidth( m_width );
-    //setMinimumHeight( m_height );
 }
 
 void  TGoods::widget_stretch( int width, int height ) noexcept
