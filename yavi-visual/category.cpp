@@ -176,7 +176,7 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setNodeParent( m_node[ GoodsParametersSection ] );
         pParam->setNodeIndex( index );
 
-        qDebug() << "index" << index;
+        qDebug() << pParam->getParamName() << "index" << index;
     }
 
     need_to_add = false;

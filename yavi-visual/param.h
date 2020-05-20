@@ -66,7 +66,6 @@ private:
     void           clear();
 
     void           clearNodeSequence();
-    void           clearNodeParameters();
 
     void           setIncBtnVisible( bool visible );
 
@@ -188,7 +187,6 @@ private:
     void           clear();
 
     void           clearNodeSequence();
-    void           clearNodeCategories();
 
     void           setIncBtnVisible( bool visible );
 
