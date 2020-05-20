@@ -21,6 +21,10 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 
     m_depth = depth;
 
+    m_node.reset();
+    m_node_parent.reset();
+    m_node_index = -1;
+
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
     m_vlayout->setMargin( 0 );
@@ -142,10 +146,10 @@ void  TCategories::onSendValues( TValues& a_tValues )
         // редактируем текущий набор параметров
 
         setCategoriesName( m_tValues.m_zName.toStdString(), true );
-        setCategoriesName( m_tValues.m_zUlink.toStdString(), true );
-        setCategoriesName( m_tValues.m_zUname.toStdString(), true );
+        setCategoriesUlink( m_tValues.m_zUlink.toStdString(), true );
+        setCategoriesUname( m_tValues.m_zUname.toStdString(), true );
 
-        //qDebug() << getCategoriesName() << "fix categories";
+        qDebug() << getCategoriesName() << "fix categories";
     }
 
     if( true == need_to_add )
@@ -154,7 +158,7 @@ void  TCategories::onSendValues( TValues& a_tValues )
 
         TParam  *pParam;
         pParam = new TParam( Q_NULLPTR, this, m_depth+1 );
-        pParam->setNode( m_node[ GoodsParametersSection ] );
+        //pParam->setNode( m_node[ GoodsParametersSection ] );
 
         //!bug  надо перерисовывать все layout-ы
         // добавляемся к родителю
@@ -178,11 +182,10 @@ void  TCategories::onSendValues( TValues& a_tValues )
         widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
         widget_parent_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
 
-        // создаем пустой узел
         YAML::Node  node;
         node.reset();
 
-        // пишем в узел значения параметров
+        // пишем их в пустой ямл
         __yaml_SetString( node, GoodsNameSection, m_tValues.m_zName.toStdString() );
         __yaml_SetScalar( node, GoodsTypeSection, m_tValues.m_uType );
         __yaml_SetString( node, GoodsPlaceholderSection, m_tValues.m_zPlaceholder.toStdString() );
@@ -195,10 +198,16 @@ void  TCategories::onSendValues( TValues& a_tValues )
         __yaml_SetScalar( node, GoodsMinSection, m_tValues.m_uMin );
         __yaml_SetScalar( node, GoodsMaxSection, m_tValues.m_uMax );
 
-        // добалляем узел в ямл
+        // добавляем ямл к основному
         m_node[ GoodsParametersSection ].push_back( node );
 
-        //qDebug() << pParam->getParamName() << "add parameter";
+        int index = static_cast<int>(m_node[ GoodsParametersSection ].size()) - 1;
+
+        pParam->setNode( m_node[ GoodsParametersSection ][index] );
+        pParam->setNodeParent( m_node[ GoodsParametersSection ] );
+        pParam->setNodeIndex( index );
+
+        qDebug() << pParam->getParamName() << "index" << index;
     }
 
     need_to_add = false;
@@ -208,23 +217,28 @@ void  TCategories::onSendValues( TValues& a_tValues )
 
 void  TCategories::clearNodeSequence()
 {
-    m_node.remove( GoodsNameSection );
-    m_node.remove( GoodsTypeSection );
-    m_node.remove( GoodsPlaceholderSection );
-    m_node.remove( GoodsNewSection );
-    m_node.remove( GoodsAfterSection );
-    m_node.remove( GoodsBeforeSection );
-    m_node.remove( GoodsUlinkSection );
-    m_node.remove( GoodsUnameSection );
-    m_node.remove( GoodsMinSection );
-    m_node.remove( GoodsMaxSection );
-    m_node.remove( GoodsMultiSection );
-    m_node.remove( GoodsValuesSection );
-}
+    // если не знаем индекс, то удаляем поля
+    if( -1 == m_node_index )
+    {
+        m_node.remove( GoodsNameSection );
+        //m_node.remove( GoodsTypeSection );
+        //m_node.remove( GoodsPlaceholderSection );
+        //m_node.remove( GoodsNewSection );
+        //m_node.remove( GoodsAfterSection );
+        //m_node.remove( GoodsBeforeSection );
+        m_node.remove( GoodsUlinkSection );
+        m_node.remove( GoodsUnameSection );
+        //m_node.remove( GoodsMinSection );
+        //m_node.remove( GoodsMaxSection );
+        //m_node.remove( GoodsMultiSection );
+        //m_node.remove( GoodsValuesSection );
+    }
 
-void  TCategories::clearNodeParameters()
-{
-    m_node.remove( GoodsParametersSection );
+    // если знаем индекс, то удаляем всю ветку
+    if( -1 != m_node_index )
+    {
+        m_node_parent.remove( m_node_index );
+    }
 }
 
 void  TCategories::CategoriesDelete()
@@ -269,6 +283,7 @@ void  TCategories::CategoriesDelete()
     // удаляем себя из списка родителя
     if( Q_NULLPTR != m_pMentor )
     {
+        // удаляемся из списка детей
         for( int i = 0; i < m_pMentor->m_apCategoriesList.count(); i++ )
         {
             if( this == m_pMentor->m_apCategoriesList.at(i) )
@@ -276,18 +291,41 @@ void  TCategories::CategoriesDelete()
                 //qDebug() << m_pMentor->m_apCategoriesList.at(i)->getCategoriesName() << "obsolete";
 
                 m_pMentor->m_apCategoriesList.removeAt(i);
+
+                break;
             }
         }
 
         // удаляем запись в values родителя
         m_pMentor->remParamList( item, true );
-    }
 
-    // очищаем вложения
-    clearNodeParameters();
+        int  index;
+
+        // делаем переиндексацию оставшихся детей
+        for( int i = 0; i < m_pMentor->m_apCategoriesList.count(); i++ )
+        {
+            index = m_pMentor->m_apCategoriesList.at(i)->getNodeIndex();
+
+            if( index > m_node_index )
+            {
+                index -= 1;
+
+                m_pMentor->m_apCategoriesList.at(i)->setNodeIndex( index );
+            }
+        }
+    }
 
     // очищаем ветку
     clearNodeSequence();
+
+    if( Q_NULLPTR != m_pMentor )
+    {
+        // если нет категорий, то удаляем строку "categories:"
+        if( m_pMentor->m_apCategoriesList.isEmpty() )
+        {
+            m_pMentor->getNode().remove( GoodsCategoriesSection );
+        }
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -297,10 +335,33 @@ void  TCategories::setNode( const YAML::Node&  node )
     m_node = node;
 }
 
+void  TCategories::setNodeParent( const YAML::Node&  node )
+{
+    m_node_parent = node;
+}
+
+void  TCategories::setNodeIndex( int  index )
+{
+    qDebug() << "categories set index" << index;
+    m_node_index = index;
+}
+
 YAML::Node&  TCategories::getNode()
 {
     return m_node;
 }
+
+YAML::Node&  TCategories::getNodeParent()
+{
+    return m_node_parent;
+}
+
+int  TCategories::getNodeIndex()
+{
+    return m_node_index;
+}
+
+//------------------------------------------------------------------------------
 
 void  TCategories::setCategoriesName( const std::string&  name, bool  set_to_node )
 {
@@ -353,6 +414,11 @@ QString  TCategories::getCategoriesUname()
     return m_zUname;
 }
 
+void  TCategories::setCategoriesDepth( int  depth )
+{
+    m_depth = depth;
+}
+
 int  TCategories::getCategoriesDepth()
 {
     return m_depth;
@@ -373,7 +439,7 @@ void  TCategories::widget_size_reset() noexcept
     m_width = 2 * m_vlayout->margin();
     m_height = 2 * m_vlayout->margin();
 
-    qDebug() << "init categories size" << m_width << m_height;
+    //qDebug() << "init categories size" << m_width << m_height;
 
     // ставим размер самого себя
 //    setMinimumWidth( m_width );
@@ -463,6 +529,8 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     // глубина вложения
     m_depth = depth;
 
+    m_node.reset();
+    m_node_parent.reset();
     m_node_index = -1;
 
     m_vlayout = new QVBoxLayout;
@@ -621,7 +689,7 @@ void  TParam::onSendValues( TValues& a_tValues )
         setParamMin( m_tValues.m_uMin, true );
         setParamMax( m_tValues.m_uMax, true );
 
-        //qDebug() << getParamName() << "fix parameter";
+        qDebug() << getParamName() << "fix parameter";
     }
 
     if( true == need_to_add )
@@ -636,7 +704,7 @@ void  TParam::onSendValues( TValues& a_tValues )
         // добавляем категорию
         TCategories  *pCategories;
         pCategories = new TCategories( this, m_depth+1 );
-        pCategories->setNode( m_node[ GoodsCategoriesSection ] );
+        //pCategories->setNode( m_node[ GoodsCategoriesSection ] );
 
         //!bug  надо перерисовывать все layout-ы
         // добавляемся к родителю
@@ -652,19 +720,24 @@ void  TParam::onSendValues( TValues& a_tValues )
         widget_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
         widget_parent_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
 
-        // создаем пустой узел
         YAML::Node  node;
         node.reset();
 
-        // пишем в узел значения параметров
+        // пишем их в пустой ямл
         __yaml_SetString( node, GoodsNameSection, m_tValues.m_zName.toStdString() );
         __yaml_SetString( node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
         __yaml_SetString( node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
 
-        // добаляем узел в ямл
+        // добавляем ямл к основному
         m_node[ GoodsCategoriesSection ].push_back( node );
 
-        //qDebug() << pCategories->getCategoriesName() << "add categories";
+        int index = static_cast<int>(m_node[ GoodsCategoriesSection ].size()) - 1;
+
+        pCategories->setNode( m_node[ GoodsCategoriesSection ][index] );
+        pCategories->setNodeParent( m_node[ GoodsCategoriesSection ] );
+        pCategories->setNodeIndex( index );
+
+        qDebug() << pCategories->getCategoriesName() << "index" << index;
     }
 
     need_to_add = false;
@@ -679,7 +752,7 @@ void  TParam::onSendValue( int  val )
 
 void  TParam::clearNodeSequence()
 {
-    // если не знаем индекс, то удаляем удаляем поля
+    // если не знаем индекс, то удаляем поля
     if( -1 == m_node_index )
     {
         m_node.remove( GoodsNameSection );
@@ -701,12 +774,6 @@ void  TParam::clearNodeSequence()
     {
         m_node_parent.remove( m_node_index );
     }
-}
-
-void  TParam::clearNodeCategories()
-{
-    // удаляем ветку categories
-    m_node.remove( GoodsCategoriesSection );
 }
 
 void  TParam::ParamDelete()
@@ -757,11 +824,15 @@ void  TParam::ParamDelete()
     // уничтожаем layout
     m_vlayout->deleteLater();
 
+    // очищаем ветку в ямле
+    clearNodeSequence();
+
     // удаляем себя из списка родителя
     if( Q_NULLPTR != m_pMentor )
     {
         // родитель
 
+        // удаляемся из списка детей
         for( int i = 0; i < m_pMentor->m_apParamList.count(); i++ )
         {
             if( this == m_pMentor->m_apParamList.at(i) )
@@ -769,13 +840,37 @@ void  TParam::ParamDelete()
                 //qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete (mentor)";
 
                 m_pMentor->m_apParamList.removeAt(i);
+
+                break;
             }
+        }
+
+        int  index;
+
+        // делаем переиндексацию оставшихся детей
+        for( int i = 0; i < m_pMentor->m_apParamList.count(); i++ )
+        {
+            index = m_pMentor->m_apParamList.at(i)->getNodeIndex();
+
+            if( index > m_node_index )
+            {
+                index -= 1;
+
+                m_pMentor->m_apParamList.at(i)->setNodeIndex( index );
+            }
+        }
+
+        // если нет параметров, то удаляем строку "parameters:"
+        if( m_pMentor->m_apParamList.isEmpty() )
+        {
+            m_pMentor->getNode().remove( GoodsParametersSection );
         }
     }
     else if( Q_NULLPTR != m_pAncestor )
     {
         // прародитель
 
+        // удаляемся из списка детей
         for( int i = 0; i < m_pAncestor->m_apParamList.count(); i++ )
         {
             if( this == m_pAncestor->m_apParamList.at(i) )
@@ -783,15 +878,32 @@ void  TParam::ParamDelete()
                 //qDebug() << m_pAncestor->m_apParamList.at(i)->getParamName() << "obsolete (ancestor)";
 
                 m_pAncestor->m_apParamList.removeAt(i);
+
+                break;
             }
         }
+
+        int  index;
+
+        // делаем переиндексацию оставшихся детей
+        for( int i = 0; i < m_pAncestor->m_apParamList.count(); i++ )
+        {
+            index = m_pAncestor->m_apParamList.at(i)->getNodeIndex();
+
+            if( index > m_node_index )
+            {
+                index -= 1;
+
+                m_pAncestor->m_apParamList.at(i)->setNodeIndex( index );
+            }
+        }
+
+        // если нет параметров, то удаляем строку "parameters:"
+        if( m_pAncestor->m_apParamList.isEmpty() )
+        {
+            m_pAncestor->getNode().remove( GoodsParametersSection );
+        }
     }
-
-    // очищаем вложения
-    clearNodeCategories();
-
-    // очищаем ветку в ямле
-    clearNodeSequence();
 }
 
 void  TParam::ParamDraw( TParam  *a_pParam )
@@ -813,6 +925,7 @@ void  TParam::setNodeParent( const YAML::Node&  node )
 
 void  TParam::setNodeIndex( int  index )
 {
+    qDebug() << "parameters set index" << index;
     m_node_index = index;
 }
 
@@ -820,6 +933,18 @@ YAML::Node&  TParam::getNode()
 {
     return m_node;
 }
+
+YAML::Node&  TParam::getNodeParent()
+{
+    return m_node_parent;
+}
+
+int  TParam::getNodeIndex()
+{
+    return m_node_index;
+}
+
+//------------------------------------------------------------------------------
 
 void  TParam::setParamName( const std::string&  name, bool  set_to_node )
 {
@@ -1098,6 +1223,18 @@ QStringList  TParam::getParamList()
 
 //------------------------------------------------------------------------------
 
+void  TParam::setParamDepth( int  depth )
+{
+    m_depth = depth;
+}
+
+int  TParam::getParamDepth()
+{
+    return m_depth;
+}
+
+//------------------------------------------------------------------------------
+
 void  TParam::setIncBtnVisible( bool visible )
 {
     m_ptBtnInc->setVisible( visible );
@@ -1196,7 +1333,7 @@ void  TParam::widget_size_reset() noexcept
     m_width = 2 * m_vlayout->margin();
     m_height = 2 * m_vlayout->margin();
 
-    qDebug() << "init param size" << m_width << m_height;
+    //qDebug() << "init param size" << m_width << m_height;
 
     // ставим размер самого себя
     //setMinimumWidth( m_width );

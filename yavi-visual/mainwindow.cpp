@@ -249,46 +249,48 @@ bool  MainWindow::fini( const QString&  filename )
     YAML::Node node1;
     node1["name"] = "node 1";
     node1["type"] = 0;
-    node1["prostoslovo11"] = "prostoznachenie11";
-    node1["prostoslovo12"] = "prostoznachenie12";
-    node1["prostoslovo13"] = "prostoznachenie13";
-    node1["prostoslovo14"] = "prostoznachenie14";
 
     YAML::Node node2;
     node2["name"] = "node 2";
     node2["type"] = 0;
-    node2["prostoslovo21"] = "prostoznachenie21";
-    node2["prostoslovo22"] = "prostoznachenie22";
-    node2["prostoslovo23"] = "prostoznachenie23";
-    node2["prostoslovo24"] = "prostoznachenie24";
 
     YAML::Node node3;
     node3["name"] = "node 3";
     node3["type"] = 0;
-    node3["prostoslovo31"] = "prostoznachenie31";
-    node3["prostoslovo32"] = "prostoznachenie32";
-    node3["prostoslovo33"] = "prostoznachenie33";
-    node3["prostoslovo34"] = "prostoznachenie34";
+
+    YAML::Node node4;
+    node4["name"] = "node 4";
+    node4["type"] = 0;
 
     YAML::Node node_name;
     node_name[ "name" ] = "NameStr";
     node_name[ "parameters" ].push_back(node1);
     node_name[ "parameters" ].push_back(node2);
     node_name[ "parameters" ].push_back(node3);
+    node_name[ "parameters" ].push_back(node4);
 
     YAML::Node node_main;
     node_main["category"].push_back( node_name );
-*/
-/*
-    YAML::Node param = m_config["category"]["parameters"];
 
-    for( size_t i = 0; i < param.size(); i++ )
+    qDebug() << "category count" << node_main["category"].size();
+
+    qDebug() << QString::fromStdString(node_main["category"][0][ "name" ].as<std::string>());
+
+    qDebug() << "parameters count" << node_main["category"][0]["parameters"].size();
+
+    for( int i = 0; i < static_cast<int>(node_main["category"][0]["parameters"].size()); i++ )
     {
-        qDebug() << i;
-//        if( param[i]["name"].as<string>() == id) {
-//            param.remove(i);
-//            break;
-//        }
+        qDebug() << i << QString::fromStdString(node_main["category"][0]["parameters"][i]["name"].as<std::string>());
+    }
+
+    // удаляем узел с именем node 2
+    node_main["category"][0]["parameters"].remove(1);
+
+    qDebug() << "parameters count" << node_main["category"][0]["parameters"].size();
+
+    for( int i = 0; i < static_cast<int>(node_main["category"][0]["parameters"].size()); i++ )
+    {
+        qDebug() << i << QString::fromStdString(node_main["category"][0]["parameters"][i]["name"].as<std::string>());
     }
 */
 
