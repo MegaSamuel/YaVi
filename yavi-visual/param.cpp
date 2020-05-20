@@ -956,6 +956,8 @@ void  TParam::setParamName( const std::string&  name, bool  set_to_node )
     m_ptBtnName->setText( m_zBtnName );                  // правленное имя кнопки
     m_ptBtnName->setToolTip( "Параметр: " +  m_zName );  // подсказка с оригинальным именем
 
+    //setParamNameColor();
+
     if( set_to_node )
     {
         __yaml_SetString( m_node, GoodsNameSection, name );
@@ -1086,6 +1088,15 @@ void  TParam::setParamMax( unsigned  val, bool  set_to_node )
         __yaml_SetScalar( m_node, GoodsMaxSection, val );
     }
 }
+
+//------------------------------------------------------------------------------
+
+void  TParam::setParamNameColor()
+{
+    m_ptBtnName->setStyleSheet( "color: red" );
+}
+
+//------------------------------------------------------------------------------
 
 void  TParam::remParamList( QString& item, bool  set_to_node )
 {

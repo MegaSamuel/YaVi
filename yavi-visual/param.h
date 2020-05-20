@@ -134,6 +134,8 @@ public:
     void           setParamMin( unsigned  val, bool  set_to_node = false );
     void           setParamMax( unsigned  val, bool  set_to_node = false );
 
+    void           setParamNameColor();
+
     // убрать запись из поля values
     void           remParamList( QString&  item, bool  set_to_node = false );
     // добавить запись в поле values
