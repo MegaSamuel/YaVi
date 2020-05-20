@@ -23,6 +23,9 @@ public:
     ~TCategories();
 
     void           setNode( const YAML::Node&  node );
+    void           setNodeParent( const YAML::Node&  node );
+    void           setNodeIndex( int  index );
+
     YAML::Node&    getNode();
 
     void           setCategoriesName( const std::string&  name, bool  set_to_node = false );
@@ -33,6 +36,7 @@ public:
     QString        getCategoriesUlink();
     QString        getCategoriesUname();
 
+    void           setCategoriesDepth( int  depth );
     int            getCategoriesDepth();
 
     int            getCategoriesWidth();
@@ -46,6 +50,7 @@ public:
     void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
     void           widget_parent_shrink( int width, int height ) noexcept;   // сжимаем виджет
 
+    QVBoxLayout   *m_vlayout;   // главный layout класса
     QList<TParam*> m_apParamList;
 
 protected Q_SLOTS :
@@ -63,9 +68,11 @@ private:
 
     void           setIncBtnVisible( bool visible );
 
-    YAML::Node     m_node;      // текущий уровнь дерева ямла
+    YAML::Node     m_node;        // текущий уровнь дерева ямла
+    YAML::Node     m_node_parent; // родительский уровнь дерева ямла
+    int            m_node_index;  // номер перечисления у родителя
 
-    QVBoxLayout   *m_vlayout;   // главный layout класса
+    //QVBoxLayout   *m_vlayout;   // главный layout класса
     QHBoxLayout   *m_hlayout;   // вложенный layout
 
     QPushButton   *m_ptBtnDec;
@@ -146,6 +153,9 @@ public:
 
     QStringList    getParamList();
 
+    void           setParamDepth( int  depth );
+    int            getParamDepth();
+
     int            getParamWidth();
     int            getParamHeight();
 
@@ -158,6 +168,7 @@ public:
     void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
     void           widget_parent_shrink( int width, int height ) noexcept;   // сжимаем виджет
 
+    QVBoxLayout   *m_vlayout;   // главный layout класса
     QList<TCategories*>  m_apCategoriesList;
 
 protected Q_SLOTS :
@@ -202,7 +213,7 @@ private:
     std::string    m_zList;
     QStringList    m_vList;
 
-    QVBoxLayout   *m_vlayout;   // главный layout класса
+    //QVBoxLayout   *m_vlayout;   // главный layout класса
     QHBoxLayout   *m_hlayout1;  // вложенный layout
     QHBoxLayout   *m_hlayout2;  // вложенный layout для второй строки
 

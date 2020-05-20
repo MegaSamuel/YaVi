@@ -22,9 +22,12 @@ public:
     ~TCategory();
 
     void           setNode( const YAML::Node&  node );
+    void           setNodeParent( const YAML::Node&  node );
+    void           setNodeIndex( int  index );
+
     YAML::Node&    getNode();
 
-    void           getCategories( const YAML::Node&  node, TParam  *a_pParam, int  depth );
+    void           getCategories( const YAML::Node&  node, TCategories  *a_pCategories, int  depth );
     void           getParameters( const YAML::Node&  node, TParam  *a_pParam, int  depth );
 
     int            getCategoryWidth();  // вернуть ширину
@@ -41,6 +44,7 @@ public:
     void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
     void           widget_parent_shrink( int width, int height ) noexcept;   // сжимаем виджет
 
+    QVBoxLayout   *m_vlayout;   // главный layout класса
     QList<TParam*> m_apParamList;
 
 protected Q_SLOTS :
@@ -52,10 +56,11 @@ protected Q_SLOTS :
 private:
     void           clear();
 
-    YAML::Node     m_node;      // текущий уровнь дерева ямла
-    int            m_index;     // номер перечисления
+    YAML::Node     m_node;        // текущий уровнь дерева ямла
+    YAML::Node     m_node_parent; // родительский уровнь дерева ямла
+    int            m_node_index;  // номер перечисления у родителя
 
-    QVBoxLayout   *m_vlayout;   // главный layout класса
+    //QVBoxLayout   *m_vlayout;   // главный layout класса
     QHBoxLayout   *m_hlayout;   // вложенный layout
 
     QPushButton   *m_ptBtnName; // кнопка "Имя"

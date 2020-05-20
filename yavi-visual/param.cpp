@@ -21,6 +21,10 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 
     m_depth = depth;
 
+    m_node.reset();
+    m_node_parent.reset();
+    m_node_index = -1;
+
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
     m_vlayout->setMargin( 0 );
@@ -208,18 +212,28 @@ void  TCategories::onSendValues( TValues& a_tValues )
 
 void  TCategories::clearNodeSequence()
 {
-    m_node.remove( GoodsNameSection );
-    m_node.remove( GoodsTypeSection );
-    m_node.remove( GoodsPlaceholderSection );
-    m_node.remove( GoodsNewSection );
-    m_node.remove( GoodsAfterSection );
-    m_node.remove( GoodsBeforeSection );
-    m_node.remove( GoodsUlinkSection );
-    m_node.remove( GoodsUnameSection );
-    m_node.remove( GoodsMinSection );
-    m_node.remove( GoodsMaxSection );
-    m_node.remove( GoodsMultiSection );
-    m_node.remove( GoodsValuesSection );
+    // если не знаем индекс, то удаляем поля
+    if( -1 == m_node_index )
+    {
+        m_node.remove( GoodsNameSection );
+        m_node.remove( GoodsTypeSection );
+        m_node.remove( GoodsPlaceholderSection );
+        m_node.remove( GoodsNewSection );
+        m_node.remove( GoodsAfterSection );
+        m_node.remove( GoodsBeforeSection );
+        m_node.remove( GoodsUlinkSection );
+        m_node.remove( GoodsUnameSection );
+        m_node.remove( GoodsMinSection );
+        m_node.remove( GoodsMaxSection );
+        m_node.remove( GoodsMultiSection );
+        m_node.remove( GoodsValuesSection );
+    }
+
+    // если знаем индекс, то удаляем всю ветку
+    if( -1 != m_node_index )
+    {
+        m_node_parent.remove( m_node_index );
+    }
 }
 
 void  TCategories::clearNodeParameters()
@@ -297,6 +311,16 @@ void  TCategories::setNode( const YAML::Node&  node )
     m_node = node;
 }
 
+void  TCategories::setNodeParent( const YAML::Node&  node )
+{
+    m_node_parent = node;
+}
+
+void  TCategories::setNodeIndex( int  index )
+{
+    m_node_index = index;
+}
+
 YAML::Node&  TCategories::getNode()
 {
     return m_node;
@@ -353,6 +377,11 @@ QString  TCategories::getCategoriesUname()
     return m_zUname;
 }
 
+void  TCategories::setCategoriesDepth( int  depth )
+{
+    m_depth = depth;
+}
+
 int  TCategories::getCategoriesDepth()
 {
     return m_depth;
@@ -373,7 +402,7 @@ void  TCategories::widget_size_reset() noexcept
     m_width = 2 * m_vlayout->margin();
     m_height = 2 * m_vlayout->margin();
 
-    qDebug() << "init categories size" << m_width << m_height;
+    //qDebug() << "init categories size" << m_width << m_height;
 
     // ставим размер самого себя
 //    setMinimumWidth( m_width );
@@ -463,6 +492,8 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     // глубина вложения
     m_depth = depth;
 
+    m_node.reset();
+    m_node_parent.reset();
     m_node_index = -1;
 
     m_vlayout = new QVBoxLayout;
@@ -679,7 +710,7 @@ void  TParam::onSendValue( int  val )
 
 void  TParam::clearNodeSequence()
 {
-    // если не знаем индекс, то удаляем удаляем поля
+    // если не знаем индекс, то удаляем поля
     if( -1 == m_node_index )
     {
         m_node.remove( GoodsNameSection );
@@ -1098,6 +1129,18 @@ QStringList  TParam::getParamList()
 
 //------------------------------------------------------------------------------
 
+void  TParam::setParamDepth( int  depth )
+{
+    m_depth = depth;
+}
+
+int  TParam::getParamDepth()
+{
+    return m_depth;
+}
+
+//------------------------------------------------------------------------------
+
 void  TParam::setIncBtnVisible( bool visible )
 {
     m_ptBtnInc->setVisible( visible );
@@ -1196,7 +1239,7 @@ void  TParam::widget_size_reset() noexcept
     m_width = 2 * m_vlayout->margin();
     m_height = 2 * m_vlayout->margin();
 
-    qDebug() << "init param size" << m_width << m_height;
+    //qDebug() << "init param size" << m_width << m_height;
 
     // ставим размер самого себя
     //setMinimumWidth( m_width );

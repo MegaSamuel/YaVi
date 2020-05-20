@@ -99,32 +99,46 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
         // файл не пуст
         priv__->m_bEmpty = false;
 
+        TCategory  *pCategory;
+
         // по заданию в ини-файле только одна Category, но на всякий случай ищем все
-        for( auto& cat : config[ GoodsCategorySection ] )
+        for( int j = 0; j < static_cast<int>(config[ GoodsCategorySection ].size()); j++ )
+//        for( auto& cat : config[ GoodsCategorySection ] )
         {
-            TCategory  *pCategory;
             pCategory = new TCategory( this );
-            pCategory->setNode( cat );
+            pCategory->setNode( config[ GoodsCategorySection ][j] );
+            pCategory->setNodeParent( config[ GoodsCategorySection ] );
+            pCategory->setNodeIndex( j );
+
+            qDebug() << "index j" << j;
 
             m_vlayout->addWidget( pCategory );
             m_apCategoryList.append(pCategory);
 
             // ищем имя
-            std::string cat_name = __yaml_GetString( cat, GoodsCategoryName );
+            std::string cat_name = __yaml_GetString( config[ GoodsCategorySection ][j], GoodsCategoryName );
             pCategory->setCategoryName( cat_name );
 
-            if( __yaml_IsSequence( cat[ GoodsParametersSection ] ) )
+            if( __yaml_IsSequence( config[ GoodsCategorySection ][j][ GoodsParametersSection ] ) )
             {
                 TParam  *pParam;
 
-                for( int i = 0; i < static_cast<int>(cat[ GoodsParametersSection ].size()); i++ )
+                for( int i = 0; i < static_cast<int>(config[ GoodsCategorySection ][j][ GoodsParametersSection ].size()); i++ )
                 {
                     pParam = new TParam( pCategory, Q_NULLPTR, 0 );
-                    pParam->setNode( cat[ GoodsParametersSection ][i] );
-                    pParam->setNodeParent( cat[ GoodsParametersSection ] );
+                    pParam->setNode( config[ GoodsCategorySection ][j][ GoodsParametersSection ][i] );
+                    pParam->setNodeParent( config[ GoodsCategorySection ][j][ GoodsParametersSection ] );
                     pParam->setNodeIndex( i );
 
-                    pCategory->getParameters( cat[ GoodsParametersSection ][i], pParam, 0 );
+                    qDebug() << "index i" << i;
+
+                    pCategory->m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
+                    pCategory->m_apParamList.append( pParam );
+
+                    pCategory->getParameters( config[ GoodsCategorySection ][j][ GoodsParametersSection ][i], pParam, pParam->getParamDepth() );
+
+                    // подгоняем размер виджета под содержимое для корректной работы скролла
+                    //widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
                 }
             }
 

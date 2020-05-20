@@ -22,6 +22,10 @@ TCategory::TCategory( TGoods  *pAncestor )
 
     m_depth = 0;
 
+    m_node.reset();
+    m_node_parent.reset();
+    m_node_index = -1;
+
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
@@ -121,7 +125,7 @@ void  TCategory::onSendValues( TValues& a_tValues )
 
         TParam  *pParam;
         pParam = new TParam( this, Q_NULLPTR, m_depth );
-        pParam->setNode( m_node[ GoodsParametersSection ] );
+        //pParam->setNode( m_node[ GoodsParametersSection ] );
 
         // добавляемся к родителю
         // в ямле новые параметры добавляются в конец, делаем так же
@@ -130,17 +134,17 @@ void  TCategory::onSendValues( TValues& a_tValues )
         m_apParamList.append( pParam );
 
         // ставим значения параметров
-        pParam->setParamName( m_tValues.m_zName.toStdString(), false );
-        pParam->setParamType( m_tValues.m_uType, false );
-        pParam->setParamPlaceholder( m_tValues.m_zPlaceholder.toStdString(), false );
-        pParam->setParamNew( m_tValues.m_zNew.toStdString(), false );
-        pParam->setParamAfter( m_tValues.m_zAfter.toStdString(), false );
-        pParam->setParamBefore( m_tValues.m_zBefore.toStdString(), false );
-        pParam->setParamUlink( m_tValues.m_zUlink.toStdString(), false );
-        pParam->setParamUname( m_tValues.m_zUname.toStdString(), false );
-        pParam->setParamMulti( m_tValues.m_zMulti.toStdString(), false );
-        pParam->setParamMin( m_tValues.m_uMin, false );
-        pParam->setParamMax( m_tValues.m_uMax, false );
+        pParam->setParamName( m_tValues.m_zName.toStdString() );
+        pParam->setParamType( m_tValues.m_uType );
+        pParam->setParamPlaceholder( m_tValues.m_zPlaceholder.toStdString() );
+        pParam->setParamNew( m_tValues.m_zNew.toStdString() );
+        pParam->setParamAfter( m_tValues.m_zAfter.toStdString() );
+        pParam->setParamBefore( m_tValues.m_zBefore.toStdString() );
+        pParam->setParamUlink( m_tValues.m_zUlink.toStdString() );
+        pParam->setParamUname( m_tValues.m_zUname.toStdString() );
+        pParam->setParamMulti( m_tValues.m_zMulti.toStdString() );
+        pParam->setParamMin( m_tValues.m_uMin );
+        pParam->setParamMax( m_tValues.m_uMax );
 
         widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
         widget_parent_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
@@ -162,6 +166,14 @@ void  TCategory::onSendValues( TValues& a_tValues )
         __yaml_SetScalar( node, GoodsMaxSection, m_tValues.m_uMax );
 
         m_node[ GoodsParametersSection ].push_back( node );
+
+        int index = static_cast<int>(m_node[ GoodsParametersSection ].size()) - 1;
+
+        pParam->setNode( m_node[ GoodsParametersSection ][index] );
+        pParam->setNodeParent( m_node[ GoodsParametersSection ] );
+        pParam->setNodeIndex( index );
+
+        qDebug() << "index" << index;
     }
 
     need_to_add = false;
@@ -223,37 +235,66 @@ void  TCategory::setNode( const YAML::Node&  node )
     m_node = node;
 }
 
+void  TCategory::setNodeParent( const YAML::Node&  node )
+{
+    m_node_parent = node;
+}
+
+void  TCategory::setNodeIndex( int  index )
+{
+    m_node_index = index;
+}
+
 YAML::Node&  TCategory::getNode()
 {
     return m_node;
 }
 
-void  TCategory::getCategories( const YAML::Node&  node, TParam  *a_pParam, int  depth )
+void  TCategory::getCategories( const YAML::Node&  node, TCategories  *a_pCategories, int  depth )
 {
     std::string  str;
-
+/*
     TCategories  *pCategories;
     pCategories = new TCategories( a_pParam, depth );
     pCategories->setNode( node );
-    m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
-
-    // добавляем Categories с список класса TParam
-    a_pParam->m_apCategoriesList.append(pCategories);
+*/
+//    m_vlayout->addWidget( a_pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
+//    a_pParam->m_apCategoriesList.append(pCategories);
 
     // имя
     str = __yaml_GetString( node, GoodsNameSection );
-    pCategories->setCategoriesName( str );
+    a_pCategories->setCategoriesName( str );
 
     //
     str = __yaml_GetString( node, GoodsUlinkSection );
-    pCategories->setCategoriesUlink( str );
+    a_pCategories->setCategoriesUlink( str );
 
     //
     str = __yaml_GetString( node, GoodsUnameSection );
-    pCategories->setCategoriesUname( str );
+    a_pCategories->setCategoriesUname( str );
 
     if( __yaml_IsSequence( node[ GoodsParametersSection ] ) )
     {
+        TParam  *pParam;
+
+        for( int i = 0; i < static_cast<int>(node[ GoodsParametersSection ].size()); i++ )
+        {
+            pParam = new TParam( Q_NULLPTR, a_pCategories, depth+1 );
+            pParam->setNode( node[ GoodsParametersSection ][i] );
+            pParam->setNodeParent( node[ GoodsParametersSection ] );
+            pParam->setNodeIndex( i );
+
+            a_pCategories->m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
+            a_pCategories->m_apParamList.append( pParam );
+
+            getParameters( node[ GoodsParametersSection ][i], pParam, depth+1 );
+
+            // подгоняем размер виджета под содержимое для корректной работы скролла
+            widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
+            widget_parent_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
+        }
+
+/*
         for( auto& par : node[ GoodsParametersSection ] )
         {
             TParam  *pParam;
@@ -268,10 +309,11 @@ void  TCategory::getCategories( const YAML::Node&  node, TParam  *a_pParam, int 
             // подгоняем размер виджета под содержимое для корректной работы скролла
             widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
         }
+*/
     }
 
     // подгоняем размер виджета под содержимое для корректной работы скролла
-    widget_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
+    //widget_stretch( a_pCategories->getCategoriesWidth(), a_pCategories->getCategoriesHeight() );
 }
 
 void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  depth )
@@ -279,8 +321,8 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
     unsigned  val;
     std::string  str;
 
-    m_vlayout->addWidget( a_pParam, 0, Qt::AlignLeft | Qt::AlignTop );
-    m_apParamList.append( a_pParam );
+    //a_pParam->m_vlayout->addWidget( a_pParam, 0, Qt::AlignLeft | Qt::AlignTop );
+    //m_apParamList.append( a_pParam );
 
     // имя
     str = __yaml_GetString( node, GoodsNameSection );
@@ -344,10 +386,34 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
     {
         if( __yaml_IsSequence( node[ GoodsCategoriesSection ] ) )
         {
+            TCategories  *pCategories;
+
+            for( int i = 0; i < static_cast<int>(node[ GoodsCategoriesSection ].size()); i++ )
+            {
+                pCategories = new TCategories( a_pParam, depth );
+                pCategories->setNode( node[ GoodsCategoriesSection ][i] );
+                pCategories->setNodeParent( node[ GoodsCategoriesSection ] );
+                pCategories->setNodeIndex( i );
+
+                a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
+                a_pParam->m_apCategoriesList.append( pCategories );
+
+                getCategories( node[ GoodsCategoriesSection ][i], pCategories, depth+1 );
+
+                // подгоняем размер виджета под содержимое для корректной работы скролла
+                widget_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
+                widget_parent_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
+            }
+
+            // подгоняем размер виджета под содержимое для корректной работы скролла
+            //widget_stretch( getCategoryWidth(), getCategoryHeight() );
+
+            /*
             for( auto& cat : node[ GoodsCategoriesSection ] )
             {
                 getCategories( cat, a_pParam, depth+1 );
             }
+            */
         }
     }
 }
@@ -385,7 +451,7 @@ void  TCategory::widget_size_reset() noexcept
     m_width = 2 * m_vlayout->margin();
     m_height = 2 * m_vlayout->margin();
 
-    qDebug() << "init category size" << m_width << m_height;
+    //qDebug() << "init category size" << m_width << m_height;
 }
 
 void  TCategory::widget_stretch( int width, int height ) noexcept
@@ -397,7 +463,7 @@ void  TCategory::widget_stretch( int width, int height ) noexcept
     // высоту увеличиваем на каждый элемент
     m_height = height;
 
-    qDebug() << "cat stretch" << width << height << m_width << m_height;
+    //qDebug() << "cat stretch" << width << height << m_width << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );
