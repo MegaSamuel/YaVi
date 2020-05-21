@@ -956,7 +956,7 @@ void  TParam::setParamName( const std::string&  name, bool  set_to_node )
     m_ptBtnName->setText( m_zBtnName );                  // правленное имя кнопки
     m_ptBtnName->setToolTip( "Параметр: " +  m_zName );  // подсказка с оригинальным именем
 
-    //setParamNameColor();
+    setParamNameColor();
 
     if( set_to_node )
     {
@@ -1093,7 +1093,18 @@ void  TParam::setParamMax( unsigned  val, bool  set_to_node )
 
 void  TParam::setParamNameColor()
 {
-    m_ptBtnName->setStyleSheet( "color: red" );
+    if( Q_NULLPTR != m_pMentor )
+    {
+
+    }
+    else if( Q_NULLPTR != m_pAncestor )
+    {
+
+    }
+
+    //m_ptBtnName->setStyleSheet( "color: red" );
+    //m_ptBtnName->setStyleSheet( "color: green" );
+    //m_ptBtnName->setStyleSheet( "color: default" );
 }
 
 //------------------------------------------------------------------------------
