@@ -133,12 +133,12 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     pCategory->getParameters( config[ GoodsCategorySection ][j][ GoodsParametersSection ][i], pParam, pParam->getParamDepth() );
 
                     // подгоняем размер виджета под содержимое для корректной работы скролла
-                    widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
+                    //widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
                 }
             }
 
             // подгоняем размер виджета под содержимое для корректной работы скролла
-            widget_stretch( pCategory->getCategoryWidth(), pCategory->getCategoryHeight() );
+            //widget_stretch( pCategory->getCategoryWidth(), pCategory->getCategoryHeight() );
         }
     }
 
@@ -252,7 +252,6 @@ TGoods::TGoods()
 
     setLayout( m_vlayout );
 
-    // ставим начальный размер себя
     widget_size_reset();
 
     widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
@@ -297,7 +296,6 @@ void  TGoods::GoodsDelete()
 
     clear();
 
-    // ставим начальный размер себя
     widget_size_reset();
 }
 
@@ -318,11 +316,6 @@ void  TGoods::widget_size_reset() noexcept
 {
     m_width = 0;
     m_height = 0;
-
-    m_width = 2 * m_vlayout->margin();
-    m_height = 2 * m_vlayout->margin();
-
-    qDebug() << "init goods size" << m_width << m_height;
 }
 
 void  TGoods::widget_stretch( int width, int height ) noexcept
@@ -334,7 +327,7 @@ void  TGoods::widget_stretch( int width, int height ) noexcept
     // высоту увеличиваем на каждый элемент
     m_height += height;
 
-    qDebug() << "wgt stretch" << width << height << "size" << m_width << m_height;
+    //qDebug() << "wgt stretch" << width << height << "size" << m_width << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );
@@ -350,10 +343,21 @@ void  TGoods::widget_shrink( int width, int height ) noexcept
     if( m_height < 0 )
         m_height = 0;
 
-    qDebug() << "wgt shrink" << height << "height" << m_height;
+    //qDebug() << "wgt shrink" << height << "height" << m_height;
 
     // ставим размер самого себя
+    setMinimumWidth( m_width );
     setMinimumHeight( m_height );
+}
+
+int TGoods::getWidgetWidth()
+{
+    return minimumSize().width();
+}
+
+int TGoods::getWidgetHeight()
+{
+    return minimumSize().height();
 }
 
 //------------------------------------------------------------------------------

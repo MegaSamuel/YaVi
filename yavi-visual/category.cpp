@@ -30,9 +30,9 @@ TCategory::TCategory( TGoods  *pAncestor )
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
     m_vlayout->setMargin(0);
 
-
     m_hlayout = new QHBoxLayout;
     m_hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    m_hlayout->setMargin(0);
 
     // кнопка с именем
     m_ptBtnName = new QPushButton( "button" );
@@ -51,7 +51,6 @@ TCategory::TCategory( TGoods  *pAncestor )
 
     setLayout( m_vlayout );
 
-    // ставим начальный размер себя
     widget_size_reset();
 
     widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
@@ -127,7 +126,6 @@ void  TCategory::onSendValues( TValues& a_tValues )
 
         TParam  *pParam;
         pParam = new TParam( this, Q_NULLPTR, m_depth );
-        //pParam->setNode( m_node[ GoodsParametersSection ] );
 
         // добавляемся к родителю
         // в ямле новые параметры добавляются в конец, делаем так же
@@ -148,8 +146,8 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setParamMin( m_tValues.m_uMin );
         pParam->setParamMax( m_tValues.m_uMax );
 
-        widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
-        widget_parent_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
+//        widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
+        widget_stretch( 0, m_vlayout->spacing() );
 
         YAML::Node  node;
         node.reset();
@@ -316,15 +314,8 @@ void  TCategory::getCategories( const YAML::Node&  node, TCategories  *a_pCatego
             a_pCategories->m_apParamList.append( pParam );
 
             getParameters( node[ GoodsParametersSection ][i], pParam, pParam->getParamDepth() );
-
-            // подгоняем размер виджета под содержимое для корректной работы скролла
-            widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
-            widget_parent_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
         }
     }
-
-    // подгоняем размер виджета под содержимое для корректной работы скролла
-    //widget_stretch( a_pCategories->getCategoriesWidth(), a_pCategories->getCategoriesHeight() );
 }
 
 void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  depth )
@@ -407,14 +398,7 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
                 a_pParam->m_apCategoriesList.append( pCategories );
 
                 getCategories( node[ GoodsCategoriesSection ][i], pCategories, pCategories->getCategoriesDepth() );
-
-                // подгоняем размер виджета под содержимое для корректной работы скролла
-                widget_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
-                widget_parent_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
             }
-
-            // подгоняем размер виджета под содержимое для корректной работы скролла
-            //widget_stretch( getCategoryWidth(), getCategoryHeight() );
         }
     }
 }
@@ -448,11 +432,6 @@ void  TCategory::widget_size_reset() noexcept
 {
     m_width = 0;
     m_height = 0;
-
-    m_width = 2 * m_vlayout->margin();
-    m_height = 2 * m_vlayout->margin();
-
-    qDebug() << "init category size" << m_width << m_height;
 }
 
 void  TCategory::widget_stretch( int width, int height ) noexcept
@@ -462,13 +441,15 @@ void  TCategory::widget_stretch( int width, int height ) noexcept
         m_width = width;
 
     // высоту увеличиваем на каждый элемент
-    m_height = height;
+    m_height += height;
 
     //qDebug() << "cat stretch" << width << height << m_width << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );
     setMinimumHeight( m_height );
+
+    widget_parent_stretch( width, height );
 }
 
 void  TCategory::widget_parent_stretch( int width, int height ) noexcept
@@ -491,7 +472,7 @@ void  TCategory::widget_shrink( int width, int height ) noexcept
     // ставим размер самого себя
     setMinimumHeight( m_height );
 
-    widget_parent_shrink( m_width, m_height );
+    widget_parent_shrink( width, height );
 }
 
 void  TCategory::widget_parent_shrink( int width, int height ) noexcept
@@ -504,12 +485,12 @@ void  TCategory::widget_parent_shrink( int width, int height ) noexcept
 
 int TCategory::getCategoryWidth()
 {
-    return m_vlayout->minimumSize().width();
+    return minimumSize().width();
 }
 
 int TCategory::getCategoryHeight()
 {
-    return m_vlayout->minimumSize().height();
+    return minimumSize().height();
 }
 
 //------------------------------------------------------------------------------

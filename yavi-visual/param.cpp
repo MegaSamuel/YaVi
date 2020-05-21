@@ -31,6 +31,7 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 
     m_hlayout = new QHBoxLayout;
     m_hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    m_hlayout->setMargin( 0 );
 
     // отступ
     for( int i = 0; i < m_depth; i++ )
@@ -65,10 +66,16 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 
     setLayout( m_vlayout );
 
-    // ставим начальный размер себя
     widget_size_reset();
 
-    widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
+    int width;
+
+    width = 2*m_vlayout->margin() + 3*93 + 2*m_vlayout->spacing() + m_depth*( 93 + m_vlayout->spacing() );
+
+    qDebug() << "categories width" << width;
+
+    //widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
+    widget_stretch( width, m_vlayout->minimumSize().height() );
 }
 
 TCategories::~TCategories()
@@ -158,9 +165,7 @@ void  TCategories::onSendValues( TValues& a_tValues )
 
         TParam  *pParam;
         pParam = new TParam( Q_NULLPTR, this, m_depth+1 );
-        //pParam->setNode( m_node[ GoodsParametersSection ] );
 
-        //!bug  надо перерисовывать все layout-ы
         // добавляемся к родителю
         //m_vlayout->insertWidget( 1, pParam, 0, Qt::AlignLeft | Qt::AlignTop );
         m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
@@ -179,8 +184,8 @@ void  TCategories::onSendValues( TValues& a_tValues )
         pParam->setParamMin( m_tValues.m_uMin );
         pParam->setParamMax( m_tValues.m_uMax );
 
-        widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
-        widget_parent_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
+        //widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
+        widget_stretch( 0, m_vlayout->spacing() );
 
         YAML::Node  node;
         node.reset();
@@ -435,10 +440,7 @@ void  TCategories::widget_size_reset() noexcept
     m_width = 0;
     m_height = 0;
 
-    m_width = 2 * m_vlayout->margin();
-    m_height = 2 * m_vlayout->margin();
-
-    qDebug() << "init categories size" << m_width << m_height;
+    //qDebug() << "init categories size" << m_width << m_height;
 }
 
 void  TCategories::widget_stretch( int width, int height ) noexcept
@@ -455,6 +457,8 @@ void  TCategories::widget_stretch( int width, int height ) noexcept
     // ставим размер самого себя
     setMinimumWidth( m_width );
     setMinimumHeight( m_height );
+
+    widget_parent_stretch( width, height );
 }
 
 void  TCategories::widget_parent_stretch( int width, int height ) noexcept
@@ -462,7 +466,6 @@ void  TCategories::widget_parent_stretch( int width, int height ) noexcept
     if( Q_NULLPTR != m_pMentor )
     {
         m_pMentor->widget_stretch( width, height );
-        m_pMentor->widget_parent_stretch( width, height );
     }
 }
 
@@ -477,6 +480,8 @@ void  TCategories::widget_shrink( int width, int height ) noexcept
 
     // ставим размер самого себя
     setMinimumHeight( m_height );
+
+    widget_parent_shrink( width, height );
 }
 
 void  TCategories::widget_parent_shrink( int width, int height ) noexcept
@@ -484,18 +489,17 @@ void  TCategories::widget_parent_shrink( int width, int height ) noexcept
     if( Q_NULLPTR != m_pMentor )
     {
         m_pMentor->widget_shrink( width, height );
-        m_pMentor->widget_parent_shrink( width, height );
     }
 }
 
 int TCategories::getCategoriesWidth()
 {
-    return m_vlayout->minimumSize().width();
+    return minimumSize().width();
 }
 
 int TCategories::getCategoriesHeight()
 {
-    return m_vlayout->minimumSize().height();
+    return minimumSize().height();
 }
 
 //------------------------------------------------------------------------------
@@ -534,6 +538,7 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
 
     m_hlayout1 = new QHBoxLayout;
     m_hlayout1->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    m_hlayout1->setMargin( 0 );
 
     // отступ
     for( int i = 0; i < m_depth; i++ )
@@ -568,10 +573,18 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
 
     setLayout( m_vlayout );
 
-    // ставим начальный размер себя
     widget_size_reset();
 
-    widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
+    int width, height;
+
+    width = 2*m_vlayout->margin() + 3*93 + 2*m_vlayout->spacing() + m_depth*( 93 + m_vlayout->spacing() );
+
+    height = 2*m_vlayout->margin() + m_ptBtnName->height();
+
+    qDebug() << "param width" << width << "param height" << height;
+    qDebug() << "param width" << m_vlayout->minimumSize().width() << "param height" << m_vlayout->minimumSize().height();
+
+    widget_stretch( width, m_vlayout->minimumSize().height() );
 }
 
 TParam::~TParam()
@@ -712,8 +725,8 @@ void  TParam::onSendValues( TValues& a_tValues )
         pCategories->setCategoriesUlink( m_tValues.m_zUlink.toStdString() );
         pCategories->setCategoriesUname( m_tValues.m_zUname.toStdString() );
 
-        widget_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
-        widget_parent_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
+        //widget_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
+        widget_stretch( 0, m_vlayout->spacing() );
 
         YAML::Node  node;
         node.reset();
@@ -1243,6 +1256,7 @@ void  TParam::setParamValueAdd()
 
     m_hlayout2 = new QHBoxLayout();
     m_hlayout2->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    m_hlayout2->setMargin( 0 );
 
     // отступ
     for( int i = 0; i < m_depth+1; i++ )
@@ -1271,7 +1285,6 @@ void  TParam::setParamValueAdd()
     //qDebug() << "add value" << m_hlayout->minimumSize().width() << m_hlayout->minimumSize().height();
 
     widget_stretch( m_hlayout2->minimumSize().width(), m_hlayout2->minimumSize().height() );
-    widget_parent_stretch( m_hlayout2->minimumSize().width(), m_hlayout2->minimumSize().height() );
 
     m_second_row_exist = true;
 }
@@ -1323,11 +1336,6 @@ void  TParam::widget_size_reset() noexcept
 {
     m_width = 0;
     m_height = 0;
-
-    m_width = 2 * m_vlayout->margin();
-    m_height = 2 * m_vlayout->margin();
-
-    qDebug() << "init param size" << m_width << m_height;
 }
 
 void  TParam::widget_stretch( int width, int height ) noexcept
@@ -1344,6 +1352,8 @@ void  TParam::widget_stretch( int width, int height ) noexcept
     // ставим размер самого себя
     setMinimumWidth( m_width );
     setMinimumHeight( m_height );
+
+    widget_parent_stretch( width, height );
 }
 
 void  TParam::widget_parent_stretch( int width, int height ) noexcept
@@ -1355,7 +1365,6 @@ void  TParam::widget_parent_stretch( int width, int height ) noexcept
     else if( Q_NULLPTR != m_pMentor )
     {
         m_pMentor->widget_stretch( width, height );
-        m_pMentor->widget_parent_stretch( width, height );
     }
 }
 
@@ -1370,6 +1379,8 @@ void  TParam::widget_shrink( int width, int height ) noexcept
 
     // ставим размер самого себя
     setMinimumHeight( m_height );
+
+    widget_parent_shrink( width, height );
 }
 
 void  TParam::widget_parent_shrink( int width, int height ) noexcept
@@ -1378,24 +1389,22 @@ void  TParam::widget_parent_shrink( int width, int height ) noexcept
     {
         qDebug() << "ancestor shrink";
         m_pAncestor->widget_shrink( width, height );
-        m_pAncestor->widget_parent_shrink( width, height );
     }
     else if( Q_NULLPTR != m_pMentor )
     {
         qDebug() << "mentor shrink";
         m_pMentor->widget_shrink( width, height );
-        m_pMentor->widget_parent_shrink( width, height );
     }
 }
 
 int TParam::getParamWidth()
 {
-    return m_vlayout->minimumSize().width();
+    return minimumSize().width();
 }
 
 int TParam::getParamHeight()
 {
-    return m_vlayout->minimumSize().height();
+    return minimumSize().height();
 }
 
 //------------------------------------------------------------------------------

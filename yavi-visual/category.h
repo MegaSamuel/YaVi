@@ -41,10 +41,7 @@ public:
     void           CategoryDelete();
 
     void           widget_stretch( int width, int height ) noexcept;         // растягиваем виджет
-    void           widget_parent_stretch( int width, int height ) noexcept;  // растягиваем виджет
-
     void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
-    void           widget_parent_shrink( int width, int height ) noexcept;   // сжимаем виджет
 
     QVBoxLayout   *m_vlayout;   // главный layout класса
     QList<TParam*> m_apParamList;
@@ -81,6 +78,9 @@ private:
 
     int            m_width;     // ширина виджета
     int            m_height;    // высота виджета
+
+    void           widget_parent_stretch( int width, int height ) noexcept;  // растягиваем виджет
+    void           widget_parent_shrink( int width, int height ) noexcept;   // сжимаем виджет
 
     void           widget_size_reset() noexcept;  // сброс размера виджета
 
