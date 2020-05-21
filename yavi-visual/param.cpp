@@ -185,7 +185,7 @@ void  TCategories::onSendValues( TValues& a_tValues )
         pParam->setParamMax( m_tValues.m_uMax );
 
         //widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
-        widget_stretch( 0, m_vlayout->spacing() );
+        //widget_stretch( 0, m_vlayout->spacing() );
 
         YAML::Node  node;
         node.reset();
@@ -465,7 +465,7 @@ void  TCategories::widget_parent_stretch( int width, int height ) noexcept
 {
     if( Q_NULLPTR != m_pMentor )
     {
-        m_pMentor->widget_stretch( width, height );
+        m_pMentor->widget_stretch( width, height + m_pMentor->m_vlayout->spacing() );
     }
 }
 
@@ -581,8 +581,8 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
 
     height = 2*m_vlayout->margin() + m_ptBtnName->height();
 
-    qDebug() << "param width" << width << "param height" << height;
-    qDebug() << "param width" << m_vlayout->minimumSize().width() << "param height" << m_vlayout->minimumSize().height();
+    //qDebug() << "param width" << width << "param height" << height;
+    //qDebug() << "param width" << m_vlayout->minimumSize().width() << "param height" << m_vlayout->minimumSize().height();
 
     widget_stretch( width, m_vlayout->minimumSize().height() );
 }
@@ -726,7 +726,7 @@ void  TParam::onSendValues( TValues& a_tValues )
         pCategories->setCategoriesUname( m_tValues.m_zUname.toStdString() );
 
         //widget_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
-        widget_stretch( 0, m_vlayout->spacing() );
+        //widget_stretch( 0, m_vlayout->spacing() );
 
         YAML::Node  node;
         node.reset();
@@ -1360,11 +1360,11 @@ void  TParam::widget_parent_stretch( int width, int height ) noexcept
 {
     if( Q_NULLPTR != m_pAncestor )
     {
-        m_pAncestor->widget_stretch( width, height );
+        m_pAncestor->widget_stretch( width, height + m_pAncestor->m_vlayout->spacing() );
     }
     else if( Q_NULLPTR != m_pMentor )
     {
-        m_pMentor->widget_stretch( width, height );
+        m_pMentor->widget_stretch( width, height + m_pMentor->m_vlayout->spacing() );
     }
 }
 

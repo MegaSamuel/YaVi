@@ -456,7 +456,7 @@ void  TCategory::widget_parent_stretch( int width, int height ) noexcept
 {
     if( Q_NULLPTR != m_pAncestor )
     {
-        m_pAncestor->widget_stretch( width, height );
+        m_pAncestor->widget_stretch( width, height + m_pAncestor->m_vlayout->spacing() );
     }
 }
 
