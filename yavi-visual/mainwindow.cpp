@@ -15,10 +15,13 @@ MainWindow::MainWindow(QWidget *parent)
     m_ptTimer->start(1000); // 1 Hz
 
     // заголовок формы
-    this->setWindowTitle("YAML Visualizer");
+    setWindowTitle("YAML Visualizer");
 
     // иконка формы
-    this->setWindowIcon( QIcon( ":/favicon.ico" ) );
+    setWindowIcon( QIcon( ":/favicon.ico" ) );
+
+    m_zFailReason.clear();
+    m_config.reset();
 
     QFrame  *frmBase = new QFrame();
 
@@ -94,15 +97,17 @@ void 	MainWindow::onBtnOpen()
         // похоже что уже есть открытый ямл
         if( !m_config.IsNull() )
         {
-            qDebug() << "m_config does not empty!";
+            //qDebug() << "m_config does not empty!";
 
             m_pGoods->GoodsDelete();
+
+            m_config.reset();
         }
 
         if( false == init( filename ) )
         {
             QString  zReport;
-            zReport = "Cannot open " + filename + " with result -> " + zFailReason;
+            zReport = "Cannot open " + filename + " with result -> " + m_zFailReason;
 
             m_ptLblNotice->setText( zReport );
 //            m_ptLblNotice->setStyleSheet( "QLabel {background-color: red;}" );
@@ -141,7 +146,7 @@ void 	MainWindow::onBtnSave()
         if( false == fini( filename ) )
         {
             QString  zReport;
-            zReport = "Cannot write " + filename + " with result -> " + zFailReason;
+            zReport = "Cannot write " + filename + " with result -> " + m_zFailReason;
 
             m_ptLblNotice->setText( zReport );
 //            m_ptLblNotice->setStyleSheet( "QLabel {background-color: red;}" );
@@ -189,14 +194,14 @@ bool  MainWindow::init( const QString&  filename )
     // а есть ли файл?
     if( !fp.exists() )
     {
-        zFailReason = "file is not exists";
+        m_zFailReason = "file is not exists";
         return false;
     }
 
     // открываем файл только на чтение
     if( !fp.open( QIODevice::ReadOnly | QIODevice::Text ) )
     {
-        zFailReason = "cannot open file";
+        m_zFailReason = "cannot open file";
         return false;
     }
 
@@ -209,7 +214,7 @@ bool  MainWindow::init( const QString&  filename )
         m_config = YAML::Load( in.readAll().toStdString() );
     } catch ( const YAML::Exception&  e ) {
         // что-то пошло не так, а что смотрим в e.what()
-        zFailReason = QString::fromStdString( e.what() );
+        m_zFailReason = QString::fromStdString( e.what() );
         return false;
     }
 
@@ -221,7 +226,7 @@ bool  MainWindow::init( const QString&  filename )
     // возможно ямл пустой
     if( m_pGoods->empty() )
     {
-        zFailReason = "file is empty";
+        m_zFailReason = "file is empty";
         return false;
     }
 
@@ -237,7 +242,7 @@ bool  MainWindow::fini( const QString&  filename )
     // открываем файл на запись
     if( !fp.open( QIODevice::WriteOnly | QIODevice::Text ) )
     {
-        zFailReason = "cannot create file";
+        m_zFailReason = "cannot create file";
         return false;
     }
 
@@ -296,7 +301,7 @@ bool  MainWindow::fini( const QString&  filename )
 //        str = YAML::Dump( node_main );
     } catch ( const YAML::Exception&  e ) {
         // что-то пошло не так, а что смотрим в e.what()
-        zFailReason = QString::fromStdString( e.what() );
+        m_zFailReason = QString::fromStdString( e.what() );
         return false;
     }
 
@@ -307,6 +312,19 @@ bool  MainWindow::fini( const QString&  filename )
     fp.close();
 
     return true;
+}
+
+//------------------------------------------------------------------------------
+
+void MainWindow::closeEvent( QCloseEvent  *event )
+{
+    //qDebug() << "close event";
+
+    m_pGoods->GoodsDelete();
+
+    m_config.reset();
+
+    event->accept();
 }
 
 //------------------------------------------------------------------------------

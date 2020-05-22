@@ -26,7 +26,7 @@ private:
     QPushButton  *m_ptBtnSave;
     QLabel       *m_ptLblNotice;
 
-    QString       zFailReason;  // причина ошибки загрузки/выгрузки ямла
+    QString       m_zFailReason;  // причина ошибки загрузки/выгрузки ямла
 
     bool          init( const QString&  filename ); // загружаем ямл из файла
     bool          fini( const QString&  filename ); // выгружаем ямл в файл
@@ -43,6 +43,8 @@ private:
 
 protected:
     TGoods 	     *m_pGoods;    // товары считанные из файла
+
+    void          closeEvent( QCloseEvent * );
 };
 
 //------------------------------------------------------------------------------
