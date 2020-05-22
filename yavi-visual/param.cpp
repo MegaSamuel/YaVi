@@ -181,9 +181,6 @@ void  TCategories::onSendValues( TValues& a_tValues )
         pParam->setParamMin( m_tValues.m_uMin );
         pParam->setParamMax( m_tValues.m_uMax );
 
-        //widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
-        //widget_stretch( 0, m_vlayout->spacing() );
-
         YAML::Node  node;
         node.reset();
 
@@ -702,7 +699,6 @@ void  TParam::onSendValues( TValues& a_tValues )
         // добавляем категорию
         TCategories  *pCategories;
         pCategories = new TCategories( this, m_depth+1 );
-        //pCategories->setNode( m_node[ GoodsCategoriesSection ] );
 
         //!bug  надо перерисовывать все layout-ы
         // добавляемся к родителю
@@ -714,9 +710,6 @@ void  TParam::onSendValues( TValues& a_tValues )
         pCategories->setCategoriesName( m_tValues.m_zName.toStdString() );
         pCategories->setCategoriesUlink( m_tValues.m_zUlink.toStdString() );
         pCategories->setCategoriesUname( m_tValues.m_zUname.toStdString() );
-
-        //widget_stretch( pCategories->getCategoriesWidth(), pCategories->getCategoriesHeight() );
-        //widget_stretch( 0, m_vlayout->spacing() );
 
         YAML::Node  node;
         node.reset();

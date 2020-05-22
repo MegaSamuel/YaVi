@@ -460,7 +460,7 @@ void  TCategory::widget_shrink( int width, int height ) noexcept
 {
     Q_UNUSED( width );
 
-    qDebug() << "shrink" << width << height;
+    //qDebug() << "shrink" << width << height;
 
     // к высоте добавляем spacing
     height += m_vlayout->spacing();
@@ -470,7 +470,7 @@ void  TCategory::widget_shrink( int width, int height ) noexcept
     if( m_height < 0 )
         m_height = 0;
 
-    qDebug() << "new size" << m_width << m_height;
+    //qDebug() << "new size" << m_width << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );
