@@ -253,6 +253,8 @@ void  TGoods::GoodsDelete()
     clear();
 
     widget_size_reset();
+
+    widget_stretch( 0, 0 );
 }
 
 void  TGoods::clear() noexcept

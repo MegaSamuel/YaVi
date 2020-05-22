@@ -86,7 +86,7 @@ void  TTable::TableDelete()
         {
             if( this == m_pAncestor->m_apTableList.at(i) )
             {
-                qDebug() << m_pAncestor->m_apTableList.at(i)->getTableName() << "obsolete";
+                //qDebug() << m_pAncestor->m_apTableList.at(i)->getTableName() << "obsolete";
 
                 m_pAncestor->m_apTableList.removeAt(i);
             }
