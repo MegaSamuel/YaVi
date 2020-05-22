@@ -72,9 +72,6 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 
     width = 2*m_vlayout->margin() + 3*93 + 2*m_vlayout->spacing() + m_depth*( 93 + m_vlayout->spacing() );
 
-    qDebug() << "categories width" << width;
-
-    //widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
     widget_stretch( width, m_vlayout->minimumSize().height() );
 }
 
@@ -439,8 +436,6 @@ void  TCategories::widget_size_reset() noexcept
 {
     m_width = 0;
     m_height = 0;
-
-    //qDebug() << "init categories size" << m_width << m_height;
 }
 
 void  TCategories::widget_stretch( int width, int height ) noexcept
@@ -452,7 +447,7 @@ void  TCategories::widget_stretch( int width, int height ) noexcept
     // высоту увеличиваем на каждый элемент
     m_height += height;
 
-    qDebug() << "categories"  << width << height << m_width << m_height;
+    //qDebug() << "categories"  << width << height << m_width << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );
@@ -575,14 +570,9 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
 
     widget_size_reset();
 
-    int width, height;
+    int width;
 
     width = 2*m_vlayout->margin() + 3*93 + 2*m_vlayout->spacing() + m_depth*( 93 + m_vlayout->spacing() );
-
-    height = 2*m_vlayout->margin() + m_ptBtnName->height();
-
-    //qDebug() << "param width" << width << "param height" << height;
-    //qDebug() << "param width" << m_vlayout->minimumSize().width() << "param height" << m_vlayout->minimumSize().height();
 
     widget_stretch( width, m_vlayout->minimumSize().height() );
 }
@@ -1282,9 +1272,7 @@ void  TParam::setParamValueAdd()
 
     m_vlayout->addLayout( m_hlayout2 );
 
-    //qDebug() << "add value" << m_hlayout->minimumSize().width() << m_hlayout->minimumSize().height();
-
-    widget_stretch( m_hlayout2->minimumSize().width(), m_hlayout2->minimumSize().height() );
+    widget_stretch( m_hlayout2->minimumSize().width(), m_hlayout2->minimumSize().height() + m_vlayout->spacing() );
 
     m_second_row_exist = true;
 }
@@ -1303,10 +1291,7 @@ void  TParam::setParamValueDel()
         delete child;
     }
 
-    //qDebug() << "del value" << m_hlayout->minimumSize().width() << m_hlayout->minimumSize().height();
-
-    widget_shrink( 0, m_hlayout2->minimumSize().height() );
-    widget_parent_shrink( 0, m_hlayout2->minimumSize().height() );
+    widget_shrink( 0, m_hlayout2->minimumSize().height() + m_vlayout->spacing() );
 
     // уничтожаем layout
     m_hlayout2->deleteLater();
@@ -1344,6 +1329,9 @@ void  TParam::widget_stretch( int width, int height ) noexcept
     if( width > m_width )
         m_width = width;
 
+    // к высоте добавляем spacing
+    //height += m_vlayout->spacing();
+
     // высоту увеличиваем на каждый элемент
     m_height += height;
 
@@ -1360,11 +1348,11 @@ void  TParam::widget_parent_stretch( int width, int height ) noexcept
 {
     if( Q_NULLPTR != m_pAncestor )
     {
-        m_pAncestor->widget_stretch( width, height + m_pAncestor->m_vlayout->spacing() );
+        m_pAncestor->widget_stretch( width, height );
     }
     else if( Q_NULLPTR != m_pMentor )
     {
-        m_pMentor->widget_stretch( width, height + m_pMentor->m_vlayout->spacing() );
+        m_pMentor->widget_stretch( width, height );
     }
 }
 
@@ -1372,12 +1360,16 @@ void  TParam::widget_shrink( int width, int height ) noexcept
 {
     Q_UNUSED( width );
 
+    // к высоте добавляем spacing
+    //height += m_vlayout->spacing();
+
     m_height -= height;
 
     if( m_height < 0 )
         m_height = 0;
 
     // ставим размер самого себя
+    setMinimumWidth( m_width );
     setMinimumHeight( m_height );
 
     widget_parent_shrink( width, height );
@@ -1387,12 +1379,10 @@ void  TParam::widget_parent_shrink( int width, int height ) noexcept
 {
     if( Q_NULLPTR != m_pAncestor )
     {
-        qDebug() << "ancestor shrink";
         m_pAncestor->widget_shrink( width, height );
     }
     else if( Q_NULLPTR != m_pMentor )
     {
-        qDebug() << "mentor shrink";
         m_pMentor->widget_shrink( width, height );
     }
 }

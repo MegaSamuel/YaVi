@@ -127,6 +127,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     pParam->setNodeParent( config[ GoodsCategorySection ][j][ GoodsParametersSection ] );
                     pParam->setNodeIndex( i );
 
+                    // добавляемся тут, внутри нельзя, т.к. getParameters вызывается разными классами
                     pCategory->m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
                     pCategory->m_apParamList.append( pParam );
 
@@ -343,7 +344,7 @@ void  TGoods::widget_shrink( int width, int height ) noexcept
     if( m_height < 0 )
         m_height = 0;
 
-    //qDebug() << "wgt shrink" << height << "height" << m_height;
+    qDebug() << "wgt shrink" << height << "height" << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );

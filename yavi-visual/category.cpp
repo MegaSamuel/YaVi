@@ -51,11 +51,7 @@ TCategory::TCategory( TGoods  *pAncestor )
 
     setLayout( m_vlayout );
 
-    //qDebug() << "v" << m_vlayout->margin() << m_vlayout->spacing() << "h" << m_hlayout->margin() << m_hlayout->spacing();
-
     widget_size_reset();
-
-    //qDebug() << "v" << m_vlayout->minimumSize().width() << m_vlayout->minimumSize().height() << "h" << m_hlayout->minimumSize().width() << m_hlayout->minimumSize().height();
 
     widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
 }
@@ -150,9 +146,6 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setParamMin( m_tValues.m_uMin );
         pParam->setParamMax( m_tValues.m_uMax );
 
-//        widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
-        //widget_stretch( 0, m_vlayout->spacing() );
-
         YAML::Node  node;
         node.reset();
 
@@ -177,8 +170,6 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setNode( m_node[ GoodsParametersSection ][index] );
         pParam->setNodeParent( m_node[ GoodsParametersSection ] );
         pParam->setNodeIndex( index );
-
-        //qDebug() << pParam->getParamName() << "index" << index;
     }
 
     need_to_add = false;
@@ -444,10 +435,11 @@ void  TCategory::widget_stretch( int width, int height ) noexcept
     if( width > m_width )
         m_width = width;
 
+    // к высоте добавляем spacing
+    height += m_vlayout->spacing();
+
     // высоту увеличиваем на каждый элемент
     m_height += height;
-
-    //qDebug() << "cat stretch" << width << height << m_width << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );
@@ -460,7 +452,7 @@ void  TCategory::widget_parent_stretch( int width, int height ) noexcept
 {
     if( Q_NULLPTR != m_pAncestor )
     {
-        m_pAncestor->widget_stretch( width, height + m_pAncestor->m_vlayout->spacing() );
+        m_pAncestor->widget_stretch( width, height );
     }
 }
 
@@ -468,12 +460,20 @@ void  TCategory::widget_shrink( int width, int height ) noexcept
 {
     Q_UNUSED( width );
 
+    qDebug() << "shrink" << width << height;
+
+    // к высоте добавляем spacing
+    height += m_vlayout->spacing();
+
     m_height -= height;
 
     if( m_height < 0 )
         m_height = 0;
 
+    qDebug() << "new size" << m_width << m_height;
+
     // ставим размер самого себя
+    setMinimumWidth( m_width );
     setMinimumHeight( m_height );
 
     widget_parent_shrink( width, height );
