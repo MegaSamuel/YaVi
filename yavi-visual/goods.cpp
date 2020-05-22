@@ -21,45 +21,6 @@
 
 //------------------------------------------------------------------------------
 
-// Устраняет необходимость использования <boost/algorithm/string.hpp>
-/*
-template<typename SequenceSequenceT, typename CharT>
-SequenceSequenceT&  split( SequenceSequenceT& result, const std::string& input, CharT delim )
-{
-    std::stringstream ss( input );
-    std::string item;
-    while( std::getline( ss, item, delim ) ) {
-        result.push_back( item );
-    }
-    return result;
-}
-*/
-// Устраняет необходимость использования <boost/algorithm/string/trim.hpp>
-
-// Удаляет пробелы в начале строки
-/*
-static inline void ltrim( std::string& s ) {
-    s.erase( s.begin(), std::find_if( s.begin(), s.end(), []( int ch ) {
-        return !std::isspace( ch );
-    } ) );
-}
-
-// Удаляет пробелы в конце строки
-static inline void rtrim( std::string& s ) {
-    s.erase( std::find_if( s.rbegin(), s.rend(), []( int ch ) {
-        return !std::isspace( ch );
-    } ).base(), s.end() );
-}
-
-// Удаляет пробелы в начале и в конце строки
-static inline void trim( std::string& s ) {
-    ltrim( s );
-    rtrim( s );
-}
-*/
-
-//------------------------------------------------------------------------------
-
 class TGoodsPrivate
 {
     friend class TGoods;
@@ -127,18 +88,13 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     pParam->setNodeParent( config[ GoodsCategorySection ][j][ GoodsParametersSection ] );
                     pParam->setNodeIndex( i );
 
+                    // добавляемся тут, внутри нельзя, т.к. getParameters вызывается разными классами
                     pCategory->m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
                     pCategory->m_apParamList.append( pParam );
 
                     pCategory->getParameters( config[ GoodsCategorySection ][j][ GoodsParametersSection ][i], pParam, pParam->getParamDepth() );
-
-                    // подгоняем размер виджета под содержимое для корректной работы скролла
-                    widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
                 }
             }
-
-            // подгоняем размер виджета под содержимое для корректной работы скролла
-            widget_stretch( pCategory->getCategoryWidth(), pCategory->getCategoryHeight() );
         }
     }
 
@@ -230,6 +186,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                 pTable->setTableLink( link );
             }
 
+            //!bug необходимо убрать
             // подгоняем размер виджета под содержимое для корректной работы скролла
             widget_stretch( pTable->getTableWidth(), pTable->getTableHeight() );
         }
@@ -248,11 +205,9 @@ TGoods::TGoods()
     // в вертикальный layout будем складывать элементы из ямла
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-    //m_vlayout->setMargin(0);
 
     setLayout( m_vlayout );
 
-    // ставим начальный размер себя
     widget_size_reset();
 
     widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
@@ -297,7 +252,6 @@ void  TGoods::GoodsDelete()
 
     clear();
 
-    // ставим начальный размер себя
     widget_size_reset();
 }
 
@@ -318,19 +272,12 @@ void  TGoods::widget_size_reset() noexcept
 {
     m_width = 0;
     m_height = 0;
-
-    m_width = 2 * m_vlayout->margin();
-    m_height = 2 * m_vlayout->margin();
-
-    qDebug() << "init goods size" << m_width << m_height;
-
-    // ставим размер самого себя
-    //setMinimumWidth( m_width );
-    //setMinimumHeight( m_height );
 }
 
 void  TGoods::widget_stretch( int width, int height ) noexcept
 {
+    width += 2*m_vlayout->margin();
+
     // ширину выбираем максимальную из элементов
     if( width > m_width )
         m_width = width;
@@ -338,7 +285,7 @@ void  TGoods::widget_stretch( int width, int height ) noexcept
     // высоту увеличиваем на каждый элемент
     m_height += height;
 
-    qDebug() << "wgt stretch" << width << height << "size" << m_width << m_height;
+    //qDebug() << "wgt stretch" << width << height << "size" << m_width << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );
@@ -354,10 +301,21 @@ void  TGoods::widget_shrink( int width, int height ) noexcept
     if( m_height < 0 )
         m_height = 0;
 
-    qDebug() << "wgt shrink" << height << "height" << m_height;
+    //qDebug() << "wgt shrink" << height << "height" << m_height;
 
     // ставим размер самого себя
+    setMinimumWidth( m_width );
     setMinimumHeight( m_height );
+}
+
+int TGoods::getWidgetWidth()
+{
+    return minimumSize().width();
+}
+
+int TGoods::getWidgetHeight()
+{
+    return minimumSize().height();
 }
 
 //------------------------------------------------------------------------------

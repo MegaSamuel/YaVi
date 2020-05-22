@@ -43,6 +43,9 @@ private :
         int            m_width;     // ширина виджета
         int            m_height;    // высота виджета
 
+        int            getWidgetWidth();  // вернуть ширину
+        int            getWidgetHeight(); // вернуть высоту
+
         void           widget_size_reset() noexcept; // сброс размера виджета
 };
 
