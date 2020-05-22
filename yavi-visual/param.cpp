@@ -1272,7 +1272,7 @@ void  TParam::setParamValueAdd()
 
     m_vlayout->addLayout( m_hlayout2 );
 
-    widget_stretch( m_hlayout2->minimumSize().width(), m_hlayout2->minimumSize().height() + m_vlayout->spacing() );
+    widget_stretch( m_hlayout2->minimumSize().width(), m_hlayout2->minimumSize().height() + 2*m_vlayout->spacing() );
 
     m_second_row_exist = true;
 }
@@ -1291,7 +1291,7 @@ void  TParam::setParamValueDel()
         delete child;
     }
 
-    widget_shrink( 0, m_hlayout2->minimumSize().height() + m_vlayout->spacing() );
+    widget_shrink( 0, m_hlayout2->minimumSize().height() + 2*m_vlayout->spacing() );
 
     // уничтожаем layout
     m_hlayout2->deleteLater();
