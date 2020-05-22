@@ -192,6 +192,8 @@ private:
     void           setParamValueMin( int  min );
     void           setParamValueMax( int  max );
 
+    bool           isChildrenAbsent(); // true если нет детей
+
     YAML::Node     m_node;        // текущий уровнь дерева ямла
     YAML::Node     m_node_parent; // родительский уровнь дерева ямла
     int            m_node_index;  // номер перечисления у родителя
