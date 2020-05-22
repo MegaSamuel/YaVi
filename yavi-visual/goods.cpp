@@ -21,44 +21,13 @@
 
 //------------------------------------------------------------------------------
 
-class TGoodsPrivate
-{
-    friend class TGoods;
-private:
-    TGoods 	*ins__;
-
-    bool  m_bEmpty;
-
-    YAML::Node 		config__;
-
-    QStringList     m_vValues;
-
-    inline 	void clear()
-    {
-        m_bEmpty = true;
-
-        m_vValues.clear();
-    }
-
-    inline TGoodsPrivate( TGoods  *ins ) :
-        ins__( ins )
-    {
-        clear();
-        (void)ins__;
-    }
-};
-
-//------------------------------------------------------------------------------
-
 bool TGoods::parse_yaml( const YAML::Node&  config )
 {
-    priv__->config__ = config;
-
     // категория (category)
     if( __yaml_IsSequence( config[ GoodsCategorySection ] ) )
     {
         // файл не пуст
-        priv__->m_bEmpty = false;
+        m_bEmpty = false;
 
         TCategory  *pCategory;
 
@@ -102,7 +71,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
     if( __yaml_IsSequence( config[ GoodsTableSection ] ) )
     {
         // файл не пуст
-        priv__->m_bEmpty = false;
+        m_bEmpty = false;
 
         for( auto& tab : config[ GoodsTableSection ] )
         {
@@ -134,11 +103,12 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     col_list.append( QString::fromStdString(col_name) );
 
                     // значение
+                    QStringList  vValues;
                     const std::string  col_val = __yaml_GetString( col, GoodsTableValue );
-                    priv__->m_vValues.clear();
-                    priv__->m_vValues = QString::fromStdString(col_val).split( '\n', QString::SkipEmptyParts );
+                    vValues.clear();
+                    vValues = QString::fromStdString(col_val).split( '\n', QString::SkipEmptyParts );
 
-                    for( auto& it : priv__->m_vValues )
+                    for( auto& it : vValues )
                     {
                         col_list.append( it );
                     }
@@ -164,11 +134,12 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     row_list.append( QString::fromStdString(row_name) );
 
                     // значение
+                    QStringList  vValues;
                     const std::string  row_val = __yaml_GetString( row, GoodsTableValue );
-                    priv__->m_vValues.clear();
-                    priv__->m_vValues = QString::fromStdString(row_val).split( '\n', QString::SkipEmptyParts );
+                    vValues.clear();
+                    vValues = QString::fromStdString(row_val).split( '\n', QString::SkipEmptyParts );
 
-                    for( auto& it : priv__->m_vValues )
+                    for( auto& it : vValues )
                     {
                         row_list.append( it );
                     }
@@ -199,7 +170,6 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
 TGoods::TGoods()
 {
-    priv__ = std::unique_ptr<TGoodsPrivate>( new TGoodsPrivate( this ) );
     clear();
 
     // в вертикальный layout будем складывать элементы из ямла
@@ -213,17 +183,9 @@ TGoods::TGoods()
     widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
 }
 
-TGoods::TGoods( const YAML::Node&  config )
-{
-    priv__ = std::unique_ptr<TGoodsPrivate>( new TGoodsPrivate( this ) );
-    clear();
-    if( ! parse_yaml( config ) )
-		clear();
-}
-
 TGoods::~TGoods()
 {
-    clear();
+
 }
 
 //------------------------------------------------------------------------------
@@ -259,15 +221,15 @@ void  TGoods::GoodsDelete()
 
 void  TGoods::clear() noexcept
 {
+    m_bEmpty = true;
+
     m_apTableList.clear();
     m_apCategoryList.clear();
-
-    priv__->clear();
 }
 
 bool  TGoods::empty() const noexcept
 {
-    return priv__->m_bEmpty;
+    return m_bEmpty;
 }
 
 void  TGoods::widget_size_reset() noexcept
@@ -310,12 +272,12 @@ void  TGoods::widget_shrink( int width, int height ) noexcept
     setMinimumHeight( m_height );
 }
 
-int TGoods::getWidgetWidth()
+int TGoods::getWidgetWidth() noexcept
 {
     return minimumSize().width();
 }
 
-int TGoods::getWidgetHeight()
+int TGoods::getWidgetHeight() noexcept
 {
     return minimumSize().height();
 }

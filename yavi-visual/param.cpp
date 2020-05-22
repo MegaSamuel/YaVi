@@ -484,12 +484,12 @@ void  TCategories::widget_parent_shrink( int width, int height ) noexcept
     }
 }
 
-int TCategories::getCategoriesWidth()
+int TCategories::getCategoriesWidth() noexcept
 {
     return minimumSize().width();
 }
 
-int TCategories::getCategoriesHeight()
+int TCategories::getCategoriesHeight() noexcept
 {
     return minimumSize().height();
 }
@@ -1387,12 +1387,12 @@ void  TParam::widget_parent_shrink( int width, int height ) noexcept
     }
 }
 
-int TParam::getParamWidth()
+int TParam::getParamWidth() noexcept
 {
     return minimumSize().width();
 }
 
-int TParam::getParamHeight()
+int TParam::getParamHeight() noexcept
 {
     return minimumSize().height();
 }

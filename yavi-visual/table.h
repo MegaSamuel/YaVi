@@ -15,7 +15,7 @@ class TTable : public QWidget
    Q_OBJECT
 
 public:
-    TTable( TGoods  *pAncestor = Q_NULLPTR );
+    explicit TTable( TGoods  *pAncestor = Q_NULLPTR );
     ~TTable();
 
     void           setTableId( const std::string&  name );

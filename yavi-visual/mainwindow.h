@@ -13,7 +13,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = Q_NULLPTR);
+    explicit MainWindow( QWidget *parent = Q_NULLPTR );
     ~MainWindow();
 
 private Q_SLOTS:
@@ -41,7 +41,6 @@ private:
     QTimer       *m_ptTimer;
     unsigned      m_uTimerCounter;
 
-protected:
     TGoods 	     *m_pGoods;    // товары считанные из файла
 
     void          closeEvent( QCloseEvent * );

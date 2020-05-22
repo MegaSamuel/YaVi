@@ -18,7 +18,7 @@ class TDialog : public QDialog
     Q_OBJECT
 
 public :
-    TDialog( bool fullsize = true, QString name = "Unknown", QWidget *parent = Q_NULLPTR );
+    explicit TDialog( bool fullsize = true, QString name = "Unknown", QWidget *parent = Q_NULLPTR );
     ~TDialog();
 
     void    setDlgName( const QString&  name );

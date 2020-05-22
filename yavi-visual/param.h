@@ -19,7 +19,7 @@ class TCategories : public QWidget
    Q_OBJECT
 
 public:
-    TCategories( TParam  *pMentor = Q_NULLPTR, int  depth = 0 );
+    explicit TCategories( TParam  *pMentor = Q_NULLPTR, int  depth = 0 );
     ~TCategories();
 
     void           setNode( const YAML::Node&  node );
@@ -41,8 +41,8 @@ public:
     void           setCategoriesDepth( int  depth );
     int            getCategoriesDepth();
 
-    int            getCategoriesWidth();
-    int            getCategoriesHeight();
+    int            getCategoriesWidth() noexcept;
+    int            getCategoriesHeight() noexcept;
 
     void           CategoriesDelete();
 
@@ -110,7 +110,7 @@ class TParam : public QWidget
    Q_OBJECT
 
 public:
-    TParam( TCategory  *pAncestor = Q_NULLPTR, TCategories  *pMentor = Q_NULLPTR, int  depth = 0 );
+    explicit TParam( TCategory  *pAncestor = Q_NULLPTR, TCategories  *pMentor = Q_NULLPTR, int  depth = 0 );
     ~TParam();
 
     void           setNode( const YAML::Node&  node );
@@ -159,8 +159,8 @@ public:
     void           setParamDepth( int  depth );
     int            getParamDepth();
 
-    int            getParamWidth();
-    int            getParamHeight();
+    int            getParamWidth() noexcept;
+    int            getParamHeight() noexcept;
 
     void           ParamDraw( TParam  *pParam );
     void           ParamDelete();
