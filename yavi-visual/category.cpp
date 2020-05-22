@@ -487,12 +487,12 @@ void  TCategory::widget_parent_shrink( int width, int height ) noexcept
     }
 }
 
-int TCategory::getCategoryWidth()
+int TCategory::getCategoryWidth() noexcept
 {
     return minimumSize().width();
 }
 
-int TCategory::getCategoryHeight()
+int TCategory::getCategoryHeight() noexcept
 {
     return minimumSize().height();
 }

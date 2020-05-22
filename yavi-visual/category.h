@@ -18,7 +18,7 @@ class TCategory : public QWidget
     Q_OBJECT
 
 public:
-    TCategory( TGoods  *pAncestor = Q_NULLPTR );
+    explicit TCategory( TGoods  *pAncestor = Q_NULLPTR );
     ~TCategory();
 
     void           setNode( const YAML::Node&  node );
@@ -32,8 +32,8 @@ public:
     void           getCategories( const YAML::Node&  node, TCategories  *a_pCategories, int  depth );
     void           getParameters( const YAML::Node&  node, TParam  *a_pParam, int  depth );
 
-    int            getCategoryWidth();  // вернуть ширину
-    int            getCategoryHeight(); // вернуть высоту
+    int            getCategoryWidth() noexcept;  // вернуть ширину
+    int            getCategoryHeight() noexcept; // вернуть высоту
 
     void           setCategoryName( const std::string&  name, bool  set_to_node = false );
     const QString  getCategoryName();
@@ -46,7 +46,7 @@ public:
     QVBoxLayout   *m_vlayout;   // главный layout класса
     QList<TParam*> m_apParamList;
 
-protected Q_SLOTS :
+private Q_SLOTS :
     void           onBtnName();
     void           onBtnInc();
     void           onSendCancel();
