@@ -104,8 +104,6 @@ void 	MainWindow::onBtnOpen()
             QString  zReport;
             zReport = "Cannot open " + filename + " with result -> " + zFailReason;
 
-//            qDebug() << zReport;
-
             m_ptLblNotice->setText( zReport );
 //            m_ptLblNotice->setStyleSheet( "QLabel {background-color: red;}" );
         }
@@ -144,8 +142,6 @@ void 	MainWindow::onBtnSave()
         {
             QString  zReport;
             zReport = "Cannot write " + filename + " with result -> " + zFailReason;
-
-//            qDebug() << zReport;
 
             m_ptLblNotice->setText( zReport );
 //            m_ptLblNotice->setStyleSheet( "QLabel {background-color: red;}" );

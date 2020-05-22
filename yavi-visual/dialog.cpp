@@ -367,7 +367,7 @@ void TDialog::onBtnAction( QAbstractButton*  btn )
     {
         //qDebug() << "dialog Cancel" << priv__->m_ptLineName->text();
 
-        // шлем сигнал с данными
+        // шлем сигнал об отмене
         Q_EMIT sendCancel();
     }
 }
