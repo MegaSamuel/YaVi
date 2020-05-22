@@ -51,7 +51,11 @@ TCategory::TCategory( TGoods  *pAncestor )
 
     setLayout( m_vlayout );
 
+    //qDebug() << "v" << m_vlayout->margin() << m_vlayout->spacing() << "h" << m_hlayout->margin() << m_hlayout->spacing();
+
     widget_size_reset();
+
+    //qDebug() << "v" << m_vlayout->minimumSize().width() << m_vlayout->minimumSize().height() << "h" << m_hlayout->minimumSize().width() << m_hlayout->minimumSize().height();
 
     widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
 }
@@ -147,7 +151,7 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setParamMax( m_tValues.m_uMax );
 
 //        widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
-        widget_stretch( 0, m_vlayout->spacing() );
+        //widget_stretch( 0, m_vlayout->spacing() );
 
         YAML::Node  node;
         node.reset();

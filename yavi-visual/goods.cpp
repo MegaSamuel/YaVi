@@ -131,14 +131,8 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     pCategory->m_apParamList.append( pParam );
 
                     pCategory->getParameters( config[ GoodsCategorySection ][j][ GoodsParametersSection ][i], pParam, pParam->getParamDepth() );
-
-                    // подгоняем размер виджета под содержимое для корректной работы скролла
-                    //widget_stretch( pParam->getParamWidth(), pParam->getParamHeight() );
                 }
             }
-
-            // подгоняем размер виджета под содержимое для корректной работы скролла
-            //widget_stretch( pCategory->getCategoryWidth(), pCategory->getCategoryHeight() );
         }
     }
 
@@ -230,6 +224,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                 pTable->setTableLink( link );
             }
 
+            //!bug необходимо убрать
             // подгоняем размер виджета под содержимое для корректной работы скролла
             widget_stretch( pTable->getTableWidth(), pTable->getTableHeight() );
         }
@@ -248,11 +243,14 @@ TGoods::TGoods()
     // в вертикальный layout будем складывать элементы из ямла
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-    //m_vlayout->setMargin(0);
 
     setLayout( m_vlayout );
 
+    //qDebug() << m_vlayout->margin() << m_vlayout->spacing();
+
     widget_size_reset();
+
+    //qDebug() << m_vlayout->minimumSize().width() << m_vlayout->minimumSize().height();
 
     widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
 }
@@ -320,6 +318,8 @@ void  TGoods::widget_size_reset() noexcept
 
 void  TGoods::widget_stretch( int width, int height ) noexcept
 {
+    width += 2*m_vlayout->margin();
+
     // ширину выбираем максимальную из элементов
     if( width > m_width )
         m_width = width;
