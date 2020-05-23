@@ -3,6 +3,9 @@
 
 #include <QtWidgets>
 
+#include "dialog.h"
+#include "values.h"
+
 //------------------------------------------------------------------------------
 
 class  TGoods;
@@ -18,19 +21,37 @@ public:
     explicit TTable( TGoods  *pAncestor = Q_NULLPTR );
     ~TTable();
 
-    void           setTableId( const std::string&  name );
-    void           setTableName( const std::string&  name );
-    void           setTableLink( const std::string&  name );
+    enum ETableType
+    {
+        keTypeNone   = 0,
+        keTypeLink   = 1,
+        keTypeColumn = 2,
+        keTypeRow    = 3,
+    };
+
+    void           setTableType( unsigned  type ) noexcept;
+
+    void           setNode( const YAML::Node&  node );
+    void           setNodeParent( const YAML::Node&  node );
+    void           setNodeIndex( int  index );
+
+    YAML::Node&    getNode();
+    YAML::Node&    getNodeParent();
+    int            getNodeIndex();
+
+    void           setTableId( const std::string&  name, bool  set_to_node = false );
+    void           setTableName( const std::string&  name, bool  set_to_node = false );
+    void           setTableLink( const std::string&  name, bool  set_to_node = false );
     void           setTableRow( QStringList& list );
     void           setTableColumn( QStringList& list );
 
-    void           resetRow();
-    void           resetColumn();
-    void           nextRow();
-    void           nextColumn();
+    void           resetRow() noexcept;
+    void           resetColumn() noexcept;
+    void           nextRow() noexcept;
+    void           nextColumn() noexcept;
 
-    int            getTableWidth();
-    int            getTableHeight();
+    int            getTableWidth() noexcept;
+    int            getTableHeight() noexcept;
 
     const QString  getTableId();
     const QString  getTableName();
@@ -38,11 +59,22 @@ public:
 
     void           TableDelete();
 
-protected Q_SLOTS :
+    void           widget_stretch( int width, int height ) noexcept;         // растягиваем виджет
+    void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
+
+private Q_SLOTS :
     void           onBtnName();
     void           onBtnInc();
+    void           onSendCancel();
+    void           onSendValues( TValues& );
 
 private:
+    void           clear();
+
+    YAML::Node     m_node;        // текущий уровнь дерева ямла
+    YAML::Node     m_node_parent; // родительский уровнь дерева ямла
+    int            m_node_index;  // номер перечисления у родителя
+
     QGridLayout   *m_grid;
 
     QPushButton   *m_ptBtnInc;
@@ -50,22 +82,31 @@ private:
 
     QLabel        *m_ptLblLink;
 
+    unsigned       m_uTableType;
+
     QString        m_zId;      // table Id
     QString        m_zName;    // table Name
     QString        m_zBtnName; // текст на кнопке
     QString        m_zLink;    // table Link
 
-    std::vector<std::string>  m_vValues;
+    TDialog       *m_ptDialog;
+
+    TValues        m_tValues;
 
     int            m_row;
     int            m_column;
 
-    inline void  clear() noexcept
-    {
-        m_vValues.clear();
-    }
-
     TGoods        *m_pAncestor;
+
+    int            m_width;     // ширина виджета
+    int            m_height;    // высота виджета
+
+    void           widget_parent_stretch( int width, int height ) noexcept;  // растягиваем виджет
+    void           widget_parent_shrink( int width, int height ) noexcept;   // сжимаем виджет
+
+    void           widget_size_reset() noexcept;  // сброс размера виджета
+
+    bool           need_to_add; // необходимость создать новый набор параметров в ямле
 };
 
 //------------------------------------------------------------------------------
