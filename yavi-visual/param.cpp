@@ -77,7 +77,8 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 
 TCategories::~TCategories()
 {
-
+    // уничтожаем диалог
+    m_ptDialog->~TDialog();
 }
 
 void TCategories::clear()
@@ -206,6 +207,8 @@ void  TCategories::onSendValues( TValues& a_tValues )
         pParam->setNodeParent( m_node[ GoodsParametersSection ] );
         pParam->setNodeIndex( index );
 
+        pParam->setParamNameColor();
+
         //qDebug() << pParam->getParamName() << "index" << index;
     }
 
@@ -248,7 +251,7 @@ void  TCategories::CategoriesDelete()
     //qDebug() << "categories" << item << "delete";
 
     // уничтожаем диалог
-    m_ptDialog->~TDialog();
+//    m_ptDialog->~TDialog();
 
     // для всех вложенных Parameters вызываем очистку
     for( auto& it : m_apParamList )
@@ -325,6 +328,37 @@ void  TCategories::CategoriesDelete()
             m_pMentor->getNode().remove( GoodsCategoriesSection );
         }
     }
+}
+
+//------------------------------------------------------------------------------
+
+int  TCategories::checkParamName( QString&  name )
+{
+    int  result = -1;
+    QString  str;
+
+    if( Q_NULLPTR != m_pMentor )
+    {
+        for( auto& it : m_apParamList )
+        {
+            str.clear();
+
+            str = it->getParamName();  // имя
+            str.replace( " ", "" );    // убираем пробелы
+
+            qDebug() << "cat str" << str << "name" << name;
+
+            // сравниваем без учета регистра
+            if( 0 == QString::compare( name, str, Qt::CaseInsensitive ) )
+            {
+                result = 0;
+
+                break;
+            }
+        }
+    }
+
+    return result;
 }
 
 //------------------------------------------------------------------------------
@@ -576,7 +610,8 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
 
 TParam::~TParam()
 {
-
+    // уничтожаем диалог
+    m_ptDialog->~TDialog();
 }
 
 void  TParam::clear()
@@ -686,6 +721,8 @@ void  TParam::onSendValues( TValues& a_tValues )
         setParamMin( m_tValues.m_uMin, true );
         setParamMax( m_tValues.m_uMax, true );
 
+        setParamNameColor();
+
         //qDebug() << getParamName() << "fix parameter";
     }
 
@@ -773,10 +810,10 @@ void  TParam::ParamDelete()
 {
     QLayoutItem *child;
 
-    //qDebug() << "parameter" << getParamName() << "delete";
+    qDebug() << "parameter" << getParamName() << "delete";
 
     // уничтожаем диалог
-    m_ptDialog->~TDialog();
+    //m_ptDialog->~TDialog();
 
     // для всех вложенных Categories вызываем очистку
     for( auto& it : m_apCategoriesList )
@@ -830,7 +867,7 @@ void  TParam::ParamDelete()
         {
             if( this == m_pMentor->m_apParamList.at(i) )
             {
-                //qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete (mentor)";
+                qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete (mentor)";
 
                 m_pMentor->m_apParamList.removeAt(i);
 
@@ -868,7 +905,7 @@ void  TParam::ParamDelete()
         {
             if( this == m_pAncestor->m_apParamList.at(i) )
             {
-                //qDebug() << m_pAncestor->m_apParamList.at(i)->getParamName() << "obsolete (ancestor)";
+                qDebug() << m_pAncestor->m_apParamList.at(i)->getParamName() << "obsolete (ancestor)";
 
                 m_pAncestor->m_apParamList.removeAt(i);
 
@@ -897,11 +934,6 @@ void  TParam::ParamDelete()
             m_pAncestor->getNode().remove( GoodsParametersSection );
         }
     }
-}
-
-void  TParam::ParamDraw( TParam  *a_pParam )
-{
-    m_vlayout->addWidget( a_pParam, 0, Qt::AlignLeft | Qt::AlignTop );
 }
 
 //------------------------------------------------------------------------------
@@ -952,8 +984,6 @@ void  TParam::setParamName( const std::string&  name, bool  set_to_node )
     m_zBtnName.replace( " ", "\n" );                     // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );                  // правленное имя кнопки
     m_ptBtnName->setToolTip( "Параметр: " +  m_zName );  // подсказка с оригинальным именем
-
-    setParamNameColor();
 
     if( set_to_node )
     {
@@ -1088,20 +1118,74 @@ void  TParam::setParamMax( unsigned  val, bool  set_to_node )
 
 //------------------------------------------------------------------------------
 
-void  TParam::setParamNameColor()
+bool  TParam::isStrEqual( QString  str1, QString  str2 )
 {
+    // убираем пробелы
+    str1.replace( " ", "" );
+    str2.replace( " ", "" );
+
+    // сравниваем без учета регистра
+    if( 0 == QString::compare( str1, str2, Qt::CaseInsensitive ) )
+        return true;
+
+    return false;
+}
+
+void  TParam::colorBtnName( bool  color )
+{
+    if( color )
+    {
+        if( 0 == getParamType() )
+        {
+            m_ptBtnName->setStyleSheet( "color: red" );
+        }
+        else
+        {
+            m_ptBtnName->setStyleSheet( "color: green" );
+        }
+    }
+    else
+    {
+        m_ptBtnName->setStyleSheet( "color: default" );
+    }
+}
+
+void  TParam::setParamNameColor( bool  force )
+{
+    QList<TParam*> list;
+
+    list.clear();
+
+    colorBtnName( false );
+
     if( Q_NULLPTR != m_pMentor )
     {
+        qDebug() << "mentor name" << m_pMentor->getCategoriesName();
 
+        list = m_pMentor->m_apParamList;
     }
     else if( Q_NULLPTR != m_pAncestor )
     {
+        qDebug() << "ancestor name" << m_pAncestor->getCategoryName();
 
+        list = m_pAncestor->m_apParamList;
     }
 
-    //m_ptBtnName->setStyleSheet( "color: red" );
-    //m_ptBtnName->setStyleSheet( "color: green" );
-    //m_ptBtnName->setStyleSheet( "color: default" );
+    if( list.size() )
+    {
+        for( auto& it : list )
+        {
+            if( ( force ) || ( it->getNodeIndex() < getNodeIndex() ) )
+            {
+                if( isStrEqual( getParamName(), it->getParamName() ) )
+                {
+                    colorBtnName( true );
+
+                    break;
+                }
+            }
+        }
+    }
 }
 
 //------------------------------------------------------------------------------

@@ -58,7 +58,8 @@ TCategory::TCategory( TGoods  *pAncestor )
 
 TCategory::~TCategory()
 {
-
+    // уничтожаем диалог
+    m_ptDialog->~TDialog();
 }
 
 void TCategory::clear()
@@ -170,6 +171,8 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setNode( m_node[ GoodsParametersSection ][index] );
         pParam->setNodeParent( m_node[ GoodsParametersSection ] );
         pParam->setNodeIndex( index );
+
+        pParam->setParamNameColor();
     }
 
     need_to_add = false;
@@ -182,17 +185,21 @@ void  TCategory::CategoryDelete()
     QLayoutItem *child;
 
     // уничтожаем диалог
-    m_ptDialog->~TDialog();
+//    m_ptDialog->~TDialog();
 
     // для всех вложенных Parameters вызываем очистку
     for( auto& it : m_apParamList )
     {
+        qDebug() << "del" << it->getParamName();
+
         // очищаем
         it->ParamDelete();
 
         // уничтожаем
         it->~TParam();
     }
+
+    qDebug() << "del m_hlayout";
 
     // уничтожаем виджеты
     while( ( child = m_hlayout->takeAt(0) ) != Q_NULLPTR )
@@ -201,15 +208,22 @@ void  TCategory::CategoryDelete()
         delete child;
     }
 
+    qDebug() << "del m_vlayout";
+
     // уничтожаем виджеты
     while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
     {
+        qDebug() << "del";
         delete child->widget();
         delete child;
     }
 
+    qDebug() << "del layout";
+
     // уничтожаем layout
     m_vlayout->deleteLater();
+
+    qDebug() << "del ancestor";
 
     // удаляем себя из списка родителя
     if( Q_NULLPTR != m_pAncestor )
@@ -219,7 +233,7 @@ void  TCategory::CategoryDelete()
         {
             if( this == m_pAncestor->m_apCategoryList.at(i) )
             {
-//                qDebug() << m_pAncestor->m_apCategoryList.at(i)->getCategoryName() << "obsolete";
+                qDebug() << m_pAncestor->m_apCategoryList.at(i)->getCategoryName() << "obsolete";
 
                 m_pAncestor->m_apCategoryList.removeAt(i);
 
@@ -242,6 +256,37 @@ void  TCategory::CategoryDelete()
             }
         }
     }
+}
+
+//------------------------------------------------------------------------------
+
+int  TCategory::checkParamName( QString&  name )
+{
+    int  result = -1;
+    QString  str;
+
+    if( Q_NULLPTR != m_pAncestor )
+    {
+        for( auto& it : m_apParamList )
+        {
+            str.clear();
+
+            str = it->getParamName();  // имя
+            str.replace( " ", "" );    // убираем пробелы
+
+            qDebug() << "str" << str;
+
+            // сравниваем без учета регистра
+            if( 0 == QString::compare( name, str, Qt::CaseInsensitive ) )
+            {
+                result = 0;
+
+                break;
+            }
+        }
+    }
+
+    return result;
 }
 
 //------------------------------------------------------------------------------
@@ -321,6 +366,8 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
     // имя
     str = __yaml_GetString( node, GoodsNameSection );
     a_pParam->setParamName( str );
+
+    a_pParam->setParamNameColor();
 
     // тип
     if( __yaml_IsScalar( node[ GoodsTypeSection ] ) )
