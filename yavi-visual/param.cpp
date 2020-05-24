@@ -98,6 +98,8 @@ void  TCategories::onBtnDec()
 {
 //    qDebug() << getCategoriesName() << "dec button";
 
+    widget_shrink( getCategoriesWidth(), getCategoriesHeight() + m_vlayout->spacing() );
+
     CategoriesDelete();
 }
 
@@ -259,7 +261,7 @@ void  TCategories::CategoriesDelete()
         it->~TParam();
     }
 
-    widget_parent_shrink( 0, getCategoriesHeight() );
+    //widget_parent_shrink( 0, getCategoriesHeight() );
 
     // удаляем виджеты на первой строке
     while( ( child = m_hlayout->takeAt(0) ) != Q_NULLPTR )
@@ -615,6 +617,8 @@ void  TParam::onBtnDec()
 {
 //    qDebug() << getParamName() << "dec button";
 
+    widget_shrink( getParamWidth(), getParamHeight() + m_vlayout->spacing() );
+
     ParamDelete();
 }
 
@@ -796,7 +800,7 @@ void  TParam::ParamDelete()
         it->~TCategories();
     }
 
-    widget_parent_shrink( 0, getParamHeight() );
+    //widget_parent_shrink( 0, getParamHeight() );
 
     // удаляем виджеты на второй строке
     if( m_second_row_exist )
