@@ -68,11 +68,10 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 
     widget_size_reset();
 
-    int width;
+    int  width = 2*m_vlayout->margin() + 3*m_ptBtnInc->minimumSizeHint().width() + 2*m_vlayout->spacing() + m_depth*( m_ptBtnInc->minimumSizeHint().width() + m_vlayout->spacing() );
+    int  height = m_ptBtnInc->minimumSizeHint().height();
 
-    width = 2*m_vlayout->margin() + 3*93 + 2*m_vlayout->spacing() + m_depth*( 93 + m_vlayout->spacing() );
-
-    widget_stretch( width, m_vlayout->minimumSize().height() );
+    widget_stretch( width, height );
 }
 
 TCategories::~TCategories()
@@ -363,13 +362,24 @@ int  TCategories::getNodeIndex()
 
 void  TCategories::setCategoriesName( const std::string&  name, bool  set_to_node )
 {
+    int  height;
+
     m_zName = QString::fromStdString(name);
+
+    height = m_ptBtnName->minimumSizeHint().height();
 
     m_zBtnName = QString::fromStdString(name);
     m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );       // убираем подряд идущие пробелы на один
     m_zBtnName.replace( " ", "\n" );                     // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );                  // правленное имя кнопки
     m_ptBtnName->setToolTip( "Категория: " + m_zName );  // подсказка с оригинальным именем
+
+    height = m_ptBtnName->minimumSizeHint().height() - height;
+
+    if( 0 < height )
+    {
+        widget_stretch( 0, height );
+    }
 
     if( set_to_node )
     {
@@ -444,8 +454,6 @@ void  TCategories::widget_stretch( int width, int height ) noexcept
     // высоту увеличиваем на каждый элемент
     m_height += height;
 
-    //qDebug() << "categories"  << width << height << m_width << m_height;
-
     // ставим размер самого себя
     setMinimumWidth( m_width );
     setMinimumHeight( m_height );
@@ -471,6 +479,7 @@ void  TCategories::widget_shrink( int width, int height ) noexcept
         m_height = 0;
 
     // ставим размер самого себя
+    setMinimumWidth( m_width );
     setMinimumHeight( m_height );
 
     widget_parent_shrink( width, height );
@@ -567,11 +576,10 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
 
     widget_size_reset();
 
-    int width;
+    int  width = 2*m_vlayout->margin() + 3*m_ptBtnInc->minimumSizeHint().width() + 2*m_vlayout->spacing() + m_depth*( m_ptBtnInc->minimumSizeHint().width() + m_vlayout->spacing() );
+    int  height = m_ptBtnInc->minimumSizeHint().height();
 
-    width = 2*m_vlayout->margin() + 3*93 + 2*m_vlayout->spacing() + m_depth*( 93 + m_vlayout->spacing() );
-
-    widget_stretch( width, m_vlayout->minimumSize().height() );
+    widget_stretch( width, height );
 }
 
 TParam::~TParam()
@@ -945,13 +953,24 @@ int  TParam::getNodeIndex()
 
 void  TParam::setParamName( const std::string&  name, bool  set_to_node )
 {
+    int  height;
+
     m_zName = QString::fromStdString(name);
+
+    height = m_ptBtnName->minimumSizeHint().height();
 
     m_zBtnName = QString::fromStdString(name);
     m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );       // убираем подряд идущие пробелы на один
     m_zBtnName.replace( " ", "\n" );                     // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );                  // правленное имя кнопки
     m_ptBtnName->setToolTip( "Параметр: " +  m_zName );  // подсказка с оригинальным именем
+
+    height = m_ptBtnName->minimumSizeHint().height() - height;
+
+    if( 0 < height )
+    {
+        widget_stretch( 0, height );
+    }
 
     setParamNameColor();
 
@@ -1294,7 +1313,12 @@ void  TParam::setParamValueAdd()
 
     m_vlayout->addLayout( m_hlayout2 );
 
-    widget_stretch( m_hlayout2->minimumSize().width(), m_hlayout2->minimumSize().height() + 2*m_vlayout->spacing() );
+    int  width = 2*m_hlayout2->margin() + 3*m_ptBtnValDec->minimumSizeHint().width() + 2*m_hlayout2->spacing() + (m_depth + 1)*( m_ptBtnValDec->minimumSizeHint().width() + m_hlayout2->spacing() );
+    int  height = m_ptBtnValDec->minimumSizeHint().height() + m_vlayout->spacing();
+
+    widget_stretch( width, height );
+
+    m_nlayout2height = height;
 
     m_second_row_exist = true;
 }
@@ -1313,10 +1337,10 @@ void  TParam::setParamValueDel()
         delete child;
     }
 
-    widget_shrink( 0, m_hlayout2->minimumSize().height() + 2*m_vlayout->spacing() );
-
     // уничтожаем layout
     m_hlayout2->deleteLater();
+
+    widget_shrink( 0, m_nlayout2height );
 
     m_second_row_exist = false;
 }
@@ -1351,13 +1375,8 @@ void  TParam::widget_stretch( int width, int height ) noexcept
     if( width > m_width )
         m_width = width;
 
-    // к высоте добавляем spacing
-    //height += m_vlayout->spacing();
-
     // высоту увеличиваем на каждый элемент
     m_height += height;
-
-//    qDebug() << "parameter" << getParamName() << m_width << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );
@@ -1381,9 +1400,6 @@ void  TParam::widget_parent_stretch( int width, int height ) noexcept
 void  TParam::widget_shrink( int width, int height ) noexcept
 {
     Q_UNUSED( width );
-
-    // к высоте добавляем spacing
-    //height += m_vlayout->spacing();
 
     m_height -= height;
 

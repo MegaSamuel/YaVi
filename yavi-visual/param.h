@@ -220,6 +220,8 @@ private:
     QHBoxLayout   *m_hlayout1;  // вложенный layout
     QHBoxLayout   *m_hlayout2;  // вложенный layout для второй строки
 
+    int            m_nlayout2height;
+
     QPushButton   *m_ptBtnDec;
     QPushButton   *m_ptBtnInc;
     QPushButton   *m_ptBtnName;

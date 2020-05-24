@@ -53,7 +53,18 @@ TCategory::TCategory( TGoods  *pAncestor )
 
     widget_size_reset();
 
-    widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
+    int  width = 2*m_vlayout->margin() + 2*m_ptBtnInc->minimumSizeHint().width() + 1*m_vlayout->spacing();
+    int  height = m_ptBtnInc->minimumSizeHint().height();
+
+//    qDebug() << m_ptBtnName->minimumSizeHint().width() << m_ptBtnName->minimumSizeHint().height();
+//    qDebug() << m_ptBtnName->minimumSize().width() << m_ptBtnName->minimumSize().height();
+//    qDebug() << m_ptBtnName->size().width() << m_ptBtnName->size().height();
+
+
+    //qDebug() << m_vlayout->minimumSize().width() << m_vlayout->minimumSize().height();
+
+    //widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
+    widget_stretch( width, height );
 }
 
 TCategory::~TCategory()
