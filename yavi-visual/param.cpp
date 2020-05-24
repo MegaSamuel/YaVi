@@ -313,6 +313,9 @@ void  TCategories::CategoriesDelete()
                 m_pMentor->m_apCategoriesList.at(i)->setNodeIndex( index );
             }
         }
+
+        // удаляемся из родительского layout-а
+        m_pMentor->m_vlayout->removeWidget(this);
     }
 
     // очищаем ветку
@@ -870,6 +873,9 @@ void  TParam::ParamDelete()
         {
             m_pMentor->getNode().remove( GoodsParametersSection );
         }
+
+        // удаляемся из родительского layout-а
+        m_pMentor->m_vlayout->removeWidget(this);
     }
     else if( Q_NULLPTR != m_pAncestor )
     {
@@ -908,6 +914,9 @@ void  TParam::ParamDelete()
         {
             m_pAncestor->getNode().remove( GoodsParametersSection );
         }
+
+        // удаляемся из родительского layout-а
+        m_pAncestor->m_vlayout->removeWidget(this);
     }
 }
 
@@ -1379,6 +1388,8 @@ void  TParam::widget_stretch( int width, int height ) noexcept
     if( width > m_width )
         m_width = width;
 
+    //qDebug() << "stretch" << width << height;
+
     // высоту увеличиваем на каждый элемент
     m_height += height;
 
@@ -1404,6 +1415,8 @@ void  TParam::widget_parent_stretch( int width, int height ) noexcept
 void  TParam::widget_shrink( int width, int height ) noexcept
 {
     Q_UNUSED( width );
+
+    //qDebug() << "shrink" << width << height;
 
     m_height -= height;
 
