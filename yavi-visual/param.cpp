@@ -68,8 +68,8 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 
     widget_size_reset();
 
-    int  width = 2*m_vlayout->margin() + 3*m_ptBtnInc->minimumSizeHint().width() + 2*m_vlayout->spacing() + m_depth*( m_ptBtnInc->minimumSizeHint().width() + m_vlayout->spacing() );
-    int  height = m_ptBtnInc->minimumSizeHint().height();
+    int  width = 2*m_vlayout->margin() + 3*m_ptBtnInc->minimumSize().width() + 2*m_vlayout->spacing() + m_depth*( m_ptBtnInc->minimumSize().width() + m_vlayout->spacing() );
+    int  height = 2*m_vlayout->margin() + m_ptBtnInc->minimumSizeHint().height();
 
     widget_stretch( width, height );
 }
@@ -581,8 +581,8 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
 
     widget_size_reset();
 
-    int  width = 2*m_vlayout->margin() + 3*m_ptBtnInc->minimumSizeHint().width() + 2*m_vlayout->spacing() + m_depth*( m_ptBtnInc->minimumSizeHint().width() + m_vlayout->spacing() );
-    int  height = m_ptBtnInc->minimumSizeHint().height();
+    int  width = 2*m_vlayout->margin() + 3*m_ptBtnInc->minimumSize().width() + 2*m_vlayout->spacing() + m_depth*( m_ptBtnInc->minimumSize().width() + m_vlayout->spacing() );
+    int  height = 2*m_vlayout->margin() + m_ptBtnInc->minimumSizeHint().height();
 
     widget_stretch( width, height );
 }
@@ -1326,8 +1326,8 @@ void  TParam::setParamValueAdd()
 
     m_vlayout->addLayout( m_hlayout2 );
 
-    int  width = 2*m_hlayout2->margin() + 3*m_ptBtnValDec->minimumSizeHint().width() + 2*m_hlayout2->spacing() + (m_depth + 1)*( m_ptBtnValDec->minimumSizeHint().width() + m_hlayout2->spacing() );
-    int  height = m_ptBtnValDec->minimumSizeHint().height() + m_vlayout->spacing();
+    int  width = 2*m_hlayout2->margin() + 3*m_ptBtnValDec->minimumSize().width() + 2*m_hlayout2->spacing() + (m_depth + 1)*( m_ptBtnValDec->minimumSize().width() + m_hlayout2->spacing() );
+    int  height = 2*m_hlayout2->margin() + m_ptBtnValDec->minimumSizeHint().height() + m_vlayout->spacing();
 
     widget_stretch( width, height );
 

@@ -180,8 +180,6 @@ TGoods::TGoods()
 
     widget_size_reset();
 
-    //qDebug() << m_vlayout->minimumSize().width() << m_vlayout->minimumSize().height();
-
     widget_stretch( 2*m_vlayout->margin(), 2*m_vlayout->margin() );
 }
 
