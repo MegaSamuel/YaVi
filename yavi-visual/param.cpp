@@ -454,7 +454,7 @@ void  TCategories::widget_size_reset() noexcept
     m_height = 0;
 }
 
-void  TCategories::widget_stretch( int width, int height, bool add ) noexcept
+void  TCategories::widget_stretch( int width, int height, bool add_height ) noexcept
 {
     // ширину выбираем максимальную из элементов
     if( width > m_width )
@@ -467,16 +467,16 @@ void  TCategories::widget_stretch( int width, int height, bool add ) noexcept
     setMinimumWidth( m_width );
     setMinimumHeight( m_height );
 
-    widget_parent_stretch( width, height, add );
+    widget_parent_stretch( width, height, add_height );
 }
 
-void  TCategories::widget_parent_stretch( int width, int height, bool add ) noexcept
+void  TCategories::widget_parent_stretch( int width, int height, bool add_height ) noexcept
 {
     int  val = 0;
 
     if( Q_NULLPTR != m_pMentor )
     {
-        if( add )
+        if( add_height )
         {
             val = m_pMentor->m_vlayout->spacing();
         }
@@ -1397,7 +1397,7 @@ void  TParam::widget_size_reset() noexcept
     m_height = 0;
 }
 
-void  TParam::widget_stretch( int width, int height, bool add ) noexcept
+void  TParam::widget_stretch( int width, int height, bool add_height ) noexcept
 {
     // ширину выбираем максимальную из элементов
     if( width > m_width )
@@ -1412,16 +1412,16 @@ void  TParam::widget_stretch( int width, int height, bool add ) noexcept
     setMinimumWidth( m_width );
     setMinimumHeight( m_height );
 
-    widget_parent_stretch( width, height, add );
+    widget_parent_stretch( width, height, add_height );
 }
 
-void  TParam::widget_parent_stretch( int width, int height, bool add ) noexcept
+void  TParam::widget_parent_stretch( int width, int height, bool add_height ) noexcept
 {
     int  val = 0;
 
     if( Q_NULLPTR != m_pAncestor )
     {
-        if( add )
+        if( add_height )
         {
             val = m_pAncestor->m_vlayout->spacing();
         }
@@ -1430,9 +1430,9 @@ void  TParam::widget_parent_stretch( int width, int height, bool add ) noexcept
     }
     else if( Q_NULLPTR != m_pMentor )
     {
-        if( add )
+        if( add_height )
         {
-            val = m_pMentor->m_vlayout->spacing();
+            //val = m_pMentor->m_vlayout->spacing();
         }
 
         m_pMentor->widget_stretch( width, height + val );

@@ -447,7 +447,7 @@ void  TCategory::widget_size_reset() noexcept
     m_height = 0;
 }
 
-void  TCategory::widget_stretch( int width, int height, bool add ) noexcept
+void  TCategory::widget_stretch( int width, int height, bool add_height ) noexcept
 {
     // ширину выбираем максимальную из элементов
     if( width > m_width )
@@ -460,16 +460,16 @@ void  TCategory::widget_stretch( int width, int height, bool add ) noexcept
     setMinimumWidth( m_width );
     setMinimumHeight( m_height );
 
-    widget_parent_stretch( width, height, add );
+    widget_parent_stretch( width, height, add_height );
 }
 
-void  TCategory::widget_parent_stretch( int width, int height, bool add ) noexcept
+void  TCategory::widget_parent_stretch( int width, int height, bool add_height ) noexcept
 {
     int  val = 0;
 
     if( Q_NULLPTR != m_pAncestor )
     {
-        if( add )
+        if( add_height )
         {
             val = m_pAncestor->m_vlayout->spacing();
         }
