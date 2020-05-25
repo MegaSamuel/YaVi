@@ -43,13 +43,16 @@ TGoods::~TGoods()
 
 void  TGoods::GoodsDelete()
 {
-    QLayoutItem *child;
+//    QLayoutItem *child;
 
     // категории
     for( auto& it : m_apCategoryList )
     {
         // очищаем
         it->CategoryDelete();
+
+        // удаляем
+        delete it;
     }
 
     // таблицы
@@ -57,16 +60,21 @@ void  TGoods::GoodsDelete()
     {
         // очищаем
         it->TableDelete();
-    }
 
+        // удаляем
+        delete it;
+    }
+/*
     // уничтожаем артефакты
     while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
     {
         // остаются, скорее всего, главные layout-ы, т.к. им ставится deletelater?
+        qDebug() << "artefact";
+
         delete child->widget();
         delete child;
     }
-
+*/
     clear();
 
     widget_size_reset();

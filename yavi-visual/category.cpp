@@ -187,6 +187,9 @@ void  TCategory::CategoryDelete()
     {
         // очищаем
         it->ParamDelete();
+
+        // удаляем
+        delete it;
     }
 
     // уничтожаем виджеты

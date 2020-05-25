@@ -247,6 +247,9 @@ void  TCategories::CategoriesDelete()
     {
         // очищаем
         it->ParamDelete();
+
+        // удаляем
+        delete it;
     }
 
     // удаляем виджеты на первой строке
@@ -782,6 +785,9 @@ void  TParam::ParamDelete()
     {
         // очищаем
         it->CategoriesDelete();
+
+        // удаляем
+        delete it;
     }
 
     // удаляем виджеты на второй строке
