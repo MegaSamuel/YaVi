@@ -105,6 +105,9 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             {
                 TParam  *pParam;
 
+                unsigned type;
+                int height = m_vlayout->spacing();
+
                 for( int i = 0; i < static_cast<int>(config[ GoodsCategorySection ][j][ GoodsParametersSection ].size()); i++ )
                 {
                     pParam = new TParam( pCategory, Q_NULLPTR, 0 );
@@ -117,6 +120,15 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     pCategory->m_apParamList.append( pParam );
 
                     pCategory->getParameters( config[ GoodsCategorySection ][j][ GoodsParametersSection ][i], pParam, pParam->getParamDepth() );
+
+                    type = pParam->getParamType();
+
+                    if( ( 1 == type ) || ( 2 == type ) || ( 3 == type ) )
+                    {
+                        height += height;
+                    }
+
+                    widget_stretch( 0, height );
                 }
             }
         }

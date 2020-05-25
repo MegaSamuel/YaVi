@@ -1437,8 +1437,7 @@ void  TParam::widget_parent_stretch( int width, int height, bool add_height ) no
             val = m_pAncestor->m_vlayout->spacing();
         }
 
-        // для главного родителя третий аргумент true!
-        m_pAncestor->widget_stretch( width, height + val );
+        m_pAncestor->widget_stretch( width, height + val, false );
     }
     else if( Q_NULLPTR != m_pMentor )
     {
