@@ -465,7 +465,7 @@ void  TCategories::widget_parent_stretch( int width, int height, bool add_height
             val = m_pMentor->m_vlayout->spacing();
         }
 
-        m_pMentor->widget_stretch( width, height + val );
+        m_pMentor->widget_stretch( width, height + val, false );
     }
 }
 
@@ -1353,9 +1353,9 @@ void  TParam::setParamValueAdd()
     m_vlayout->addLayout( m_hlayout2 );
 
     int  width = 2*m_hlayout2->margin() + 3*m_ptBtnValDec->minimumSize().width() + 2*m_hlayout2->spacing() + (m_depth + 1)*( m_ptBtnValDec->minimumSize().width() + m_hlayout2->spacing() );
-    int  height = 2*m_hlayout2->margin() + m_ptBtnValDec->minimumSizeHint().height();
+    int  height = 2*m_hlayout2->margin() + m_ptBtnValDec->minimumSizeHint().height() + m_vlayout->spacing();
 
-    widget_stretch( width, height );
+    widget_stretch( width, height, false );
 
     m_nlayout2height = height;
 
@@ -1437,16 +1437,16 @@ void  TParam::widget_parent_stretch( int width, int height, bool add_height ) no
             val = m_pAncestor->m_vlayout->spacing();
         }
 
-        m_pAncestor->widget_stretch( width, height + val );
+        m_pAncestor->widget_stretch( width, height + val, false );
     }
     else if( Q_NULLPTR != m_pMentor )
     {
         if( add_height )
         {
-            //val = m_pMentor->m_vlayout->spacing();
+            val = m_pMentor->m_vlayout->spacing();
         }
 
-        m_pMentor->widget_stretch( width, height + val );
+        m_pMentor->widget_stretch( width, height + val, false );
     }
 }
 
