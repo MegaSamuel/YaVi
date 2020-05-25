@@ -69,11 +69,27 @@ MainWindow::MainWindow(QWidget *parent)
 
     // центральный элеиент
     setCentralWidget( frmBase );
+
+    style();
 }
 
 MainWindow::~MainWindow()
 {
 
+}
+
+//------------------------------------------------------------------------------
+
+void MainWindow::style()
+{
+    QStringList  list;
+
+    list = QStyleFactory::keys();
+
+    for( auto& it : list )
+    {
+        qDebug() << it;
+    }
 }
 
 //------------------------------------------------------------------------------
