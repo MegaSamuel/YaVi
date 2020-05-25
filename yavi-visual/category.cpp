@@ -53,7 +53,10 @@ TCategory::TCategory( TGoods  *pAncestor )
 
     widget_size_reset();
 
-    widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
+    int  width = 2*m_vlayout->margin() + 2*m_ptBtnInc->minimumSize().width() + 1*m_vlayout->spacing();
+    int  height = 2*m_vlayout->margin() + m_ptBtnInc->minimumSizeHint().height();
+
+    widget_stretch( width, height );
 }
 
 TCategory::~TCategory()
@@ -75,8 +78,6 @@ void TCategory::clear()
 
 void  TCategory::onBtnName()
 {
-//    qDebug() << getCategoryName() << "button";
-
     // диалог с пустыми параметрами
     m_ptDialog->setDlgEmpty();
 
@@ -89,8 +90,6 @@ void  TCategory::onBtnName()
 
 void  TCategory::onBtnInc()
 {
-//    qDebug() << getCategoryName() << "inc button";
-
     // признак что хотим создать новый набор параметров
     need_to_add = true;
 
@@ -170,6 +169,8 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setNode( m_node[ GoodsParametersSection ][index] );
         pParam->setNodeParent( m_node[ GoodsParametersSection ] );
         pParam->setNodeIndex( index );
+
+        pParam->setParamNameColor();
     }
 
     need_to_add = false;
@@ -181,17 +182,11 @@ void  TCategory::CategoryDelete()
 {
     QLayoutItem *child;
 
-    // уничтожаем диалог
-    m_ptDialog->~TDialog();
-
     // для всех вложенных Parameters вызываем очистку
     for( auto& it : m_apParamList )
     {
         // очищаем
         it->ParamDelete();
-
-        // уничтожаем
-        it->~TParam();
     }
 
     // уничтожаем виджеты
@@ -219,8 +214,6 @@ void  TCategory::CategoryDelete()
         {
             if( this == m_pAncestor->m_apCategoryList.at(i) )
             {
-//                qDebug() << m_pAncestor->m_apCategoryList.at(i)->getCategoryName() << "obsolete";
-
                 m_pAncestor->m_apCategoryList.removeAt(i);
 
                 break;
@@ -241,6 +234,9 @@ void  TCategory::CategoryDelete()
                 m_pAncestor->m_apCategoryList.at(i)->setNodeIndex( index );
             }
         }
+
+        // удаляемся из родительского layout-а
+        m_pAncestor->m_vlayout->removeWidget(this);
     }
 }
 
@@ -322,6 +318,8 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
     str = __yaml_GetString( node, GoodsNameSection );
     a_pParam->setParamName( str );
 
+    a_pParam->setParamNameColor();
+
     // тип
     if( __yaml_IsScalar( node[ GoodsTypeSection ] ) )
     {
@@ -402,13 +400,28 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
 
 void  TCategory::setCategoryName( const std::string&  name, bool  set_to_node )
 {
+    int  height;
+
     m_zName = QString::fromStdString(name);
+
+    height = m_ptBtnName->minimumSizeHint().height();
 
     m_zBtnName = QString::fromStdString(name);
     m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );       // убираем подряд идущие пробелы на один
     m_zBtnName.replace( " ", "\n" );                     // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );                  // правленное имя кнопки
     m_ptBtnName->setToolTip( "Категория: " + m_zName );  // подсказка с оригинальным именем
+
+    height = m_ptBtnName->minimumSizeHint().height() - height;
+
+    if( 0 < height )
+    {
+        widget_stretch( 0, height, false );
+    }
+    else
+    {
+        widget_shrink( 0, -1 * height );
+    }
 
     if( set_to_node )
     {
@@ -429,14 +442,11 @@ void  TCategory::widget_size_reset() noexcept
     m_height = 0;
 }
 
-void  TCategory::widget_stretch( int width, int height ) noexcept
+void  TCategory::widget_stretch( int width, int height, bool add_height ) noexcept
 {
     // ширину выбираем максимальную из элементов
     if( width > m_width )
         m_width = width;
-
-    // к высоте добавляем spacing
-    height += m_vlayout->spacing();
 
     // высоту увеличиваем на каждый элемент
     m_height += height;
@@ -445,14 +455,21 @@ void  TCategory::widget_stretch( int width, int height ) noexcept
     setMinimumWidth( m_width );
     setMinimumHeight( m_height );
 
-    widget_parent_stretch( width, height );
+    widget_parent_stretch( width, height, add_height );
 }
 
-void  TCategory::widget_parent_stretch( int width, int height ) noexcept
+void  TCategory::widget_parent_stretch( int width, int height, bool add_height ) noexcept
 {
+    int  val = 0;
+
     if( Q_NULLPTR != m_pAncestor )
     {
-        m_pAncestor->widget_stretch( width, height );
+        if( add_height )
+        {
+            val = m_pAncestor->m_vlayout->spacing();
+        }
+
+        m_pAncestor->widget_stretch( width, height + val );
     }
 }
 
@@ -460,17 +477,10 @@ void  TCategory::widget_shrink( int width, int height ) noexcept
 {
     Q_UNUSED( width );
 
-    //qDebug() << "shrink" << width << height;
-
-    // к высоте добавляем spacing
-    height += m_vlayout->spacing();
-
     m_height -= height;
 
     if( m_height < 0 )
         m_height = 0;
-
-    //qDebug() << "new size" << m_width << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );
@@ -487,12 +497,12 @@ void  TCategory::widget_parent_shrink( int width, int height ) noexcept
     }
 }
 
-int TCategory::getCategoryWidth()
+int TCategory::getCategoryWidth() noexcept
 {
     return minimumSize().width();
 }
 
-int TCategory::getCategoryHeight()
+int TCategory::getCategoryHeight() noexcept
 {
     return minimumSize().height();
 }

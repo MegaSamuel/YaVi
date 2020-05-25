@@ -18,7 +18,7 @@ class TCategory : public QWidget
     Q_OBJECT
 
 public:
-    TCategory( TGoods  *pAncestor = Q_NULLPTR );
+    explicit TCategory( TGoods  *pAncestor = Q_NULLPTR );
     ~TCategory();
 
     void           setNode( const YAML::Node&  node );
@@ -32,21 +32,21 @@ public:
     void           getCategories( const YAML::Node&  node, TCategories  *a_pCategories, int  depth );
     void           getParameters( const YAML::Node&  node, TParam  *a_pParam, int  depth );
 
-    int            getCategoryWidth();  // вернуть ширину
-    int            getCategoryHeight(); // вернуть высоту
+    int            getCategoryWidth() noexcept;  // вернуть ширину
+    int            getCategoryHeight() noexcept; // вернуть высоту
 
     void           setCategoryName( const std::string&  name, bool  set_to_node = false );
     const QString  getCategoryName();
 
     void           CategoryDelete();
 
-    void           widget_stretch( int width, int height ) noexcept;         // растягиваем виджет
+    void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет
     void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
 
     QVBoxLayout   *m_vlayout;   // главный layout класса
     QList<TParam*> m_apParamList;
 
-protected Q_SLOTS :
+private Q_SLOTS :
     void           onBtnName();
     void           onBtnInc();
     void           onSendCancel();
@@ -79,7 +79,7 @@ private:
     int            m_width;     // ширина виджета
     int            m_height;    // высота виджета
 
-    void           widget_parent_stretch( int width, int height ) noexcept;  // растягиваем виджет
+    void           widget_parent_stretch( int width, int height, bool add_height = true ) noexcept;  // растягиваем виджет
     void           widget_parent_shrink( int width, int height ) noexcept;   // сжимаем виджет
 
     void           widget_size_reset() noexcept;  // сброс размера виджета

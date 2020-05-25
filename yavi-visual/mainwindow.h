@@ -13,7 +13,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = Q_NULLPTR);
+    explicit MainWindow( QWidget *parent = Q_NULLPTR );
     ~MainWindow();
 
 private Q_SLOTS:
@@ -26,7 +26,7 @@ private:
     QPushButton  *m_ptBtnSave;
     QLabel       *m_ptLblNotice;
 
-    QString       zFailReason;  // причина ошибки загрузки/выгрузки ямла
+    QString       m_zFailReason;  // причина ошибки загрузки/выгрузки ямла
 
     bool          init( const QString&  filename ); // загружаем ямл из файла
     bool          fini( const QString&  filename ); // выгружаем ямл в файл
@@ -41,8 +41,9 @@ private:
     QTimer       *m_ptTimer;
     unsigned      m_uTimerCounter;
 
-protected:
     TGoods 	     *m_pGoods;    // товары считанные из файла
+
+    void          closeEvent( QCloseEvent * );
 };
 
 //------------------------------------------------------------------------------

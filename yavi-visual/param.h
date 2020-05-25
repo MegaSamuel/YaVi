@@ -19,7 +19,7 @@ class TCategories : public QWidget
    Q_OBJECT
 
 public:
-    TCategories( TParam  *pMentor = Q_NULLPTR, int  depth = 0 );
+    explicit TCategories( TParam  *pMentor = Q_NULLPTR, int  depth = 0 );
     ~TCategories();
 
     void           setNode( const YAML::Node&  node );
@@ -41,12 +41,12 @@ public:
     void           setCategoriesDepth( int  depth );
     int            getCategoriesDepth();
 
-    int            getCategoriesWidth();
-    int            getCategoriesHeight();
+    int            getCategoriesWidth() noexcept;
+    int            getCategoriesHeight() noexcept;
 
     void           CategoriesDelete();
 
-    void           widget_stretch( int width, int height ) noexcept;         // растягиваем виджет
+    void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет
     void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
 
     QVBoxLayout   *m_vlayout;   // главный layout класса
@@ -94,7 +94,7 @@ private:
     int            m_width;     // ширина виджета
     int            m_height;    // высота виджета
 
-    void           widget_parent_stretch( int width, int height ) noexcept;  // растягиваем виджет
+    void           widget_parent_stretch( int width, int height, bool add_height = true ) noexcept;  // растягиваем виджет
     void           widget_parent_shrink( int width, int height ) noexcept;   // сжимаем виджет
 
     void           widget_size_reset() noexcept;  // сброс размера виджета
@@ -110,7 +110,7 @@ class TParam : public QWidget
    Q_OBJECT
 
 public:
-    TParam( TCategory  *pAncestor = Q_NULLPTR, TCategories  *pMentor = Q_NULLPTR, int  depth = 0 );
+    explicit TParam( TCategory  *pAncestor = Q_NULLPTR, TCategories  *pMentor = Q_NULLPTR, int  depth = 0 );
     ~TParam();
 
     void           setNode( const YAML::Node&  node );
@@ -133,6 +133,8 @@ public:
     void           setParamType( unsigned  val, bool  set_to_node = false );
     void           setParamMin( unsigned  val, bool  set_to_node = false );
     void           setParamMax( unsigned  val, bool  set_to_node = false );
+
+    void           setParamNameColor( bool  force = false );
 
     // убрать запись из поля values
     void           remParamList( QString&  item, bool  set_to_node = false );
@@ -159,13 +161,12 @@ public:
     void           setParamDepth( int  depth );
     int            getParamDepth();
 
-    int            getParamWidth();
-    int            getParamHeight();
+    int            getParamWidth() noexcept;
+    int            getParamHeight() noexcept;
 
-    void           ParamDraw( TParam  *pParam );
     void           ParamDelete();
 
-    void           widget_stretch( int width, int height ) noexcept;         // растягиваем виджет
+    void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет
     void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
 
     QVBoxLayout   *m_vlayout;   // главный layout класса
@@ -192,6 +193,8 @@ private:
     void           setParamValueMin( int  min );
     void           setParamValueMax( int  max );
 
+    bool           isChildrenAbsent(); // true если нет детей
+
     YAML::Node     m_node;        // текущий уровнь дерева ямла
     YAML::Node     m_node_parent; // родительский уровнь дерева ямла
     int            m_node_index;  // номер перечисления у родителя
@@ -216,6 +219,8 @@ private:
     QHBoxLayout   *m_hlayout1;  // вложенный layout
     QHBoxLayout   *m_hlayout2;  // вложенный layout для второй строки
 
+    int            m_nlayout2height;
+
     QPushButton   *m_ptBtnDec;
     QPushButton   *m_ptBtnInc;
     QPushButton   *m_ptBtnName;
@@ -237,7 +242,10 @@ private:
     int            m_width;     // ширина виджета
     int            m_height;    // высота виджета
 
-    void           widget_parent_stretch( int width, int height ) noexcept;  // растягиваем виджет
+    bool           isStrEqual( QString  str1, QString  str2 );
+    void           colorBtnName( bool  color = false );
+
+    void           widget_parent_stretch( int width, int height, bool add_height = true ) noexcept;  // растягиваем виджет
     void           widget_parent_shrink( int width, int height ) noexcept;   // сжимаем виджет
 
     void           widget_size_reset() noexcept;  // сброс размера виджета

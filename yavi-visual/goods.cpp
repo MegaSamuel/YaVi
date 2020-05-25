@@ -21,44 +21,68 @@
 
 //------------------------------------------------------------------------------
 
-class TGoodsPrivate
+TGoods::TGoods()
 {
-    friend class TGoods;
-private:
-    TGoods 	*ins__;
+    clear();
 
-    bool  m_bEmpty;
+    // в вертикальный layout будем складывать элементы из ямла
+    m_vlayout = new QVBoxLayout;
+    m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
-    YAML::Node 		config__;
+    setLayout( m_vlayout );
 
-    QStringList     m_vValues;
+    widget_size_reset();
 
-    inline 	void clear()
+    widget_stretch( 2*m_vlayout->margin(), 2*m_vlayout->margin() );
+}
+
+TGoods::~TGoods()
+{
+
+}
+
+void  TGoods::GoodsDelete()
+{
+    QLayoutItem *child;
+
+    // категории
+    for( auto& it : m_apCategoryList )
     {
-        m_bEmpty = true;
-
-        m_vValues.clear();
+        // очищаем
+        it->CategoryDelete();
     }
 
-    inline TGoodsPrivate( TGoods  *ins ) :
-        ins__( ins )
+    // таблицы
+    for( auto& it : m_apTableList )
     {
-        clear();
-        (void)ins__;
+        // очищаем
+        it->TableDelete();
     }
-};
+
+    // уничтожаем артефакты
+    while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
+    {
+        // остаются, скорее всего, главные layout-ы, т.к. им ставится deletelater?
+        delete child->widget();
+        delete child;
+    }
+
+    clear();
+
+    widget_size_reset();
+
+    widget_stretch( 0, 0 );
+}
 
 //------------------------------------------------------------------------------
 
 bool TGoods::parse_yaml( const YAML::Node&  config )
 {
-    priv__->config__ = config;
-
     // категория (category)
     if( __yaml_IsSequence( config[ GoodsCategorySection ] ) )
     {
         // файл не пуст
-        priv__->m_bEmpty = false;
+        m_bEmpty = false;
 
         TCategory  *pCategory;
 
@@ -81,6 +105,9 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             {
                 TParam  *pParam;
 
+                unsigned type;
+                int height = m_vlayout->spacing();
+
                 for( int i = 0; i < static_cast<int>(config[ GoodsCategorySection ][j][ GoodsParametersSection ].size()); i++ )
                 {
                     pParam = new TParam( pCategory, Q_NULLPTR, 0 );
@@ -93,6 +120,15 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     pCategory->m_apParamList.append( pParam );
 
                     pCategory->getParameters( config[ GoodsCategorySection ][j][ GoodsParametersSection ][i], pParam, pParam->getParamDepth() );
+
+                    type = pParam->getParamType();
+
+                    if( ( 1 == type ) || ( 2 == type ) || ( 3 == type ) )
+                    {
+                        height += height;
+                    }
+
+                    widget_stretch( 0, height );
                 }
             }
         }
@@ -102,7 +138,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
     if( __yaml_IsSequence( config[ GoodsTableSection ] ) )
     {
         // файл не пуст
-        priv__->m_bEmpty = false;
+        m_bEmpty = false;
 
         for( auto& tab : config[ GoodsTableSection ] )
         {
@@ -134,11 +170,12 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     col_list.append( QString::fromStdString(col_name) );
 
                     // значение
+                    QStringList  vValues;
                     const std::string  col_val = __yaml_GetString( col, GoodsTableValue );
-                    priv__->m_vValues.clear();
-                    priv__->m_vValues = QString::fromStdString(col_val).split( '\n', QString::SkipEmptyParts );
+                    vValues.clear();
+                    vValues = QString::fromStdString(col_val).split( '\n', QString::SkipEmptyParts );
 
-                    for( auto& it : priv__->m_vValues )
+                    for( auto& it : vValues )
                     {
                         col_list.append( it );
                     }
@@ -164,11 +201,12 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     row_list.append( QString::fromStdString(row_name) );
 
                     // значение
+                    QStringList  vValues;
                     const std::string  row_val = __yaml_GetString( row, GoodsTableValue );
-                    priv__->m_vValues.clear();
-                    priv__->m_vValues = QString::fromStdString(row_val).split( '\n', QString::SkipEmptyParts );
+                    vValues.clear();
+                    vValues = QString::fromStdString(row_val).split( '\n', QString::SkipEmptyParts );
 
-                    for( auto& it : priv__->m_vValues )
+                    for( auto& it : vValues )
                     {
                         row_list.append( it );
                     }
@@ -197,75 +235,17 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
 //------------------------------------------------------------------------------
 
-TGoods::TGoods()
-{
-    priv__ = std::unique_ptr<TGoodsPrivate>( new TGoodsPrivate( this ) );
-    clear();
-
-    // в вертикальный layout будем складывать элементы из ямла
-    m_vlayout = new QVBoxLayout;
-    m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-
-    setLayout( m_vlayout );
-
-    widget_size_reset();
-
-    widget_stretch( m_vlayout->minimumSize().width(), m_vlayout->minimumSize().height() );
-}
-
-TGoods::TGoods( const YAML::Node&  config )
-{
-    priv__ = std::unique_ptr<TGoodsPrivate>( new TGoodsPrivate( this ) );
-    clear();
-    if( ! parse_yaml( config ) )
-		clear();
-}
-
-TGoods::~TGoods()
-{
-    clear();
-}
-
-//------------------------------------------------------------------------------
-
-void  TGoods::GoodsDelete()
-{
-    // категории
-    for( auto& it : m_apCategoryList )
-    {
-        // очищаем
-        it->CategoryDelete();
-
-        // уничтожаем
-        it->~TCategory();
-    }
-
-    // таблицы
-    for( auto& it : m_apTableList )
-    {
-        // очищаем
-        it->TableDelete();
-
-        // уничтожаем
-        it->~TTable();
-    }
-
-    clear();
-
-    widget_size_reset();
-}
-
 void  TGoods::clear() noexcept
 {
+    m_bEmpty = true;
+
     m_apTableList.clear();
     m_apCategoryList.clear();
-
-    priv__->clear();
 }
 
 bool  TGoods::empty() const noexcept
 {
-    return priv__->m_bEmpty;
+    return m_bEmpty;
 }
 
 void  TGoods::widget_size_reset() noexcept
@@ -308,12 +288,12 @@ void  TGoods::widget_shrink( int width, int height ) noexcept
     setMinimumHeight( m_height );
 }
 
-int TGoods::getWidgetWidth()
+int TGoods::getWidgetWidth() noexcept
 {
     return minimumSize().width();
 }
 
-int TGoods::getWidgetHeight()
+int TGoods::getWidgetHeight() noexcept
 {
     return minimumSize().height();
 }

@@ -160,11 +160,13 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
 
 //    priv__->m_grid->setSizeConstraint( QLayout::SetFixedSize );
     setLayout( priv__->m_grid );
+
+    setMinimumSize( priv__->m_grid->minimumSize().width(), priv__->m_grid->minimumSize().height() );
 }
 
 TDialog::~TDialog()
 {
-    priv__->~TPrivDialog();
+
 }
 
 //------------------------------------------------------------------------------
