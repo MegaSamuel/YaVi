@@ -44,6 +44,8 @@ public:
     int            getCategoriesWidth() noexcept;
     int            getCategoriesHeight() noexcept;
 
+    int            checkParamName( QString&  name ); //?
+
     void           CategoriesDelete();
 
     void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет
@@ -134,7 +136,7 @@ public:
     void           setParamMin( unsigned  val, bool  set_to_node = false );
     void           setParamMax( unsigned  val, bool  set_to_node = false );
 
-    void           setParamNameColor();
+    void           setParamNameColor( bool  force = false );
 
     // убрать запись из поля values
     void           remParamList( QString&  item, bool  set_to_node = false );
@@ -164,7 +166,6 @@ public:
     int            getParamWidth() noexcept;
     int            getParamHeight() noexcept;
 
-    void           ParamDraw( TParam  *pParam );
     void           ParamDelete();
 
     void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет
@@ -242,6 +243,9 @@ private:
 
     int            m_width;     // ширина виджета
     int            m_height;    // высота виджета
+
+    bool           isStrEqual( QString  str1, QString  str2 );
+    void           colorBtnName( bool  color = false );
 
     void           widget_parent_stretch( int width, int height, bool add_height = true ) noexcept;  // растягиваем виджет
     void           widget_parent_shrink( int width, int height ) noexcept;   // сжимаем виджет
