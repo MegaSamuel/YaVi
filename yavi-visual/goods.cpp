@@ -21,6 +21,61 @@
 
 //------------------------------------------------------------------------------
 
+TGoods::TGoods()
+{
+    clear();
+
+    // в вертикальный layout будем складывать элементы из ямла
+    m_vlayout = new QVBoxLayout;
+    m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+
+    setLayout( m_vlayout );
+
+    widget_size_reset();
+
+    widget_stretch( 2*m_vlayout->margin(), 2*m_vlayout->margin() );
+}
+
+TGoods::~TGoods()
+{
+
+}
+
+void  TGoods::GoodsDelete()
+{
+    QLayoutItem *child;
+
+    // категории
+    for( auto& it : m_apCategoryList )
+    {
+        // очищаем
+        it->CategoryDelete();
+    }
+
+    // таблицы
+    for( auto& it : m_apTableList )
+    {
+        // очищаем
+        it->TableDelete();
+    }
+
+    // уничтожаем артефакты
+    while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
+    {
+        // остаются, скорее всего, главные layout-ы, т.к. им ставится deletelater?
+        delete child->widget();
+        delete child;
+    }
+
+    clear();
+
+    widget_size_reset();
+
+    widget_stretch( 0, 0 );
+}
+
+//------------------------------------------------------------------------------
+
 bool TGoods::parse_yaml( const YAML::Node&  config )
 {
     // категория (category)
@@ -167,51 +222,6 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 }
 
 //------------------------------------------------------------------------------
-
-TGoods::TGoods()
-{
-    clear();
-
-    // в вертикальный layout будем складывать элементы из ямла
-    m_vlayout = new QVBoxLayout;
-    m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
-
-    setLayout( m_vlayout );
-
-    widget_size_reset();
-
-    widget_stretch( 2*m_vlayout->margin(), 2*m_vlayout->margin() );
-}
-
-TGoods::~TGoods()
-{
-
-}
-
-//------------------------------------------------------------------------------
-
-void  TGoods::GoodsDelete()
-{
-    // категории
-    for( auto& it : m_apCategoryList )
-    {
-        // очищаем
-        it->CategoryDelete();
-    }
-
-    // таблицы
-    for( auto& it : m_apTableList )
-    {
-        // очищаем
-        it->TableDelete();
-    }
-
-    clear();
-
-    widget_size_reset();
-
-    widget_stretch( 0, 0 );
-}
 
 void  TGoods::clear() noexcept
 {
