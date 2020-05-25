@@ -385,6 +385,10 @@ void  TCategories::setCategoriesName( const std::string&  name, bool  set_to_nod
     {
         widget_stretch( 0, height, false );
     }
+    else
+    {
+        widget_shrink( 0, -1 * height );
+    }
 
     if( set_to_node )
     {
@@ -990,6 +994,10 @@ void  TParam::setParamName( const std::string&  name, bool  set_to_node )
     if( 0 < height )
     {
         widget_stretch( 0, height, false );
+    }
+    else
+    {
+        widget_shrink( 0, -1 * height );
     }
 
     setParamNameColor();

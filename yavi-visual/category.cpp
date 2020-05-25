@@ -423,6 +423,10 @@ void  TCategory::setCategoryName( const std::string&  name, bool  set_to_node )
     {
         widget_stretch( 0, height, false );
     }
+    else
+    {
+        widget_shrink( 0, -1 * height );
+    }
 
     if( set_to_node )
     {
@@ -448,9 +452,6 @@ void  TCategory::widget_stretch( int width, int height, bool add ) noexcept
     // ширину выбираем максимальную из элементов
     if( width > m_width )
         m_width = width;
-
-    // к высоте добавляем spacing
-    //height += m_vlayout->spacing();
 
     // высоту увеличиваем на каждый элемент
     m_height += height;
@@ -482,9 +483,6 @@ void  TCategory::widget_shrink( int width, int height ) noexcept
     Q_UNUSED( width );
 
     //qDebug() << "shrink" << width << height;
-
-    // к высоте добавляем spacing
-    height += m_vlayout->spacing();
 
     m_height -= height;
 
