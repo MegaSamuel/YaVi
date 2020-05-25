@@ -46,7 +46,7 @@ public:
 
     void           CategoriesDelete();
 
-    void           widget_stretch( int width, int height ) noexcept;         // растягиваем виджет
+    void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет
     void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
 
     QVBoxLayout   *m_vlayout;   // главный layout класса
@@ -94,7 +94,7 @@ private:
     int            m_width;     // ширина виджета
     int            m_height;    // высота виджета
 
-    void           widget_parent_stretch( int width, int height ) noexcept;  // растягиваем виджет
+    void           widget_parent_stretch( int width, int height, bool add_height = true ) noexcept;  // растягиваем виджет
     void           widget_parent_shrink( int width, int height ) noexcept;   // сжимаем виджет
 
     void           widget_size_reset() noexcept;  // сброс размера виджета
@@ -167,7 +167,7 @@ public:
     void           ParamDraw( TParam  *pParam );
     void           ParamDelete();
 
-    void           widget_stretch( int width, int height ) noexcept;         // растягиваем виджет
+    void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет
     void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
 
     QVBoxLayout   *m_vlayout;   // главный layout класса
@@ -220,6 +220,8 @@ private:
     QHBoxLayout   *m_hlayout1;  // вложенный layout
     QHBoxLayout   *m_hlayout2;  // вложенный layout для второй строки
 
+    int            m_nlayout2height;
+
     QPushButton   *m_ptBtnDec;
     QPushButton   *m_ptBtnInc;
     QPushButton   *m_ptBtnName;
@@ -241,7 +243,7 @@ private:
     int            m_width;     // ширина виджета
     int            m_height;    // высота виджета
 
-    void           widget_parent_stretch( int width, int height ) noexcept;  // растягиваем виджет
+    void           widget_parent_stretch( int width, int height, bool add_height = true ) noexcept;  // растягиваем виджет
     void           widget_parent_shrink( int width, int height ) noexcept;   // сжимаем виджет
 
     void           widget_size_reset() noexcept;  // сброс размера виджета
