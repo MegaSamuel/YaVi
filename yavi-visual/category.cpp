@@ -405,13 +405,24 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
 
 void  TCategory::setCategoryName( const std::string&  name, bool  set_to_node )
 {
+    int  height;
+
     m_zName = QString::fromStdString(name);
+
+    height = m_ptBtnName->minimumSizeHint().height();
 
     m_zBtnName = QString::fromStdString(name);
     m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );       // убираем подряд идущие пробелы на один
     m_zBtnName.replace( " ", "\n" );                     // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );                  // правленное имя кнопки
     m_ptBtnName->setToolTip( "Категория: " + m_zName );  // подсказка с оригинальным именем
+
+    height = m_ptBtnName->minimumSizeHint().height() - height;
+
+    if( 0 < height )
+    {
+        widget_stretch( 0, height, false );
+    }
 
     if( set_to_node )
     {
@@ -432,14 +443,14 @@ void  TCategory::widget_size_reset() noexcept
     m_height = 0;
 }
 
-void  TCategory::widget_stretch( int width, int height ) noexcept
+void  TCategory::widget_stretch( int width, int height, bool add ) noexcept
 {
     // ширину выбираем максимальную из элементов
     if( width > m_width )
         m_width = width;
 
     // к высоте добавляем spacing
-    height += m_vlayout->spacing();
+    //height += m_vlayout->spacing();
 
     // высоту увеличиваем на каждый элемент
     m_height += height;
@@ -448,14 +459,21 @@ void  TCategory::widget_stretch( int width, int height ) noexcept
     setMinimumWidth( m_width );
     setMinimumHeight( m_height );
 
-    widget_parent_stretch( width, height );
+    widget_parent_stretch( width, height, add );
 }
 
-void  TCategory::widget_parent_stretch( int width, int height ) noexcept
+void  TCategory::widget_parent_stretch( int width, int height, bool add ) noexcept
 {
+    int  val = 0;
+
     if( Q_NULLPTR != m_pAncestor )
     {
-        m_pAncestor->widget_stretch( width, height );
+        if( add )
+        {
+            val = m_pAncestor->m_vlayout->spacing();
+        }
+
+        m_pAncestor->widget_stretch( width, height + val );
     }
 }
 

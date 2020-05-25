@@ -383,7 +383,7 @@ void  TCategories::setCategoriesName( const std::string&  name, bool  set_to_nod
 
     if( 0 < height )
     {
-        widget_stretch( 0, height );
+        widget_stretch( 0, height, false );
     }
 
     if( set_to_node )
@@ -450,7 +450,7 @@ void  TCategories::widget_size_reset() noexcept
     m_height = 0;
 }
 
-void  TCategories::widget_stretch( int width, int height ) noexcept
+void  TCategories::widget_stretch( int width, int height, bool add ) noexcept
 {
     // ширину выбираем максимальную из элементов
     if( width > m_width )
@@ -463,14 +463,21 @@ void  TCategories::widget_stretch( int width, int height ) noexcept
     setMinimumWidth( m_width );
     setMinimumHeight( m_height );
 
-    widget_parent_stretch( width, height );
+    widget_parent_stretch( width, height, add );
 }
 
-void  TCategories::widget_parent_stretch( int width, int height ) noexcept
+void  TCategories::widget_parent_stretch( int width, int height, bool add ) noexcept
 {
+    int  val = 0;
+
     if( Q_NULLPTR != m_pMentor )
     {
-        m_pMentor->widget_stretch( width, height + m_pMentor->m_vlayout->spacing() );
+        if( add )
+        {
+            val = m_pMentor->m_vlayout->spacing();
+        }
+
+        m_pMentor->widget_stretch( width, height + val );
     }
 }
 
@@ -982,7 +989,7 @@ void  TParam::setParamName( const std::string&  name, bool  set_to_node )
 
     if( 0 < height )
     {
-        widget_stretch( 0, height );
+        widget_stretch( 0, height, false );
     }
 
     setParamNameColor();
@@ -1327,7 +1334,7 @@ void  TParam::setParamValueAdd()
     m_vlayout->addLayout( m_hlayout2 );
 
     int  width = 2*m_hlayout2->margin() + 3*m_ptBtnValDec->minimumSize().width() + 2*m_hlayout2->spacing() + (m_depth + 1)*( m_ptBtnValDec->minimumSize().width() + m_hlayout2->spacing() );
-    int  height = 2*m_hlayout2->margin() + m_ptBtnValDec->minimumSizeHint().height() + m_vlayout->spacing();
+    int  height = 2*m_hlayout2->margin() + m_ptBtnValDec->minimumSizeHint().height();
 
     widget_stretch( width, height );
 
@@ -1382,7 +1389,7 @@ void  TParam::widget_size_reset() noexcept
     m_height = 0;
 }
 
-void  TParam::widget_stretch( int width, int height ) noexcept
+void  TParam::widget_stretch( int width, int height, bool add ) noexcept
 {
     // ширину выбираем максимальную из элементов
     if( width > m_width )
@@ -1397,18 +1404,30 @@ void  TParam::widget_stretch( int width, int height ) noexcept
     setMinimumWidth( m_width );
     setMinimumHeight( m_height );
 
-    widget_parent_stretch( width, height );
+    widget_parent_stretch( width, height, add );
 }
 
-void  TParam::widget_parent_stretch( int width, int height ) noexcept
+void  TParam::widget_parent_stretch( int width, int height, bool add ) noexcept
 {
+    int  val = 0;
+
     if( Q_NULLPTR != m_pAncestor )
     {
-        m_pAncestor->widget_stretch( width, height );
+        if( add )
+        {
+            val = m_pAncestor->m_vlayout->spacing();
+        }
+
+        m_pAncestor->widget_stretch( width, height + val );
     }
     else if( Q_NULLPTR != m_pMentor )
     {
-        m_pMentor->widget_stretch( width, height );
+        if( add )
+        {
+            val = m_pMentor->m_vlayout->spacing();
+        }
+
+        m_pMentor->widget_stretch( width, height + val );
     }
 }
 
