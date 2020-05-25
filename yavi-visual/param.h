@@ -44,8 +44,6 @@ public:
     int            getCategoriesWidth() noexcept;
     int            getCategoriesHeight() noexcept;
 
-    int            checkParamName( QString&  name ); //?
-
     void           CategoriesDelete();
 
     void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет

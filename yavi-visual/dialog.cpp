@@ -166,7 +166,7 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
 
 TDialog::~TDialog()
 {
-    priv__->~TPrivDialog();
+
 }
 
 //------------------------------------------------------------------------------

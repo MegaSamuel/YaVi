@@ -38,8 +38,6 @@ public:
     void           setCategoryName( const std::string&  name, bool  set_to_node = false );
     const QString  getCategoryName();
 
-    int            checkParamName( QString&  name );
-
     void           CategoryDelete();
 
     void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет

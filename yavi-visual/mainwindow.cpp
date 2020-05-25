@@ -14,6 +14,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect( m_ptTimer, SIGNAL(timeout()), this, SLOT(onTimerWork()) );
     m_ptTimer->start(1000); // 1 Hz
 
+    // ставим стиль
+    QApplication::setStyle(QStyleFactory::create("fusion"));
+
     // заголовок формы
     setWindowTitle("YAML Visualizer");
 
@@ -77,8 +80,6 @@ MainWindow::~MainWindow()
 
 void 	MainWindow::onBtnOpen()
 {
-//    qDebug() << "Open button";
-
     // очищаем лэйбл с описанием ошибки
     m_ptLblNotice->clear();
 //    m_ptLblNotice->setStyleSheet( "QLabel {background-color: transparent;}" );
@@ -97,8 +98,6 @@ void 	MainWindow::onBtnOpen()
         // похоже что уже есть открытый ямл
         if( !m_config.IsNull() )
         {
-            //qDebug() << "m_config does not empty!";
-
             m_pGoods->GoodsDelete();
 
             m_config.reset();
@@ -127,8 +126,6 @@ void 	MainWindow::onBtnOpen()
 
 void 	MainWindow::onBtnSave()
 {
-//    qDebug() << "Save button";
-
     // формируем имя файла по умолчанию
     QString deffilename = QString( "/test.yml" );
 
@@ -318,8 +315,6 @@ bool  MainWindow::fini( const QString&  filename )
 
 void MainWindow::closeEvent( QCloseEvent  *event )
 {
-    //qDebug() << "close event";
-
     m_pGoods->GoodsDelete();
 
     m_config.reset();

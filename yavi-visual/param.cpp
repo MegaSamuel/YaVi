@@ -76,8 +76,7 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 
 TCategories::~TCategories()
 {
-    // уничтожаем диалог
-    m_ptDialog->~TDialog();
+
 }
 
 void TCategories::clear()
@@ -97,8 +96,6 @@ void TCategories::clear()
 
 void  TCategories::onBtnDec()
 {
-//    qDebug() << getCategoriesName() << "dec button";
-
     widget_shrink( getCategoriesWidth(), getCategoriesHeight() + m_vlayout->spacing() );
 
     CategoriesDelete();
@@ -106,8 +103,6 @@ void  TCategories::onBtnDec()
 
 void  TCategories::onBtnInc()
 {
-//    qDebug() << getCategoriesName() << "inc button";
-
     // признак что хотим создать новый набор параметров
     need_to_add = true;
 
@@ -121,8 +116,6 @@ void  TCategories::onBtnInc()
 
 void  TCategories::onBtnName()
 {
-//    qDebug() << getCategoriesName() << "button";
-
     // диалог с пустыми параметрами
     m_ptDialog->setDlgEmpty();
 
@@ -249,22 +242,12 @@ void  TCategories::CategoriesDelete()
     QLayoutItem *child;
     QString  item = getCategoriesName();
 
-    //qDebug() << "categories" << item << "delete";
-
-    // уничтожаем диалог
-//    m_ptDialog->~TDialog();
-
     // для всех вложенных Parameters вызываем очистку
     for( auto& it : m_apParamList )
     {
         // очищаем
         it->ParamDelete();
-
-        // уничтожаем
-        it->~TParam();
     }
-
-    //widget_parent_shrink( 0, getCategoriesHeight() );
 
     // удаляем виджеты на первой строке
     while( ( child = m_hlayout->takeAt(0) ) != Q_NULLPTR )
@@ -291,8 +274,6 @@ void  TCategories::CategoriesDelete()
         {
             if( this == m_pMentor->m_apCategoriesList.at(i) )
             {
-                //qDebug() << m_pMentor->m_apCategoriesList.at(i)->getCategoriesName() << "obsolete";
-
                 m_pMentor->m_apCategoriesList.removeAt(i);
 
                 break;
@@ -332,37 +313,6 @@ void  TCategories::CategoriesDelete()
             m_pMentor->getNode().remove( GoodsCategoriesSection );
         }
     }
-}
-
-//------------------------------------------------------------------------------
-
-int  TCategories::checkParamName( QString&  name )
-{
-    int  result = -1;
-    QString  str;
-
-    if( Q_NULLPTR != m_pMentor )
-    {
-        for( auto& it : m_apParamList )
-        {
-            str.clear();
-
-            str = it->getParamName();  // имя
-            str.replace( " ", "" );    // убираем пробелы
-
-            qDebug() << "cat str" << str << "name" << name;
-
-            // сравниваем без учета регистра
-            if( 0 == QString::compare( name, str, Qt::CaseInsensitive ) )
-            {
-                result = 0;
-
-                break;
-            }
-        }
-    }
-
-    return result;
 }
 
 //------------------------------------------------------------------------------
@@ -634,8 +584,7 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
 
 TParam::~TParam()
 {
-    // уничтожаем диалог
-    m_ptDialog->~TDialog();
+
 }
 
 void  TParam::clear()
@@ -664,8 +613,6 @@ void  TParam::clear()
 
 void  TParam::onBtnDec()
 {
-//    qDebug() << getParamName() << "dec button";
-
     widget_shrink( getParamWidth(), getParamHeight() + m_vlayout->spacing() );
 
     ParamDelete();
@@ -673,15 +620,11 @@ void  TParam::onBtnDec()
 
 void  TParam::onBtnValDec()
 {
-//    qDebug() << getParamName() << "dec val button";
-
     setParamType( 0, true );
 }
 
 void  TParam::onBtnInc()
 {
-//    qDebug() << getParamName() << "inc button";
-
     // признак что хотим создать новую категорию
     need_to_add = true;
 
@@ -700,8 +643,6 @@ void  TParam::onBtnInc()
 
 void  TParam::onBtnName()
 {
-//    qDebug() << getParamName() << "button";
-
     m_ptDialog->setDlgName( getParamName() );
     m_ptDialog->setDlgPlaceholder( getParamPlaceholder() );
     m_ptDialog->setDlgNew( getParamNew() );
@@ -836,22 +777,12 @@ void  TParam::ParamDelete()
 {
     QLayoutItem *child;
 
-    qDebug() << "parameter" << getParamName() << "delete";
-
-    // уничтожаем диалог
-    //m_ptDialog->~TDialog();
-
     // для всех вложенных Categories вызываем очистку
     for( auto& it : m_apCategoriesList )
     {
         // очищаем
         it->CategoriesDelete();
-
-        // уничтожаем
-        it->~TCategories();
     }
-
-    //widget_parent_shrink( 0, getParamHeight() );
 
     // удаляем виджеты на второй строке
     if( m_second_row_exist )
@@ -893,8 +824,6 @@ void  TParam::ParamDelete()
         {
             if( this == m_pMentor->m_apParamList.at(i) )
             {
-                qDebug() << m_pMentor->m_apParamList.at(i)->getParamName() << "obsolete (mentor)";
-
                 m_pMentor->m_apParamList.removeAt(i);
 
                 break;
@@ -934,8 +863,6 @@ void  TParam::ParamDelete()
         {
             if( this == m_pAncestor->m_apParamList.at(i) )
             {
-                qDebug() << m_pAncestor->m_apParamList.at(i)->getParamName() << "obsolete (ancestor)";
-
                 m_pAncestor->m_apParamList.removeAt(i);
 
                 break;
@@ -1115,8 +1042,6 @@ void  TParam::setParamType( unsigned  val, bool  set_to_node )
 {
     m_uType = val;
 
-//    qDebug() << getParamName() << "set param" << m_uType << m_second_row_exist;
-
     if( ( 1 == m_uType ) || ( 2 == m_uType ) || ( 3 == m_uType ) )
     {
         setParamValueAdd();
@@ -1209,13 +1134,13 @@ void  TParam::setParamNameColor( bool  force )
 
     if( Q_NULLPTR != m_pMentor )
     {
-        qDebug() << "mentor name" << m_pMentor->getCategoriesName();
+        //qDebug() << "mentor name" << m_pMentor->getCategoriesName();
 
         list = m_pMentor->m_apParamList;
     }
     else if( Q_NULLPTR != m_pAncestor )
     {
-        qDebug() << "ancestor name" << m_pAncestor->getCategoryName();
+        //qDebug() << "ancestor name" << m_pAncestor->getCategoryName();
 
         list = m_pAncestor->m_apParamList;
     }

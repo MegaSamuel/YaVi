@@ -61,8 +61,7 @@ TCategory::TCategory( TGoods  *pAncestor )
 
 TCategory::~TCategory()
 {
-    // уничтожаем диалог
-    m_ptDialog->~TDialog();
+
 }
 
 void TCategory::clear()
@@ -79,8 +78,6 @@ void TCategory::clear()
 
 void  TCategory::onBtnName()
 {
-//    qDebug() << getCategoryName() << "button";
-
     // диалог с пустыми параметрами
     m_ptDialog->setDlgEmpty();
 
@@ -93,8 +90,6 @@ void  TCategory::onBtnName()
 
 void  TCategory::onBtnInc()
 {
-//    qDebug() << getCategoryName() << "inc button";
-
     // признак что хотим создать новый набор параметров
     need_to_add = true;
 
@@ -187,22 +182,12 @@ void  TCategory::CategoryDelete()
 {
     QLayoutItem *child;
 
-    // уничтожаем диалог
-//    m_ptDialog->~TDialog();
-
     // для всех вложенных Parameters вызываем очистку
     for( auto& it : m_apParamList )
     {
-        qDebug() << "del" << it->getParamName();
-
         // очищаем
         it->ParamDelete();
-
-        // уничтожаем
-        it->~TParam();
     }
-
-    qDebug() << "del m_hlayout";
 
     // уничтожаем виджеты
     while( ( child = m_hlayout->takeAt(0) ) != Q_NULLPTR )
@@ -211,22 +196,15 @@ void  TCategory::CategoryDelete()
         delete child;
     }
 
-    qDebug() << "del m_vlayout";
-
     // уничтожаем виджеты
     while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
     {
-        qDebug() << "del";
         delete child->widget();
         delete child;
     }
 
-    qDebug() << "del layout";
-
     // уничтожаем layout
     m_vlayout->deleteLater();
-
-    qDebug() << "del ancestor";
 
     // удаляем себя из списка родителя
     if( Q_NULLPTR != m_pAncestor )
@@ -236,8 +214,6 @@ void  TCategory::CategoryDelete()
         {
             if( this == m_pAncestor->m_apCategoryList.at(i) )
             {
-                qDebug() << m_pAncestor->m_apCategoryList.at(i)->getCategoryName() << "obsolete";
-
                 m_pAncestor->m_apCategoryList.removeAt(i);
 
                 break;
@@ -258,38 +234,10 @@ void  TCategory::CategoryDelete()
                 m_pAncestor->m_apCategoryList.at(i)->setNodeIndex( index );
             }
         }
+
+        // удаляемся из родительского layout-а
+        m_pAncestor->m_vlayout->removeWidget(this);
     }
-}
-
-//------------------------------------------------------------------------------
-
-int  TCategory::checkParamName( QString&  name )
-{
-    int  result = -1;
-    QString  str;
-
-    if( Q_NULLPTR != m_pAncestor )
-    {
-        for( auto& it : m_apParamList )
-        {
-            str.clear();
-
-            str = it->getParamName();  // имя
-            str.replace( " ", "" );    // убираем пробелы
-
-            qDebug() << "str" << str;
-
-            // сравниваем без учета регистра
-            if( 0 == QString::compare( name, str, Qt::CaseInsensitive ) )
-            {
-                result = 0;
-
-                break;
-            }
-        }
-    }
-
-    return result;
 }
 
 //------------------------------------------------------------------------------
@@ -529,14 +477,10 @@ void  TCategory::widget_shrink( int width, int height ) noexcept
 {
     Q_UNUSED( width );
 
-    //qDebug() << "shrink" << width << height;
-
     m_height -= height;
 
     if( m_height < 0 )
         m_height = 0;
-
-    //qDebug() << "new size" << m_width << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );

@@ -195,25 +195,15 @@ void  TGoods::GoodsDelete()
     // категории
     for( auto& it : m_apCategoryList )
     {
-        qDebug() << "del" << it->getCategoryName();
-
         // очищаем
         it->CategoryDelete();
-
-        // уничтожаем
-        it->~TCategory();
     }
 
     // таблицы
     for( auto& it : m_apTableList )
     {
-        qDebug() << "del" << it->getTableName();
-
         // очищаем
         it->TableDelete();
-
-        // уничтожаем
-        it->~TTable();
     }
 
     clear();
