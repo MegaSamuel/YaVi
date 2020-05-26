@@ -156,6 +156,8 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setParamMulti( m_tValues.m_zMulti.toStdString() );
         pParam->setParamMin( m_tValues.m_nMin );
         pParam->setParamMax( m_tValues.m_nMax );
+        pParam->setParamDMin( m_tValues.m_fMin );
+        pParam->setParamDMax( m_tValues.m_fMax );
 
         YAML::Node  node;
         node.reset();
@@ -163,15 +165,32 @@ void  TCategory::onSendValues( TValues& a_tValues )
         // пишем их в пустой ямл
         __yaml_SetString( node, GoodsNameSection, m_tValues.m_zName.toStdString() );
         __yaml_SetScalar( node, GoodsTypeSection, m_tValues.m_uType );
-        __yaml_SetString( node, GoodsPlaceholderSection, m_tValues.m_zPlaceholder.toStdString() );
-        __yaml_SetString( node, GoodsNewSection, m_tValues.m_zNew.toStdString() );
-        __yaml_SetString( node, GoodsAfterSection, m_tValues.m_zAfter.toStdString() );
-        __yaml_SetString( node, GoodsBeforeSection, m_tValues.m_zBefore.toStdString() );
-        __yaml_SetString( node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
-        __yaml_SetString( node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
-        __yaml_SetString( node, GoodsMultiSection, m_tValues.m_zMulti.toStdString() );
-        __yaml_SetScalar( node, GoodsMinSection, m_tValues.m_nMin );
-        __yaml_SetScalar( node, GoodsMaxSection, m_tValues.m_nMax );
+
+        if( 0 != m_tValues.m_uType )
+        {
+            __yaml_SetString( node, GoodsPlaceholderSection, m_tValues.m_zPlaceholder.toStdString() );
+            __yaml_SetString( node, GoodsNewSection, m_tValues.m_zNew.toStdString() );
+            __yaml_SetString( node, GoodsAfterSection, m_tValues.m_zAfter.toStdString() );
+            __yaml_SetString( node, GoodsBeforeSection, m_tValues.m_zBefore.toStdString() );
+            __yaml_SetString( node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
+            __yaml_SetString( node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
+        }
+
+        if( 2 == m_tValues.m_uType )
+        {
+            __yaml_SetInteger( node, GoodsMinSection, m_tValues.m_nMin );
+            __yaml_SetInteger( node, GoodsMaxSection, m_tValues.m_nMax );
+        }
+        else if( 3 == m_tValues.m_uType )
+        {
+            __yaml_SetDouble( node, GoodsMinSection, m_tValues.m_fMin );
+            __yaml_SetDouble( node, GoodsMaxSection, m_tValues.m_fMax );
+        }
+
+        if( 5 == m_tValues.m_uType )
+        {
+            __yaml_SetString( node, GoodsMultiSection, m_tValues.m_zMulti.toStdString() );
+        }
 
         // добавляем ямл к основному
         m_node[ GoodsParametersSection ].push_back( node );
@@ -326,7 +345,7 @@ void  TCategory::getCategories( const YAML::Node&  node, TCategories  *a_pCatego
 
 void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  depth )
 {
-    unsigned  val;
+    unsigned     type;
     std::string  str;
 
     // имя
@@ -336,11 +355,8 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
     a_pParam->setParamNameColor();
 
     // тип
-    if( __yaml_IsScalar( node[ GoodsTypeSection ] ) )
-    {
-        val = node[ GoodsTypeSection ].as<unsigned>();
-        a_pParam->setParamType( val );
-    }
+    type = __yaml_GetUnsigned( node, GoodsTypeSection );
+    a_pParam->setParamType( type );
 
     //
     str = __yaml_GetString( node, GoodsPlaceholderSection );
@@ -366,18 +382,16 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
     str = __yaml_GetString( node, GoodsUnameSection );
     a_pParam->setParamUname( str );
 
-    // мин
-    if( __yaml_IsScalar( node[ GoodsMinSection ] ) )
+    // мин, макс
+    if( 2 == type )
     {
-        val = node[ GoodsMinSection ].as<unsigned>();
-        a_pParam->setParamMin( val );
+        a_pParam->setParamMin( __yaml_GetInteger( node, GoodsMinSection ) );
+        a_pParam->setParamMax( __yaml_GetInteger( node, GoodsMaxSection ) );
     }
-
-    // макс
-    if( __yaml_IsScalar( node[ GoodsMaxSection ] ) )
+    else if( 3 == type )
     {
-        val = node[ GoodsMaxSection ].as<unsigned>();
-        a_pParam->setParamMax( val );
+        a_pParam->setParamDMin( __yaml_GetDouble( node, GoodsMinSection ) );
+        a_pParam->setParamDMax( __yaml_GetDouble( node, GoodsMaxSection ) );
     }
 
     //

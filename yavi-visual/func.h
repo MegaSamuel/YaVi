@@ -27,6 +27,28 @@ inline const std::string __yaml_GetString( const YAML::Node&  node, const std::s
     return def;
 }
 
+inline unsigned __yaml_GetUnsigned( const YAML::Node&  node, const std::string&  name, unsigned  def = 0 )
+{
+    if( __yaml_IsScalar( node[ name ] ) )
+        return node[ name ].as<unsigned>();
+    return def;
+}
+
+inline int __yaml_GetInteger( const YAML::Node&  node, const std::string&  name, int  def = 0 )
+{
+    if( __yaml_IsScalar( node[ name ] ) )
+        return node[ name ].as<int>();
+    return def;
+}
+
+inline double __yaml_GetDouble( const YAML::Node&  node, const std::string&  name, double  def = 0.0 )
+{
+    if( __yaml_IsScalar( node[ name ] ) )
+        return node[ name ].as<double>();
+    return def;
+}
+
+
 //------------------------------------------------------------------------------
 
 inline bool __yaml_SetScalar( YAML::Node&  node, const std::string&  name, const unsigned  val )
