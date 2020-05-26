@@ -8,6 +8,12 @@ MainWindow::MainWindow(QWidget *parent)
 {
     m_fBeginTime = cpu_time();
 
+    m_zPrgName.clear();
+    m_zPrgTitle.clear();
+    m_bPrgTitleChanged = false;
+
+    m_zPrgName = "YAML Visualizer";
+
     // создаем и запускаем основной таймер
     m_uTimerCounter = 0;
     m_ptTimer = new QTimer( this );
@@ -18,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
     QApplication::setStyle(QStyleFactory::create("fusion"));
 
     // заголовок формы
-    setWindowTitle("YAML Visualizer");
+    setPrgTitleText();
 
     // иконка формы
     setWindowIcon( QIcon( ":/favicon.ico" ) );
@@ -113,6 +119,9 @@ void 	MainWindow::onBtnOpen()
         }
         else
         {
+            // заголовок формы
+            setPrgTitleText( filename );
+
 //            qDebug() << "Open file" << filename;
         }
     }
@@ -150,6 +159,8 @@ void 	MainWindow::onBtnSave()
         }
         else
         {
+            setPrgTitleText( filename );
+
 //            qDebug() << "Save file" << filename;
         }
     }
@@ -313,7 +324,54 @@ bool  MainWindow::fini( const QString&  filename )
 
 //------------------------------------------------------------------------------
 
-void MainWindow::closeEvent( QCloseEvent  *event )
+void  MainWindow::setPrgTitleText( const QString&  text )
+{
+    if( 0 != text.length() )
+    {
+        m_zPrgTitle = text + " - " + m_zPrgName;
+    }
+    else
+    {
+        m_zPrgTitle = m_zPrgName;
+    }
+
+    setWindowTitle( m_zPrgTitle );
+}
+
+bool  MainWindow::getPrgTitleChanged()
+{
+    return m_bPrgTitleChanged;
+}
+
+void  MainWindow::setPrgTitleChanged( bool  changed )
+{
+    m_bPrgTitleChanged = changed;
+
+    if( changed )
+    {
+        m_zPrgTitle.prepend( "*" );
+
+        setWindowTitle( m_zPrgTitle );
+    }
+    else
+    {
+        m_zPrgTitle.replace( "*", "" );
+
+        setWindowTitle( m_zPrgTitle );
+    }
+}
+
+void  MainWindow::onYamlChanged()
+{
+    if( !getPrgTitleChanged() )
+    {
+        setPrgTitleChanged( true );
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void  MainWindow::closeEvent( QCloseEvent  *event )
 {
     m_pGoods->GoodsDelete();
 
