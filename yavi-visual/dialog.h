@@ -31,26 +31,30 @@ public :
     void    setDlgMulti( const QString&  name );
 
     void    setDlgType( unsigned  val );
-    void    setDlgMin( unsigned  val );
-    void    setDlgMax( unsigned  val );
+
+    void    setDlgMin( int  val );
+    void    setDlgMax( int  val );
+
+    void    setDlgDMin( double  val );
+    void    setDlgDMax( double  val );
 
     void    setDlgCombo( QStringList  list );
 
     void    setDlgEmpty();
 
-    void    setDlgEnabled( bool  enabled );
+    void    setDlgEnabled( bool  enabled ) noexcept;
 
-    void    setDlgTypeEnabled( bool  enabled );
-    void    setDlgPlaceholderEnabled( bool  enabled );
-    void    setDlgNewEnabled( bool  enabled );
-    void    setDlgAfterEnabled( bool  enabled );
-    void    setDlgBeforeEnabled( bool  enabled );
-    void    setDlgUlinkEnabled( bool  enabled );
-    void    setDlgUnameEnabled( bool  enabled );
-    void    setDlgMultiEnabled( bool  enabled );
-    void    setDlgMinEnabled( bool  enabled );
-    void    setDlgMaxEnabled( bool  enabled );
-    void    setDlgComboEnabled( bool  enabled );
+    void    setDlgTypeEnabled( bool  enabled ) noexcept;
+    void    setDlgPlaceholderEnabled( bool  enabled ) noexcept;
+    void    setDlgNewEnabled( bool  enabled ) noexcept;
+    void    setDlgAfterEnabled( bool  enabled ) noexcept;
+    void    setDlgBeforeEnabled( bool  enabled ) noexcept;
+    void    setDlgUlinkEnabled( bool  enabled ) noexcept;
+    void    setDlgUnameEnabled( bool  enabled ) noexcept;
+    void    setDlgMultiEnabled( bool  enabled ) noexcept;
+    void    setDlgMinEnabled( bool  enabled ) noexcept;
+    void    setDlgMaxEnabled( bool  enabled ) noexcept;
+    void    setDlgComboEnabled( bool  enabled ) noexcept;
 
 Q_SIGNALS:
     void    sendCancel();
@@ -60,7 +64,12 @@ protected Q_SLOTS:
     void 	onBtnAction( QAbstractButton *btn );
 
 private:
-   std::unique_ptr<TPrivDialog> priv__;
+    std::unique_ptr<TPrivDialog> priv__;
+
+    int     row_min;
+    int     row_max;
+
+    void    setDlgEnabledByType( unsigned  val ) noexcept;
 };
 
 //------------------------------------------------------------------------------

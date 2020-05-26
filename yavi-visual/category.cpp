@@ -154,8 +154,8 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setParamUlink( m_tValues.m_zUlink.toStdString() );
         pParam->setParamUname( m_tValues.m_zUname.toStdString() );
         pParam->setParamMulti( m_tValues.m_zMulti.toStdString() );
-        pParam->setParamMin( m_tValues.m_uMin );
-        pParam->setParamMax( m_tValues.m_uMax );
+        pParam->setParamMin( m_tValues.m_nMin );
+        pParam->setParamMax( m_tValues.m_nMax );
 
         YAML::Node  node;
         node.reset();
@@ -170,8 +170,8 @@ void  TCategory::onSendValues( TValues& a_tValues )
         __yaml_SetString( node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
         __yaml_SetString( node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
         __yaml_SetString( node, GoodsMultiSection, m_tValues.m_zMulti.toStdString() );
-        __yaml_SetScalar( node, GoodsMinSection, m_tValues.m_uMin );
-        __yaml_SetScalar( node, GoodsMaxSection, m_tValues.m_uMax );
+        __yaml_SetScalar( node, GoodsMinSection, m_tValues.m_nMin );
+        __yaml_SetScalar( node, GoodsMaxSection, m_tValues.m_nMax );
 
         // добавляем ямл к основному
         m_node[ GoodsParametersSection ].push_back( node );

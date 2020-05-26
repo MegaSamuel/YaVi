@@ -177,8 +177,17 @@ void  TCategories::onSendValues( TValues& a_tValues )
         pParam->setParamUlink( m_tValues.m_zUlink.toStdString() );
         pParam->setParamUname( m_tValues.m_zUname.toStdString() );
         pParam->setParamMulti( m_tValues.m_zMulti.toStdString() );
-        pParam->setParamMin( m_tValues.m_uMin );
-        pParam->setParamMax( m_tValues.m_uMax );
+
+        if( 2 == m_tValues.m_uType )
+        {
+            pParam->setParamMin( m_tValues.m_nMin );
+            pParam->setParamMax( m_tValues.m_nMax );
+        }
+        else if( 3 == m_tValues.m_uType )
+        {
+            pParam->setParamDMin( m_tValues.m_fMin );
+            pParam->setParamDMax( m_tValues.m_fMax );
+        }
 
         YAML::Node  node;
         node.reset();
@@ -193,8 +202,17 @@ void  TCategories::onSendValues( TValues& a_tValues )
         __yaml_SetString( node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
         __yaml_SetString( node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
         __yaml_SetString( node, GoodsMultiSection, m_tValues.m_zMulti.toStdString() );
-        __yaml_SetScalar( node, GoodsMinSection, m_tValues.m_uMin );
-        __yaml_SetScalar( node, GoodsMaxSection, m_tValues.m_uMax );
+
+        if( 2 == m_tValues.m_uType )
+        {
+            __yaml_SetInteger( node, GoodsMinSection, m_tValues.m_nMin );
+            __yaml_SetInteger( node, GoodsMaxSection, m_tValues.m_nMax );
+        }
+        else if( 3 == m_tValues.m_uType )
+        {
+            __yaml_SetDouble( node, GoodsMinSection, m_tValues.m_fMin );
+            __yaml_SetDouble( node, GoodsMaxSection, m_tValues.m_fMax );
+        }
 
         // добавляем ямл к основному
         m_node[ GoodsParametersSection ].push_back( node );
@@ -615,8 +633,10 @@ void  TParam::clear()
     m_zMulti.clear();
 
     m_uType = 0;
-    m_uMin = 0;
-    m_uMax = 0;
+    m_nMin = 0;
+    m_nMax = 0;
+    m_fMin = 0.0;
+    m_fMax = 0.0;
 
     m_vList.clear();
 
@@ -667,8 +687,12 @@ void  TParam::onBtnName()
     m_ptDialogSelf->setDlgMulti( getParamMulti() );
 
     m_ptDialogSelf->setDlgType( getParamType() );
+
     m_ptDialogSelf->setDlgMin( getParamMin() );
     m_ptDialogSelf->setDlgMax( getParamMax() );
+
+    m_ptDialogSelf->setDlgDMin( getParamDMin() );
+    m_ptDialogSelf->setDlgDMax( getParamDMax() );
 
     m_ptDialogSelf->setDlgCombo( getParamList() );
 
@@ -699,8 +723,17 @@ void  TParam::onSendValues( TValues& a_tValues )
         setParamUlink( m_tValues.m_zUlink.toStdString(), true );
         setParamUname( m_tValues.m_zUname.toStdString(), true );
         setParamMulti( m_tValues.m_zMulti.toStdString(), true );
-        setParamMin( m_tValues.m_uMin, true );
-        setParamMax( m_tValues.m_uMax, true );
+
+        if( 2 == m_tValues.m_uType )
+        {
+            setParamMin( m_tValues.m_nMin, true );
+            setParamMax( m_tValues.m_nMax, true );
+        }
+        else if( 3 == m_tValues.m_uType )
+        {
+            setParamDMin( m_tValues.m_fMin, true );
+            setParamDMax( m_tValues.m_fMax, true );
+        }
 
         setParamNameColor();
 
@@ -754,9 +787,19 @@ void  TParam::onSendValues( TValues& a_tValues )
     need_to_add = false;
 }
 
+void  TParam::onSendValue( QString  val )
+{
+    m_tValues.m_zVal = val;
+}
+
 void  TParam::onSendValue( int  val )
 {
-    m_tValues.m_uValue = static_cast<unsigned>(val);
+    m_tValues.m_nVal = val;
+}
+
+void  TParam::onSendValue( double  val )
+{
+    m_tValues.m_fVal = val;
 }
 
 //------------------------------------------------------------------------------
@@ -1083,27 +1126,51 @@ void  TParam::setParamType( unsigned  val, bool  set_to_node )
     }
 }
 
-void  TParam::setParamMin( unsigned  val, bool  set_to_node )
+void  TParam::setParamMin( int  val, bool  set_to_node )
 {
-    m_uMin = val;
+    m_nMin = val;
 
-    setParamValueMin( static_cast<int>(m_uMin) );
+    setParamValueMin( m_nMin );
 
     if( set_to_node )
     {
-        __yaml_SetScalar( m_node, GoodsMinSection, val );
+        __yaml_SetInteger( m_node, GoodsMinSection, val );
     }
 }
 
-void  TParam::setParamMax( unsigned  val, bool  set_to_node )
+void  TParam::setParamMax( int  val, bool  set_to_node )
 {
-    m_uMax = val;
+    m_nMax = val;
 
-    setParamValueMax( static_cast<int>(m_uMax) );
+    setParamValueMax( m_nMax );
 
     if( set_to_node )
     {
-        __yaml_SetScalar( m_node, GoodsMaxSection, val );
+        __yaml_SetInteger( m_node, GoodsMaxSection, val );
+    }
+}
+
+void  TParam::setParamDMin( double  val, bool  set_to_node )
+{
+    m_fMin = val;
+
+    setParamValueDMin( m_fMin );
+
+    if( set_to_node )
+    {
+        __yaml_SetDouble( m_node, GoodsMinSection, val );
+    }
+}
+
+void  TParam::setParamDMax( double  val, bool  set_to_node )
+{
+    m_fMax = val;
+
+    setParamValueDMax( m_fMax );
+
+    if( set_to_node )
+    {
+        __yaml_SetDouble( m_node, GoodsMaxSection, val );
     }
 }
 
@@ -1253,62 +1320,71 @@ void  TParam::setParamList( QStringList  vlist, const std::string&  zlist, bool 
 
 //------------------------------------------------------------------------------
 
-QString  TParam::getParamName()
+QString  TParam::getParamName() noexcept
 {
     return m_zName;
 }
 
-QString  TParam::getParamPlaceholder()
+QString  TParam::getParamPlaceholder() noexcept
 {
     return m_zPlaceholder;
 }
 
-QString  TParam::getParamNew()
+QString  TParam::getParamNew() noexcept
 {
     return m_zNew;
 }
 
-QString  TParam::getParamAfter()
+QString  TParam::getParamAfter() noexcept
 {
     return m_zAfter;
 }
 
-QString  TParam::getParamBefore()
+QString  TParam::getParamBefore() noexcept
 {
     return m_zBefore;
 }
 
-QString  TParam::getParamUlink()
+QString  TParam::getParamUlink() noexcept
 {
     return m_zUlink;
 }
 
-QString  TParam::getParamUname()
+QString  TParam::getParamUname() noexcept
 {
     return m_zUname;
 }
 
-QString  TParam::getParamMulti()
+QString  TParam::getParamMulti() noexcept
 {
     return m_zMulti;
 }
 
 
-unsigned  TParam::getParamType()
+unsigned  TParam::getParamType() noexcept
 {
     return m_uType;
 }
 
-unsigned  TParam::getParamMin()
+int  TParam::getParamMin() noexcept
 {
-    return m_uMin;
+    return m_nMin;
 }
 
-unsigned  TParam::getParamMax()
+int  TParam::getParamMax() noexcept
 {
-    return m_uMax;
+    return m_nMax;
 }
 
+double  TParam::getParamDMin() noexcept
+{
+    return m_fMin;
+}
+
+double  TParam::getParamDMax() noexcept
+{
+    return m_fMax;
+}
 
 QStringList  TParam::getParamList()
 {
@@ -1401,7 +1477,7 @@ void  TParam::setParamValueDel()
     m_second_row_exist = false;
 }
 
-void  TParam::setParamValueMin( int  min )
+void  TParam::setParamValueMin( int  min ) noexcept
 {
     if( m_second_row_exist )
     {
@@ -1409,11 +1485,27 @@ void  TParam::setParamValueMin( int  min )
     }
 }
 
-void  TParam::setParamValueMax( int  max )
+void  TParam::setParamValueMax( int  max ) noexcept
 {
     if( m_second_row_exist )
     {
         m_ptSpinValue->setMaximum( max );
+    }
+}
+
+void  TParam::setParamValueDMin( double  min ) noexcept
+{
+    if( m_second_row_exist )
+    {
+        m_ptDSpinValue->setMinimum( min );
+    }
+}
+
+void  TParam::setParamValueDMax( double  max ) noexcept
+{
+    if( m_second_row_exist )
+    {
+        m_ptDSpinValue->setMaximum( max );
     }
 }
 

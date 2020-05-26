@@ -20,11 +20,15 @@ public:
         m_zBefore.clear();
         m_zUlink.clear();
         m_zUname.clear();
-        m_uMin = 0;
-        m_uMax = 0;
+        m_nMin = 0;
+        m_nMax = 0;
+        m_fMin = 0.0;
+        m_fMax = 0.0;
         m_zMulti.clear();
 
-        m_uValue = 0;
+        m_zVal.clear();
+        m_nVal = 0;
+        m_fVal = 0.0;
 
         m_vList.clear();
     }
@@ -72,12 +76,16 @@ public:
     QString      m_zBefore;
     QString      m_zUlink;
     QString      m_zUname;
-    unsigned     m_uMin;
-    unsigned     m_uMax;
+    int          m_nMin;
+    int          m_nMax;
+    double       m_fMin;
+    double       m_fMax;
     QString      m_zMulti;
 
-    // значение (для type 1,2,3)
-    unsigned     m_uValue;
+    // не используются
+    QString      m_zVal; // значение (для type 1)
+    int          m_nVal; // значение (для type 2)
+    double       m_fVal; // значение (для type 3)
 
     // список для combobox (для type 4,5)
     QStringList  m_vList;

@@ -132,8 +132,12 @@ public:
     void           setParamMulti( const std::string&  name, bool  set_to_node = false );
 
     void           setParamType( unsigned  val, bool  set_to_node = false );
-    void           setParamMin( unsigned  val, bool  set_to_node = false );
-    void           setParamMax( unsigned  val, bool  set_to_node = false );
+
+    void           setParamMin( int  val, bool  set_to_node = false );
+    void           setParamMax( int  val, bool  set_to_node = false );
+
+    void           setParamDMin( double  val, bool  set_to_node = false );
+    void           setParamDMax( double  val, bool  set_to_node = false );
 
     void           setParamNameColor( bool  force = false );
 
@@ -144,18 +148,22 @@ public:
     // установить поле values
     void           setParamList( QStringList  vlist, const std::string&  list, bool  set_to_node = false );
 
-    QString        getParamName();
-    QString        getParamPlaceholder();
-    QString        getParamNew();
-    QString        getParamAfter();
-    QString        getParamBefore();
-    QString        getParamUlink();
-    QString        getParamUname();
-    QString        getParamMulti();
+    QString        getParamName() noexcept;
+    QString        getParamPlaceholder() noexcept;
+    QString        getParamNew() noexcept;
+    QString        getParamAfter() noexcept;
+    QString        getParamBefore() noexcept;
+    QString        getParamUlink() noexcept;
+    QString        getParamUname() noexcept;
+    QString        getParamMulti() noexcept;
 
-    unsigned       getParamType();
-    unsigned       getParamMin();
-    unsigned       getParamMax();
+    unsigned       getParamType() noexcept;
+
+    int            getParamMin() noexcept;
+    int            getParamMax() noexcept;
+
+    double         getParamDMin() noexcept;
+    double         getParamDMax() noexcept;
 
     QStringList    getParamList();
 
@@ -180,7 +188,9 @@ protected Q_SLOTS :
     void           onBtnName();
     void           onSendCancel();
     void           onSendValues( TValues& );
+    void           onSendValue( QString );
     void           onSendValue( int );
+    void           onSendValue( double );
 
 private:
     void           clear();
@@ -191,8 +201,10 @@ private:
 
     void           setParamValueAdd();
     void           setParamValueDel();
-    void           setParamValueMin( int  min );
-    void           setParamValueMax( int  max );
+    void           setParamValueMin( int  min ) noexcept;
+    void           setParamValueMax( int  max ) noexcept;
+    void           setParamValueDMin( double  min ) noexcept;
+    void           setParamValueDMax( double  max ) noexcept;
 
     bool           isChildrenAbsent(); // true если нет детей
 
@@ -210,8 +222,10 @@ private:
     QString        m_zMulti;
 
     unsigned       m_uType;
-    unsigned       m_uMin;
-    unsigned       m_uMax;
+    int            m_nMin;
+    int            m_nMax;
+    double         m_fMin;
+    double         m_fMax;
 
     std::string    m_zList;
     QStringList    m_vList;
@@ -228,9 +242,11 @@ private:
 
     QString        m_zBtnName;  // текст на кнопке
 
-    bool           m_second_row_exist = false;
-    QPushButton   *m_ptBtnValDec;
-    QSpinBox      *m_ptSpinValue;
+    bool            m_second_row_exist = false;
+    QPushButton    *m_ptBtnValDec;
+    QLineEdit      *m_ptLineValue;
+    QSpinBox       *m_ptSpinValue;
+    QDoubleSpinBox *m_ptDSpinValue;
 
     TDialog       *m_ptDialogSelf; // диалог на кнопке "Имя"
     TDialog       *m_ptDialogAdd;  // диалог на кнопке "+"
