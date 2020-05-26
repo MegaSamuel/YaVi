@@ -31,6 +31,12 @@ private:
     bool          init( const QString&  filename ); // загружаем ямл из файла
     bool          fini( const QString&  filename ); // выгружаем ямл в файл
 
+    QString       m_zPrgName;
+    QString       m_zPrgTitle;
+
+    void          setPrgTitleText( const QString&  text = "" );
+    void          setPrgTitleChanged( bool  changed );
+
     YAML::Node    m_config; // считанный ямл
 
     double        cpu_time() const;
