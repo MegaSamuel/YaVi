@@ -8,14 +8,23 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 {
     clear();
 
-    // диалог
-    m_ptDialog = new TDialog( false, "Categories",  this );
+    // диалог для себя
+    m_ptDialogSelf = new TDialog( false, "Value",  this );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptDialog, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+    connect( m_ptDialogSelf, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
+    connect( m_ptDialogSelf, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
+
+    // диалог для добавления параметра
+    m_ptDialogAdd = new TDialog( true, "Add parameter",  this );
+
+    // ловим сигнал от диалога об отмене
+    connect( m_ptDialogAdd, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+
+    // ловим сигнал от диалога с данными
+    connect( m_ptDialogAdd, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
 
     m_pMentor = pMentor;
 
@@ -43,7 +52,7 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 
     // кнопка минус
     m_ptBtnDec = new QPushButton( "-" );
-    m_ptBtnDec->setToolTip( "Удалить параметр" );
+    m_ptBtnDec->setToolTip( "Удалить значение" );
     m_ptBtnDec->setFixedWidth( 93 );
     connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
     m_hlayout->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
@@ -107,28 +116,23 @@ void  TCategories::onBtnInc()
     need_to_add = true;
 
     // диалог с пустыми параметрами
-    m_ptDialog->setDlgEmpty();
+    m_ptDialogAdd->setDlgEmpty();
 
-    m_ptDialog->setDlgName( "NewParameter" );
+    m_ptDialogAdd->setDlgName( "NewParameter" );
 
-    m_ptDialog->open();
+    m_ptDialogAdd->open();
 }
 
 void  TCategories::onBtnName()
 {
     // диалог с пустыми параметрами
-    m_ptDialog->setDlgEmpty();
+    m_ptDialogSelf->setDlgEmpty();
 
-    m_ptDialog->setDlgEnabled( false );
+    m_ptDialogSelf->setDlgName( getCategoriesName() );
+    m_ptDialogSelf->setDlgUlink( getCategoriesUlink() );
+    m_ptDialogSelf->setDlgUname( getCategoriesUname() );
 
-    m_ptDialog->setDlgUlinkEnabled( true );
-    m_ptDialog->setDlgUnameEnabled( true );
-
-    m_ptDialog->setDlgName( getCategoriesName() );
-    m_ptDialog->setDlgUlink( getCategoriesUlink() );
-    m_ptDialog->setDlgUname( getCategoriesUname() );
-
-    m_ptDialog->open();
+    m_ptDialogSelf->open();
 }
 
 void  TCategories::onSendCancel()
@@ -364,7 +368,7 @@ void  TCategories::setCategoriesName( const std::string&  name, bool  set_to_nod
     m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );       // убираем подряд идущие пробелы на один
     m_zBtnName.replace( " ", "\n" );                     // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );                  // правленное имя кнопки
-    m_ptBtnName->setToolTip( "Категория: " + m_zName );  // подсказка с оригинальным именем
+    m_ptBtnName->setToolTip( "Значение: " + m_zName );  // подсказка с оригинальным именем
 
     height = m_ptBtnName->minimumSizeHint().height() - height;
 
@@ -514,14 +518,23 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
 {
     clear();
 
-    // диалог
-    m_ptDialog = new TDialog( true, "Parameters",  this );
+    // диалог для себя
+    m_ptDialogSelf = new TDialog( true, "Parameter",  this );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptDialog, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+    connect( m_ptDialogSelf, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
+    connect( m_ptDialogSelf, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
+
+    // диалог для добавления values
+    m_ptDialogAdd = new TDialog( false, "Add value",  this );
+
+    // ловим сигнал от диалога об отмене
+    connect( m_ptDialogAdd, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+
+    // ловим сигнал от диалога с данными
+    connect( m_ptDialogAdd, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
 
     // указатель на прародителя (имеется у первого, по дереву, TParam)
     m_pAncestor = pAncestor;
@@ -567,7 +580,7 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+" );
-    m_ptBtnInc->setToolTip( "Добавить категорию" );
+    m_ptBtnInc->setToolTip( "Добавить значение" );
     m_ptBtnInc->setFixedWidth( 93 );
     setIncBtnVisible( false );  // по умолчанию кнопка невидимая
     connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
@@ -632,38 +645,36 @@ void  TParam::onBtnInc()
     need_to_add = true;
 
     // диалог с пустыми параметрами
-    m_ptDialog->setDlgEmpty();
+    m_ptDialogAdd->setDlgEmpty();
 
-    m_ptDialog->setDlgEnabled( false );
+    m_ptDialogAdd->setDlgName( "NewValue" );
 
-    m_ptDialog->setDlgUlinkEnabled( true );
-    m_ptDialog->setDlgUnameEnabled( true );
-
-    m_ptDialog->setDlgName( "NewCategory" );
-
-    m_ptDialog->open();
+    m_ptDialogAdd->open();
 }
 
 void  TParam::onBtnName()
 {
-    m_ptDialog->setDlgName( getParamName() );
-    m_ptDialog->setDlgPlaceholder( getParamPlaceholder() );
-    m_ptDialog->setDlgNew( getParamNew() );
-    m_ptDialog->setDlgAfter( getParamAfter() );
-    m_ptDialog->setDlgBefore( getParamBefore() );
-    m_ptDialog->setDlgUlink( getParamUlink() );
-    m_ptDialog->setDlgUname( getParamUname() );
-    m_ptDialog->setDlgMulti( getParamMulti() );
+    // диалог с пустыми параметрами
+    m_ptDialogSelf->setDlgEmpty();
 
-    m_ptDialog->setDlgType( getParamType() );
-    m_ptDialog->setDlgMin( getParamMin() );
-    m_ptDialog->setDlgMax( getParamMax() );
+    m_ptDialogSelf->setDlgName( getParamName() );
+    m_ptDialogSelf->setDlgPlaceholder( getParamPlaceholder() );
+    m_ptDialogSelf->setDlgNew( getParamNew() );
+    m_ptDialogSelf->setDlgAfter( getParamAfter() );
+    m_ptDialogSelf->setDlgBefore( getParamBefore() );
+    m_ptDialogSelf->setDlgUlink( getParamUlink() );
+    m_ptDialogSelf->setDlgUname( getParamUname() );
+    m_ptDialogSelf->setDlgMulti( getParamMulti() );
 
-    m_ptDialog->setDlgCombo( getParamList() );
+    m_ptDialogSelf->setDlgType( getParamType() );
+    m_ptDialogSelf->setDlgMin( getParamMin() );
+    m_ptDialogSelf->setDlgMax( getParamMax() );
 
-    m_ptDialog->setDlgTypeEnabled( isChildrenAbsent() );
+    m_ptDialogSelf->setDlgCombo( getParamList() );
 
-    m_ptDialog->open();
+    m_ptDialogSelf->setDlgTypeEnabled( isChildrenAbsent() );
+
+    m_ptDialogSelf->open();
 }
 
 void  TParam::onSendCancel()

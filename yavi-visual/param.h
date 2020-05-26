@@ -85,7 +85,8 @@ private:
 
     int            m_depth;
 
-    TDialog       *m_ptDialog;
+    TDialog       *m_ptDialogSelf; // диалог на кнопке "Имя"
+    TDialog       *m_ptDialogAdd;  // диалог на кнопке "+"
 
     TValues        m_tValues;
 
@@ -231,7 +232,8 @@ private:
     QPushButton   *m_ptBtnValDec;
     QSpinBox      *m_ptSpinValue;
 
-    TDialog       *m_ptDialog;
+    TDialog       *m_ptDialogSelf; // диалог на кнопке "Имя"
+    TDialog       *m_ptDialogAdd;  // диалог на кнопке "+"
 
     TValues        m_tValues;
 
