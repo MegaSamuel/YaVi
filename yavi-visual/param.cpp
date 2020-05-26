@@ -1436,12 +1436,30 @@ void  TParam::setParamValueAdd()
     connect( m_ptBtnValDec, SIGNAL(clicked()), this, SLOT(onBtnValDec()) );
     m_hlayout2->addWidget( m_ptBtnValDec, 0, Qt::AlignLeft );
 
+    // поле со значением
+    m_ptLineValue = new QLineEdit();
+    m_ptLineValue->setToolTip( "Значение" );
+    m_ptLineValue->setFixedWidth( 93 );
+    connect( m_ptLineValue, SIGNAL(textChanged(QString)), this, SLOT(onSendValue(QString)) );
+
     // спин со значением
     m_ptSpinValue = new QSpinBox();
     m_ptSpinValue->setToolTip( "Значение" );
     m_ptSpinValue->setFixedWidth( 93 );
     connect( m_ptSpinValue, SIGNAL(valueChanged(int)), this, SLOT(onSendValue(int)) );
-    m_hlayout2->addWidget( m_ptSpinValue, 0, Qt::AlignLeft );
+
+    // дабл спин со значением
+    m_ptDSpinValue = new QDoubleSpinBox();
+    m_ptDSpinValue->setToolTip( "Значение" );
+    m_ptDSpinValue->setFixedWidth( 93 );
+    connect( m_ptDSpinValue, SIGNAL(valueChanged(double)), this, SLOT(onSendValue(double)) );
+
+    if( 1 == getParamType() )
+        m_hlayout2->addWidget( m_ptLineValue, 0, Qt::AlignLeft );
+    else if( 2 == getParamType() )
+        m_hlayout2->addWidget( m_ptSpinValue, 0, Qt::AlignLeft );
+    else if( 3 == getParamType() )
+        m_hlayout2->addWidget( m_ptDSpinValue, 0, Qt::AlignLeft );
 
     m_vlayout->addLayout( m_hlayout2 );
 
