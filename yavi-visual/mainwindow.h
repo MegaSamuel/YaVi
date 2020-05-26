@@ -20,6 +20,7 @@ private Q_SLOTS:
     void         onTimerWork();
     void         onBtnOpen();
     void         onBtnSave();
+    void         onYamlChanged();
 
 private:
     QPushButton  *m_ptBtnOpen;
@@ -33,8 +34,11 @@ private:
 
     QString       m_zPrgName;
     QString       m_zPrgTitle;
+    bool          m_bPrgTitleChanged;
 
     void          setPrgTitleText( const QString&  text = "" );
+
+    bool          getPrgTitleChanged();
     void          setPrgTitleChanged( bool  changed );
 
     YAML::Node    m_config; // считанный ямл

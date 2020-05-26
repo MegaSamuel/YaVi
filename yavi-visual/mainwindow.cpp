@@ -10,6 +10,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     m_zPrgName.clear();
     m_zPrgTitle.clear();
+    m_bPrgTitleChanged = false;
 
     m_zPrgName = "YAML Visualizer";
 
@@ -337,22 +338,35 @@ void  MainWindow::setPrgTitleText( const QString&  text )
     setWindowTitle( m_zPrgTitle );
 }
 
+bool  MainWindow::getPrgTitleChanged()
+{
+    return m_bPrgTitleChanged;
+}
+
 void  MainWindow::setPrgTitleChanged( bool  changed )
 {
-    QString  str;
-
-    str.clear();
+    m_bPrgTitleChanged = changed;
 
     if( changed )
     {
-        str = "*" + m_zPrgTitle;
+        m_zPrgTitle.prepend( "*" );
+
+        setWindowTitle( m_zPrgTitle );
     }
     else
     {
-        str = m_zPrgTitle;
-    }
+        m_zPrgTitle.replace( "*", "" );
 
-    setWindowTitle( m_zPrgTitle );
+        setWindowTitle( m_zPrgTitle );
+    }
+}
+
+void  MainWindow::onYamlChanged()
+{
+    if( !getPrgTitleChanged() )
+    {
+        setPrgTitleChanged( true );
+    }
 }
 
 //------------------------------------------------------------------------------
