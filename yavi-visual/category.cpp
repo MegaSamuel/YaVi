@@ -8,14 +8,23 @@ TCategory::TCategory( TGoods  *pAncestor )
 {
     clear();
 
-    // диалог
-    m_ptDialog = new TDialog( true, "Category", this );
+    // диалог для себя
+    m_ptDialogSelf = new TDialog( false, "Category", this );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptDialog, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+    connect( m_ptDialogSelf, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
+    connect( m_ptDialogSelf, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
+
+    // диалог для добавления параметра
+    m_ptDialogAdd = new TDialog( true, "Add parameter", this );
+
+    // ловим сигнал от диалога об отмене
+    connect( m_ptDialogAdd, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+
+    // ловим сигнал от диалога с данными
+    connect( m_ptDialogAdd, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
 
     // указатель на родителя
     m_pAncestor = pAncestor;
@@ -69,6 +78,9 @@ void TCategory::clear()
     m_zName.clear();
     m_zBtnName.clear();
 
+    m_zUlink.clear();
+    m_zUname.clear();
+
     m_apParamList.clear();
 
     need_to_add = false;
@@ -79,13 +91,13 @@ void TCategory::clear()
 void  TCategory::onBtnName()
 {
     // диалог с пустыми параметрами
-    m_ptDialog->setDlgEmpty();
+    m_ptDialogSelf->setDlgEmpty();
 
-    m_ptDialog->setDlgEnabled( false );
+    m_ptDialogSelf->setDlgName( getCategoryName() );
+    m_ptDialogSelf->setDlgUlink( getCategoryUlink() );
+    m_ptDialogSelf->setDlgUname( getCategoryUname() );
 
-    m_ptDialog->setDlgName( getCategoryName() );
-
-    m_ptDialog->open();
+    m_ptDialogSelf->open();
 }
 
 void  TCategory::onBtnInc()
@@ -94,13 +106,11 @@ void  TCategory::onBtnInc()
     need_to_add = true;
 
     // диалог с пустыми параметрами
-    m_ptDialog->setDlgEmpty();
+    m_ptDialogAdd->setDlgEmpty();
 
-    m_ptDialog->setDlgEnabled( true );
+    m_ptDialogAdd->setDlgName( "NewParam" );
 
-    m_ptDialog->setDlgName( "NewParam" );
-
-    m_ptDialog->open();
+    m_ptDialogAdd->open();
 }
 
 void  TCategory::onSendCancel()
@@ -117,6 +127,8 @@ void  TCategory::onSendValues( TValues& a_tValues )
         // редактируем текущий набор параметров
 
         setCategoryName( m_tValues.m_zName.toStdString(), true );
+        setCategoryUlink( m_tValues.m_zUlink.toStdString(), true );
+        setCategoryUname( m_tValues.m_zUname.toStdString(), true );
     }
 
     if( true == need_to_add )
@@ -432,9 +444,39 @@ void  TCategory::setCategoryName( const std::string&  name, bool  set_to_node )
     }
 }
 
-const QString TCategory::getCategoryName()
+void  TCategory::setCategoryUlink( const std::string&  name, bool  set_to_node )
+{
+    m_zUlink = QString::fromStdString(name);
+
+    if( set_to_node )
+    {
+        __yaml_SetString( m_node, GoodsUlinkSection, name );
+    }
+}
+
+void  TCategory::setCategoryUname( const std::string&  name, bool  set_to_node )
+{
+    m_zUname = QString::fromStdString(name);
+
+    if( set_to_node )
+    {
+        __yaml_SetString( m_node, GoodsUnameSection, name );
+    }
+}
+
+QString  TCategory::getCategoryName() noexcept
 {
     return m_zName;
+}
+
+QString  TCategory::getCategoryUlink() noexcept
+{
+    return m_zUlink;
+}
+
+QString  TCategory::getCategoryUname() noexcept
+{
+    return m_zUname;
 }
 
 //------------------------------------------------------------------------------

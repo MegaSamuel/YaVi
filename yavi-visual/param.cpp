@@ -9,7 +9,7 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     clear();
 
     // диалог
-    m_ptDialog = new TDialog( true, "Categories",  this );
+    m_ptDialog = new TDialog( false, "Categories",  this );
 
     // ловим сигнал от диалога об отмене
     connect( m_ptDialog, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );

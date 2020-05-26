@@ -108,17 +108,20 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
         priv__->m_grid->addWidget( lblBefore, row, 0, 1, 1 );
         priv__->m_grid->addWidget( priv__->m_ptLineBefore, row, 1, 1, 1 );
         row++;
+    }
 
-        QLabel *lblUlink = new QLabel( QString( "%1%2" ).arg("Ulink").arg(":"), this );
-        priv__->m_grid->addWidget( lblUlink, row, 0, 1, 1 );
-        priv__->m_grid->addWidget( priv__->m_ptLineUlink, row, 1, 1, 1 );
-        row++;
+    QLabel *lblUlink = new QLabel( QString( "%1%2" ).arg("Ulink").arg(":"), this );
+    priv__->m_grid->addWidget( lblUlink, row, 0, 1, 1 );
+    priv__->m_grid->addWidget( priv__->m_ptLineUlink, row, 1, 1, 1 );
+    row++;
 
-        QLabel *lblUname = new QLabel( QString( "%1%2" ).arg("Uname").arg(":"), this );
-        priv__->m_grid->addWidget( lblUname, row, 0, 1, 1 );
-        priv__->m_grid->addWidget( priv__->m_ptLineUname, row, 1, 1, 1 );
-        row++;
+    QLabel *lblUname = new QLabel( QString( "%1%2" ).arg("Uname").arg(":"), this );
+    priv__->m_grid->addWidget( lblUname, row, 0, 1, 1 );
+    priv__->m_grid->addWidget( priv__->m_ptLineUname, row, 1, 1, 1 );
+    row++;
 
+    if( fullsize )
+    {
         QLabel *lblMin = new QLabel( QString( "%1%2" ).arg("Min").arg(":"), this );
         priv__->m_grid->addWidget( lblMin, row, 0, 1, 1 );
         priv__->m_grid->addWidget( priv__->m_ptSpinMin, row, 1, 1, 1 );

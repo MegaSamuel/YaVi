@@ -105,9 +105,19 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             m_vlayout->addWidget( pCategory );
             m_apCategoryList.append(pCategory);
 
+            std::string name;
+
             // ищем имя
-            std::string cat_name = __yaml_GetString( config[ GoodsCategorySection ][j], GoodsCategoryName );
-            pCategory->setCategoryName( cat_name );
+            name = __yaml_GetString( config[ GoodsCategorySection ][j], GoodsCategoryName );
+            pCategory->setCategoryName( name );
+
+            // ищем ulink
+            name = __yaml_GetString( config[ GoodsCategorySection ][j], GoodsUlinkSection );
+            pCategory->setCategoryUlink( name );
+
+            // ищем uname
+            name = __yaml_GetString( config[ GoodsCategorySection ][j], GoodsUnameSection );
+            pCategory->setCategoryUname( name );
 
             if( __yaml_IsSequence( config[ GoodsCategorySection ][j][ GoodsParametersSection ] ) )
             {
