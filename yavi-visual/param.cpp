@@ -1046,8 +1046,6 @@ void  TParam::setParamName( const std::string&  name, bool  set_to_node )
         widget_shrink( 0, -1 * height );
     }
 
-    setParamNameColor();
-
     if( set_to_node )
     {
         __yaml_SetString( m_node, GoodsNameSection, name );
@@ -1243,25 +1241,29 @@ void  TParam::setParamNameColor( bool  force )
 
     colorBtnName( false );
 
+    // берем список параметров у родителя
     if( Q_NULLPTR != m_pMentor )
     {
-        //qDebug() << "mentor name" << m_pMentor->getCategoriesName();
+        qDebug() << "mentor name" << m_pMentor->getCategoriesName();
 
         list = m_pMentor->m_apParamList;
     }
     else if( Q_NULLPTR != m_pAncestor )
     {
-        //qDebug() << "ancestor name" << m_pAncestor->getCategoryName();
+        qDebug() << "ancestor name" << m_pAncestor->getCategoryName();
 
         list = m_pAncestor->m_apParamList;
     }
 
+    // если список не пуст, то просматриваем его
     if( list.size() )
     {
         for( auto& it : list )
         {
+            // смотрим только параметры с индексами меньше чем у нас
             if( ( force ) || ( it->getNodeIndex() < getNodeIndex() ) )
             {
+                // нашли совпадение -> красим
                 if( isStrEqual( getParamName(), it->getParamName() ) )
                 {
                     colorBtnName( true );
