@@ -44,6 +44,8 @@ public:
     int            getCategoriesWidth() noexcept;
     int            getCategoriesHeight() noexcept;
 
+    bool           isParamNameRedefined( const QString&  name );
+
     void           CategoriesDelete();
 
     void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет
@@ -172,6 +174,8 @@ public:
 
     int            getParamWidth() noexcept;
     int            getParamHeight() noexcept;
+
+    bool           isParamNameRedefined( const QString&  name );
 
     void           ParamDelete();
 

@@ -1,0 +1,33 @@
+category:
+  - name: NameStr
+    parameters:
+      - name: node 1
+        type: 0
+      - name: node 2
+        type: 1
+      - name: node 3
+        type: 2
+      - name: node 4
+        type: 3
+      - name: node 5
+        type: 4
+      - name: node 6
+        type: 5
+        values: NewValue
+        categories:
+          - name: NewValue
+            ulink: ""
+            uname: ""
+            parameters:
+              - name: NODE 2
+                type: 4
+                placeholder: ""
+                new: ""
+                after: ""
+                before: ""
+                ulink: ""
+                uname: ""
+      - name: NODE 1
+        type: 0
+tables:
+  - name: NameStr

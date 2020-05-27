@@ -276,6 +276,17 @@ void  TCategory::CategoryDelete()
 
 //------------------------------------------------------------------------------
 
+bool  TCategory::isParamNameRedefined( const QString&  name )
+{
+    Q_UNUSED(name);
+
+    qDebug() << "what to do?";
+
+    return false;
+}
+
+//------------------------------------------------------------------------------
+
 void  TCategory::setNode( const YAML::Node&  node )
 {
     m_node = node;

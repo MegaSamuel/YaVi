@@ -43,6 +43,8 @@ public:
     QString        getCategoryUlink() noexcept;
     QString        getCategoryUname() noexcept;
 
+    bool           isParamNameRedefined( const QString&  name );
+
     void           CategoryDelete();
 
     void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет
