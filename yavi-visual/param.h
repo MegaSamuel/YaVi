@@ -199,7 +199,8 @@ private:
 
     void           setIncBtnVisible( bool visible );
 
-    void           setParamValueAdd();
+    void           setParamValueAdd( unsigned  type );
+    void           setParamValueChange( unsigned  type );
     void           setParamValueDel();
     void           setParamValueMin( int  min ) noexcept;
     void           setParamValueMax( int  max ) noexcept;
@@ -242,7 +243,8 @@ private:
 
     QString        m_zBtnName;  // текст на кнопке
 
-    bool            m_second_row_exist = false;
+    bool            m_second_row_exist;
+    unsigned        m_second_row_type;
     QPushButton    *m_ptBtnValDec;
     QLineEdit      *m_ptLineValue;
     QSpinBox       *m_ptSpinValue;

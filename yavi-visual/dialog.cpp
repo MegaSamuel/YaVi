@@ -49,7 +49,9 @@ public:
         m_ptSpinMax = new QSpinBox;
 
         m_ptDSpinMin = new QDoubleSpinBox;
+        m_ptDSpinMin->setDecimals( 1 );
         m_ptDSpinMax = new QDoubleSpinBox;
+        m_ptDSpinMax->setDecimals( 1 );
 
         m_ptComboList = new QComboBox;
     }
@@ -95,6 +97,7 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
         QLabel *lblType = new QLabel( QString( "%1%2" ).arg("Type").arg(":"), this );
         priv__->m_grid->addWidget( lblType, row, 0, 1, 1 );
         priv__->m_grid->addWidget( priv__->m_ptSpinType, row, 1, 1, 1 );
+        connect( priv__->m_ptSpinType, SIGNAL(valueChanged(int)), this, SLOT(onTypeChanged(int)) );
         row++;
 
         QLabel *lblPlaceholder = new QLabel( QString( "%1%2" ).arg("Placeholder").arg(":"), this );
@@ -239,6 +242,8 @@ void  TDialog::setDlgType( unsigned  val )
     priv__->m_ptSpinType->setValue( static_cast<int>(val) );
 
     setDlgEnabledByType( val );
+
+    setDlgShowByType( val );
 }
 
 void  TDialog::setDlgMin( int  val )
@@ -283,6 +288,8 @@ void  TDialog::setDlgEmpty()
     priv__->m_ptSpinType->setValue( val );
     priv__->m_ptSpinMin->setValue( val );
     priv__->m_ptSpinMax->setValue( val );
+    priv__->m_ptDSpinMin->setValue( 0.0 );
+    priv__->m_ptDSpinMax->setValue( 0.0 );
 
     priv__->m_ptComboList->clear();
 }
@@ -361,23 +368,62 @@ void  TDialog::setDlgComboEnabled( bool  enabled ) noexcept
 
 //------------------------------------------------------------------------------
 
-void  TDialog::setDlgEnabledByType( unsigned  val ) noexcept
+void  TDialog::setDlgEnabledByType( unsigned  type ) noexcept
 {
-    setDlgPlaceholderEnabled( 0 != val );
-    setDlgNewEnabled( 0 != val );
-    setDlgAfterEnabled( 0 != val );
-    setDlgBeforeEnabled( 0 != val );
-    setDlgUlinkEnabled( 0 != val );
-    setDlgUnameEnabled( 0 != val );
-    setDlgMultiEnabled( 5 == val );
-    setDlgMinEnabled( ( 2 == val ) || ( 3 == val ) );
-    setDlgMaxEnabled( ( 2 == val ) || ( 3 == val ) );
-    setDlgComboEnabled( ( 4 == val ) || ( 5 == val ) );
+    setDlgPlaceholderEnabled( 0 != type );
+    setDlgNewEnabled( 0 != type );
+    setDlgAfterEnabled( 0 != type );
+    setDlgBeforeEnabled( 0 != type );
+    setDlgUlinkEnabled( 0 != type );
+    setDlgUnameEnabled( 0 != type );
+    setDlgMultiEnabled( 5 == type );
+    setDlgMinEnabled( ( 2 == type ) || ( 3 == type ) );
+    setDlgMaxEnabled( ( 2 == type ) || ( 3 == type ) );
+    setDlgComboEnabled( ( 4 == type ) || ( 5 == type ) );
+}
+
+void  TDialog::setDlgShowByType( unsigned  type ) noexcept
+{
+    if( 3 == type )
+    {
+        priv__->m_ptSpinMin->hide();
+        priv__->m_ptSpinMax->hide();
+
+        priv__->m_grid->removeWidget( priv__->m_ptSpinMin );
+        priv__->m_grid->removeWidget( priv__->m_ptSpinMax );
+
+        priv__->m_grid->addWidget( priv__->m_ptDSpinMin, row_min, 1, 1, 1 );
+        priv__->m_grid->addWidget( priv__->m_ptDSpinMax, row_max, 1, 1, 1 );
+
+        priv__->m_ptDSpinMin->show();
+        priv__->m_ptDSpinMax->show();
+    }
+    else
+    {
+        priv__->m_ptDSpinMin->hide();
+        priv__->m_ptDSpinMax->hide();
+
+        priv__->m_grid->removeWidget( priv__->m_ptDSpinMin );
+        priv__->m_grid->removeWidget( priv__->m_ptDSpinMax );
+
+        priv__->m_grid->addWidget( priv__->m_ptSpinMin, row_min, 1, 1, 1 );
+        priv__->m_grid->addWidget( priv__->m_ptSpinMax, row_max, 1, 1, 1 );
+
+        priv__->m_ptSpinMin->show();
+        priv__->m_ptSpinMax->show();
+    }
 }
 
 //------------------------------------------------------------------------------
 
-void TDialog::onBtnAction( QAbstractButton*  btn )
+void  TDialog::onTypeChanged( int  type )
+{
+    setDlgEnabledByType( static_cast<unsigned>(type) );
+
+    setDlgShowByType( static_cast<unsigned>(type) );
+}
+
+void  TDialog::onBtnAction( QAbstractButton*  btn )
 {
     // нажали Ok
     if( QDialogButtonBox::AcceptRole == priv__->m_ptBtnBox->buttonRole( btn ) )

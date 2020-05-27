@@ -61,6 +61,7 @@ Q_SIGNALS:
     void    sendValues( TValues&  values );
 
 protected Q_SLOTS:
+    void    onTypeChanged( int );
     void 	onBtnAction( QAbstractButton *btn );
 
 private:
@@ -69,7 +70,8 @@ private:
     int     row_min;
     int     row_max;
 
-    void    setDlgEnabledByType( unsigned  val ) noexcept;
+    void    setDlgEnabledByType( unsigned  type ) noexcept;
+    void    setDlgShowByType( unsigned  type ) noexcept;
 };
 
 //------------------------------------------------------------------------------
