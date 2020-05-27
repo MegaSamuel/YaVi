@@ -46,11 +46,21 @@ public:
         m_ptSpinType->setMaximum( 5 );
 
         m_ptSpinMin = new QSpinBox;
+        m_ptSpinMin->setMinimum( -999 );
+        m_ptSpinMin->setMaximum( 999 );
+
         m_ptSpinMax = new QSpinBox;
+        m_ptSpinMax->setMinimum( -999 );
+        m_ptSpinMax->setMaximum( 999 );
 
         m_ptDSpinMin = new QDoubleSpinBox;
+        m_ptDSpinMin->setMinimum( -999.0 );
+        m_ptDSpinMin->setMaximum( 999.0 );
         m_ptDSpinMin->setDecimals( 1 );
+
         m_ptDSpinMax = new QDoubleSpinBox;
+        m_ptDSpinMax->setMinimum( -999.0 );
+        m_ptDSpinMax->setMaximum( 999.0 );
         m_ptDSpinMax->setDecimals( 1 );
 
         m_ptComboList = new QComboBox;
