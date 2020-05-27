@@ -125,8 +125,17 @@ void  MainWindow::onBtnOpen()
             // заголовок формы
             setPrgTitleText( filename );
 
+            /*
+            QString file = filename.section("\\",-1,-1);
+            qDebug() << file;
+
+            QString dir = filename.section("\\",0,-2);
+            qDebug() << dir;
+            */
+
             // запоминаем каталог
-            //cfgSetLastOpenPath( );
+            // does it work on Linux?
+            cfgSetLastOpenPath( filename.section( "\\", 0, -2 ) );
 
             // запоминаем файл
             cfgSetLastOpenFile( filename );
@@ -140,7 +149,7 @@ void  MainWindow::onBtnOpen()
     {
         // долбоящер не ввел имя файла
 
-        qDebug() << "Cannot open: no filename";
+        //qDebug() << "Cannot open: no filename";
     }
 }
 
@@ -174,9 +183,10 @@ void  MainWindow::onBtnSave()
             setPrgTitleText( filename );
 
             // запоминаем каталог
-            //cfgSetLastSavePath( );
+            // does it work on Linux?
+            cfgSetLastSavePath( filename.section( "\\", 0, -2 ) );
 
-            //cfgRefresh();
+            cfgRefresh();
 
 //            qDebug() << "Save file" << filename;
         }
@@ -388,23 +398,6 @@ void  MainWindow::onYamlChanged()
 
 //------------------------------------------------------------------------------
 
-void  MainWindow::actionAutoload()
-{
-    // полное имя ранее открытого файла
-    QString filename = cfgGetLastOpenFile();
-
-    if( !filename.isEmpty() )
-    {
-        if( init( filename ) )
-        {
-            // заголовок формы
-            setPrgTitleText( filename );
-
-            qDebug() << "Autoload file" << filename;
-        }
-    }
-}
-
 void  MainWindow::actionAfterStart()
 {
     cfgReset();
@@ -418,9 +411,9 @@ void  MainWindow::actionAfterStart()
     cfgSetCurrentPath( dir );
 
     // формиреум путь с именем файла
-    QString filename = QDir::toNativeSeparators( dir + "/yavi.yml" );
+    QString cfgfilename = QDir::toNativeSeparators( dir + "/yavi.yml" );
 
-    if( false == cfgRead( filename ) )
+    if( false == cfgRead( cfgfilename ) )
     {
         // дефолтные значения
         cfgSetAutoload( 1 );
@@ -429,17 +422,27 @@ void  MainWindow::actionAfterStart()
         cfgSetLastOpenFile();
 
         // сохраняем
-        cfgWrite( filename );
+        cfgWrite( cfgfilename );
     }
     else
     {
         // сразу сохраняем
-        cfgWrite( filename );
+        cfgWrite( cfgfilename );
     }
 
     if( cfgGetAutoload() )
     {
-        actionAutoload();
+        // полное имя ранее открытого файла
+        QString filename = cfgGetLastOpenFile();
+
+        if( !filename.isEmpty() )
+        {
+            if( init( filename ) )
+            {
+                // заголовок формы
+                setPrgTitleText( filename );
+            }
+        }
     }
 }
 
