@@ -135,11 +135,6 @@ void  TTable::TableDelete()
 {
     QLayoutItem *child;
 
-    // уничтожаем диалог
-//    m_ptDialog->~TDialog();
-
-//    qDebug() << getTableName() << "del dialog";
-
     // уничтожаем виджеты
     while( ( child = m_grid->takeAt(0) ) != Q_NULLPTR )
     {
@@ -147,12 +142,8 @@ void  TTable::TableDelete()
         delete child;
     }
 
-//    qDebug() << getTableName() << "del widgets";
-
     // уничтожаем grid
     m_grid->deleteLater();
-
-//    qDebug() << getTableName() << "del grid";
 
     // удаляем себя из списка родителя
     if( Q_NULLPTR != m_pAncestor )
@@ -166,6 +157,9 @@ void  TTable::TableDelete()
                 m_pAncestor->m_apTableList.removeAt(i);
             }
         }
+
+        // удаляемся из родительского layout-а
+        m_pAncestor->m_vlayout->removeWidget(this);
     }
 }
 
@@ -175,7 +169,7 @@ void  TTable::setTableType( unsigned type ) noexcept
 {
     m_uTableType = type;
 
-    qDebug() << "table" << getTableName() << "type" << m_uTableType;
+    //qDebug() << "table" << getTableName() << "type" << m_uTableType;
 }
 
 //------------------------------------------------------------------------------
@@ -344,14 +338,11 @@ void  TTable::widget_size_reset() noexcept
     m_height = 0;
 }
 
-void  TTable::widget_stretch( int width, int height ) noexcept
+void  TTable::widget_stretch( int width, int height, bool add_height ) noexcept
 {
     // ширину выбираем максимальную из элементов
     if( width > m_width )
         m_width = width;
-
-    // к высоте добавляем spacing
-    //height += m_vlayout->spacing();
 
     // высоту увеличиваем на каждый элемент
     m_height += height;
@@ -362,23 +353,27 @@ void  TTable::widget_stretch( int width, int height ) noexcept
     setMinimumWidth( m_width );
     setMinimumHeight( m_height );
 
-    widget_parent_stretch( width, height );
+    widget_parent_stretch( width, height, add_height );
 }
 
-void  TTable::widget_parent_stretch( int width, int height ) noexcept
+void  TTable::widget_parent_stretch( int width, int height, bool add_height ) noexcept
 {
+    int  val = 0;
+
     if( Q_NULLPTR != m_pAncestor )
     {
-        m_pAncestor->widget_stretch( width, height );
+        if( add_height )
+        {
+            val = m_pAncestor->m_vlayout->spacing();
+        }
+
+        m_pAncestor->widget_stretch( width, height + val );
     }
 }
 
 void  TTable::widget_shrink( int width, int height ) noexcept
 {
     Q_UNUSED( width );
-
-    // к высоте добавляем spacing
-    //height += m_vlayout->spacing();
 
     m_height -= height;
 

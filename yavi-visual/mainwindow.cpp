@@ -97,7 +97,7 @@ void 	MainWindow::onBtnOpen()
     QString dir( pDir->path() );
 
     // формиреум путь и имя файла через диалог
-    QString filename = QFileDialog::getOpenFileName( this, "Open file", dir, "YAML (*.yaml *.yml)" );
+    QString filename = QDir::toNativeSeparators( QFileDialog::getOpenFileName( this, "Open file", dir, "YAML (*.yaml *.yml)" ) );
 
     if( !filename.isEmpty() )
     {
@@ -145,7 +145,7 @@ void 	MainWindow::onBtnSave()
     QString dir( pDir->path() );
 
     // формиреум путь и имя файла через диалог
-    QString filename = QFileDialog::getSaveFileName( this, "Save file", dir, "YAML (*.yml)" );
+    QString filename = QDir::toNativeSeparators( QFileDialog::getSaveFileName( this, "Save file", dir, "YAML (*.yml)" ) );
 
     if( !filename.isEmpty() )
     {
