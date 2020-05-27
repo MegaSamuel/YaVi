@@ -65,8 +65,11 @@ private:
     unsigned      m_cfg_autoload;        // автоматическая загрузка последнего файла (0 - no / 1 - yes)
 
     void          actionAfterStart();
+    void          actionAutoload();
 
     void          cfgReset() noexcept;
+
+    void          cfgRefresh() noexcept;
 
     bool          cfgRead( const QString&  filename );   // прочитать конфиг
     bool          cfgWrite( const QString&  filename );  // сохранить конфиг

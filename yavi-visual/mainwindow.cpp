@@ -94,7 +94,7 @@ void  MainWindow::onBtnOpen()
 //    m_ptLblNotice->setStyleSheet( "QLabel {background-color: transparent;}" );
 
     // каталог где мы находимся
-    QDir *pDir = new QDir( QDir::currentPath() );
+    QDir *pDir = new QDir( cfgGetLastOpenPath() );
 
     // строка с именем каталога где мы находимся
     QString dir( pDir->path() );
@@ -125,6 +125,14 @@ void  MainWindow::onBtnOpen()
             // заголовок формы
             setPrgTitleText( filename );
 
+            // запоминаем каталог
+            //cfgSetLastOpenPath( );
+
+            // запоминаем файл
+            cfgSetLastOpenFile( filename );
+
+            cfgRefresh();
+
 //            qDebug() << "Open file" << filename;
         }
     }
@@ -141,10 +149,10 @@ void  MainWindow::onBtnSave()
     // формируем имя файла по умолчанию
     QString deffilename = QString( "/test.yml" );
 
-    // каталог где мы находимся
-    QDir *pDir = new QDir( QDir::currentPath() + deffilename );
+    // каталог где мы сохранялись крайний раз
+    QDir *pDir = new QDir( cfgGetLastSavePath() + deffilename );
 
-    // строка с именем каталога где мы находимся
+    // строка с именем каталога где мы сохранялись крайний раз
     QString dir( pDir->path() );
 
     // формиреум путь и имя файла через диалог
@@ -162,7 +170,13 @@ void  MainWindow::onBtnSave()
         }
         else
         {
+            // заголовок формы
             setPrgTitleText( filename );
+
+            // запоминаем каталог
+            //cfgSetLastSavePath( );
+
+            //cfgRefresh();
 
 //            qDebug() << "Save file" << filename;
         }
@@ -374,6 +388,23 @@ void  MainWindow::onYamlChanged()
 
 //------------------------------------------------------------------------------
 
+void  MainWindow::actionAutoload()
+{
+    // полное имя ранее открытого файла
+    QString filename = cfgGetLastOpenFile();
+
+    if( !filename.isEmpty() )
+    {
+        if( init( filename ) )
+        {
+            // заголовок формы
+            setPrgTitleText( filename );
+
+            qDebug() << "Autoload file" << filename;
+        }
+    }
+}
+
 void  MainWindow::actionAfterStart()
 {
     cfgReset();
@@ -405,6 +436,11 @@ void  MainWindow::actionAfterStart()
         // сразу сохраняем
         cfgWrite( filename );
     }
+
+    if( cfgGetAutoload() )
+    {
+        actionAutoload();
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -421,6 +457,15 @@ void  MainWindow::cfgReset() noexcept
 
     m_cfg_current_path.clear();
     m_cfg_filename.clear();
+}
+
+void  MainWindow::cfgRefresh() noexcept
+{
+    // формиреум путь с именем файла
+    QString filename = QDir::toNativeSeparators( cfgGetCurrentPath() + "/yavi.yml" );
+
+    // сохраняем
+    cfgWrite( filename );
 }
 
 bool  MainWindow::cfgRead( const QString&  filename )
