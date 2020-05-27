@@ -53,6 +53,34 @@ private:
 
     TGoods 	     *m_pGoods;    // товары считанные из файла
 
+    YAML::Node    m_cfg;                 // считанный ямл с настройками
+
+    QString       m_cfg_last_open_path;  // последняя папка из диалога чтения
+    QString       m_cfg_last_save_path;  // последняя папка из диалога записи
+    QString       m_cfg_last_open_file;  // имя последнего загруженного файла
+
+    QString       m_cfg_current_path;    // папка откуда мы запустились
+    QString       m_cfg_filename;        // имя файла с настройками
+
+    void          actionAfterStart();
+
+    void          cfgReset() noexcept;
+
+    bool          cfgRead( const QString&  filename );   // прочитать конфиг
+    bool          cfgWrite( const QString&  filename );  // сохранить конфиг
+
+    void          cfgSetCurrentPath( const QString&  path ) noexcept;
+
+    QString       cfgGetCurrentPath() noexcept;
+
+    void          cfgSetLastOpenPath( const QString&  path = "" ) noexcept;
+    void          cfgSetLastSavePath( const QString&  path = "" ) noexcept;
+    void          cfgSetLastSaveFile( const QString&  file ) noexcept;
+
+    QString       cfgGetLastOpenPath() noexcept;
+    QString       cfgGetLastSavePath() noexcept;
+    QString       cfgGetLastSaveFile() noexcept;
+
     void          closeEvent( QCloseEvent * );
 };
 

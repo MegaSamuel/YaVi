@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-//#include "work.h"
+#include "func.h"
 
 //------------------------------------------------------------------------------
 
@@ -75,6 +75,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     // центральный элеиент
     setCentralWidget( frmBase );
+
+    // читаем ini и, возможно, что-то делаем
+    actionAfterStart();
 }
 
 MainWindow::~MainWindow()
@@ -84,7 +87,7 @@ MainWindow::~MainWindow()
 
 //------------------------------------------------------------------------------
 
-void 	MainWindow::onBtnOpen()
+void  MainWindow::onBtnOpen()
 {
     // очищаем лэйбл с описанием ошибки
     m_ptLblNotice->clear();
@@ -133,7 +136,7 @@ void 	MainWindow::onBtnOpen()
     }
 }
 
-void 	MainWindow::onBtnSave()
+void  MainWindow::onBtnSave()
 {
     // формируем имя файла по умолчанию
     QString deffilename = QString( "/test.yml" );
@@ -367,6 +370,171 @@ void  MainWindow::onYamlChanged()
     {
         setPrgTitleChanged( true );
     }
+}
+
+//------------------------------------------------------------------------------
+
+void  MainWindow::actionAfterStart()
+{
+    cfgReset();
+
+    // каталог где мы находимся
+    QDir *pDir = new QDir( QDir::currentPath() );
+
+    // строка с именем каталога где мы находимся
+    QString dir( pDir->path() );
+
+    cfgSetCurrentPath( dir );
+
+    // формиреум путь с именем файла
+    QString filename = QDir::toNativeSeparators( dir + "/yavi.yml" );
+
+    if( false == cfgRead( filename ) )
+    {
+        cfgSetLastOpenPath();
+        cfgSetLastSavePath();
+
+        cfgWrite( filename );
+    }
+}
+
+//------------------------------------------------------------------------------
+
+void  MainWindow::cfgReset() noexcept
+{
+    m_cfg.reset();
+
+    m_cfg_last_open_path.clear();
+    m_cfg_last_save_path.clear();
+    m_cfg_last_open_file.clear();
+
+    m_cfg_current_path.clear();
+    m_cfg_filename.clear();
+}
+
+bool  MainWindow::cfgRead( const QString&  filename )
+{
+    QFile  fp( filename );
+
+    // а есть ли файл?
+    if( !fp.exists() )
+    {
+        m_zFailReason = "file is not exists";
+        return false;
+    }
+
+    // открываем файл только на чтение
+    if( !fp.open( QIODevice::ReadOnly | QIODevice::Text ) )
+    {
+        m_zFailReason = "cannot open file";
+        return false;
+    }
+
+    QTextStream  in( &fp );
+
+    in.setCodec("UTF-8");
+
+    // пробуем читать ямл
+    try {
+        m_cfg = YAML::Load( in.readAll().toStdString() );
+    } catch ( const YAML::Exception&  e ) {
+        m_zFailReason = QString::fromStdString( e.what() );
+        fp.close();
+        return false;
+    }
+
+    // разбираем ямл
+    cfgSetLastOpenPath( QString::fromStdString( __yaml_GetString( m_cfg, "last open path" ) ) );
+    cfgSetLastSavePath( QString::fromStdString( __yaml_GetString( m_cfg, "last save path" ) ) );
+    cfgSetLastSaveFile( QString::fromStdString( __yaml_GetString( m_cfg, "last open file" ) ) );
+
+    fp.close();
+
+    return true;
+}
+
+bool  MainWindow::cfgWrite( const QString&  filename )
+{
+    std::string str;
+    QFile 		fp( filename );
+    QTextStream out( &fp );
+
+    // открываем файл на запись
+    if( !fp.open( QIODevice::WriteOnly | QIODevice::Text ) )
+    {
+        m_zFailReason = "cannot create file";
+        return false;
+    }
+
+    YAML::Node node;
+    node[ "last open path" ] = cfgGetLastOpenPath().toStdString();
+    node[ "last save path" ] = cfgGetLastSavePath().toStdString();
+    node[ "last open file" ] = cfgGetLastSaveFile().toStdString();
+
+    // пробуем выгрузить ямл в строку
+    try {
+        str = YAML::Dump( node );
+    } catch ( const YAML::Exception&  e ) {
+        m_zFailReason = QString::fromStdString( e.what() );
+        fp.close();
+        return false;
+    }
+
+    // пишем строку в файл
+    out.setCodec("UTF-8");
+    out << QString::fromStdString( str );
+
+    fp.close();
+
+    return true;
+}
+
+//------------------------------------------------------------------------------
+
+void  MainWindow::cfgSetCurrentPath( const QString&  path ) noexcept
+{
+    m_cfg_current_path = QDir::toNativeSeparators( path );
+}
+
+QString  MainWindow::cfgGetCurrentPath() noexcept
+{
+    return m_cfg_current_path;
+}
+
+void  MainWindow::cfgSetLastOpenPath( const QString&  path ) noexcept
+{
+    if( 0 == path.length() )
+        m_cfg_last_open_path = cfgGetCurrentPath();
+    else
+        m_cfg_last_open_path = QDir::toNativeSeparators( path );
+}
+
+void  MainWindow::cfgSetLastSavePath( const QString&  path ) noexcept
+{
+    if( 0 == path.length() )
+        m_cfg_last_save_path = cfgGetCurrentPath();
+    else
+        m_cfg_last_save_path = QDir::toNativeSeparators( path );
+}
+
+void  MainWindow::cfgSetLastSaveFile( const QString&  file ) noexcept
+{
+    m_cfg_last_open_file = file;
+}
+
+QString  MainWindow::cfgGetLastOpenPath() noexcept
+{
+    return m_cfg_last_open_path;
+}
+
+QString  MainWindow::cfgGetLastSavePath() noexcept
+{
+    return m_cfg_last_save_path;
+}
+
+QString  MainWindow::cfgGetLastSaveFile() noexcept
+{
+    return m_cfg_last_open_file;
 }
 
 //------------------------------------------------------------------------------
