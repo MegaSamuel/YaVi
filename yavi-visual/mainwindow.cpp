@@ -391,9 +391,18 @@ void  MainWindow::actionAfterStart()
 
     if( false == cfgRead( filename ) )
     {
+        // дефолтные значения
+        cfgSetAutoload( 1 );
         cfgSetLastOpenPath();
         cfgSetLastSavePath();
+        cfgSetLastOpenFile();
 
+        // сохраняем
+        cfgWrite( filename );
+    }
+    else
+    {
+        // сразу сохраняем
         cfgWrite( filename );
     }
 }
@@ -403,6 +412,8 @@ void  MainWindow::actionAfterStart()
 void  MainWindow::cfgReset() noexcept
 {
     m_cfg.reset();
+
+    m_cfg_autoload = 1;
 
     m_cfg_last_open_path.clear();
     m_cfg_last_save_path.clear();
@@ -444,9 +455,24 @@ bool  MainWindow::cfgRead( const QString&  filename )
     }
 
     // разбираем ямл
+
+    if( __yaml_IsScalar( m_cfg[ "autoload" ] ) )
+    {
+        try {
+            cfgSetAutoload( m_cfg[ "autoload" ].as<unsigned>() );
+        } catch ( const YAML::Exception&  e ) {
+            m_zFailReason = QString::fromStdString( e.what() );
+            cfgSetAutoload( 1 );
+        }
+    }
+    else
+    {
+        cfgSetAutoload( 1 );
+    }
+
     cfgSetLastOpenPath( QString::fromStdString( __yaml_GetString( m_cfg, "last open path" ) ) );
     cfgSetLastSavePath( QString::fromStdString( __yaml_GetString( m_cfg, "last save path" ) ) );
-    cfgSetLastSaveFile( QString::fromStdString( __yaml_GetString( m_cfg, "last open file" ) ) );
+    cfgSetLastOpenFile( QString::fromStdString( __yaml_GetString( m_cfg, "last open file" ) ) );
 
     fp.close();
 
@@ -467,9 +493,10 @@ bool  MainWindow::cfgWrite( const QString&  filename )
     }
 
     YAML::Node node;
+    node[ "autoload" ] = cfgGetAutoload();
     node[ "last open path" ] = cfgGetLastOpenPath().toStdString();
     node[ "last save path" ] = cfgGetLastSavePath().toStdString();
-    node[ "last open file" ] = cfgGetLastSaveFile().toStdString();
+    node[ "last open file" ] = cfgGetLastOpenFile().toStdString();
 
     // пробуем выгрузить ямл в строку
     try {
@@ -490,6 +517,19 @@ bool  MainWindow::cfgWrite( const QString&  filename )
 }
 
 //------------------------------------------------------------------------------
+
+void  MainWindow::cfgSetAutoload( unsigned  load ) noexcept
+{
+    if( 0 == load )
+        m_cfg_autoload = 0;
+    else
+        m_cfg_autoload = 1;
+}
+
+unsigned  MainWindow::cfgGetAutoload() noexcept
+{
+    return m_cfg_autoload;
+}
 
 void  MainWindow::cfgSetCurrentPath( const QString&  path ) noexcept
 {
@@ -517,7 +557,7 @@ void  MainWindow::cfgSetLastSavePath( const QString&  path ) noexcept
         m_cfg_last_save_path = QDir::toNativeSeparators( path );
 }
 
-void  MainWindow::cfgSetLastSaveFile( const QString&  file ) noexcept
+void  MainWindow::cfgSetLastOpenFile( const QString&  file ) noexcept
 {
     m_cfg_last_open_file = file;
 }
@@ -532,7 +572,7 @@ QString  MainWindow::cfgGetLastSavePath() noexcept
     return m_cfg_last_save_path;
 }
 
-QString  MainWindow::cfgGetLastSaveFile() noexcept
+QString  MainWindow::cfgGetLastOpenFile() noexcept
 {
     return m_cfg_last_open_file;
 }

@@ -62,6 +62,8 @@ private:
     QString       m_cfg_current_path;    // папка откуда мы запустились
     QString       m_cfg_filename;        // имя файла с настройками
 
+    unsigned      m_cfg_autoload;        // автоматическая загрузка последнего файла (0 - no / 1 - yes)
+
     void          actionAfterStart();
 
     void          cfgReset() noexcept;
@@ -69,17 +71,19 @@ private:
     bool          cfgRead( const QString&  filename );   // прочитать конфиг
     bool          cfgWrite( const QString&  filename );  // сохранить конфиг
 
-    void          cfgSetCurrentPath( const QString&  path ) noexcept;
+    void          cfgSetAutoload( unsigned  load ) noexcept;
+    unsigned      cfgGetAutoload() noexcept;
 
+    void          cfgSetCurrentPath( const QString&  path ) noexcept;
     QString       cfgGetCurrentPath() noexcept;
 
     void          cfgSetLastOpenPath( const QString&  path = "" ) noexcept;
     void          cfgSetLastSavePath( const QString&  path = "" ) noexcept;
-    void          cfgSetLastSaveFile( const QString&  file ) noexcept;
+    void          cfgSetLastOpenFile( const QString&  file = "" ) noexcept;
 
     QString       cfgGetLastOpenPath() noexcept;
     QString       cfgGetLastSavePath() noexcept;
-    QString       cfgGetLastSaveFile() noexcept;
+    QString       cfgGetLastOpenFile() noexcept;
 
     void          closeEvent( QCloseEvent * );
 };
