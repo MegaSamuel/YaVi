@@ -8,14 +8,23 @@ TCategory::TCategory( TGoods  *pAncestor )
 {
     clear();
 
-    // диалог
-    m_ptDialog = new TDialog( true, "Category", this );
+    // диалог для себя
+    m_ptDialogSelf = new TDialog( false, "Category", this );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptDialog, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+    connect( m_ptDialogSelf, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
+    connect( m_ptDialogSelf, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
+
+    // диалог для добавления параметра
+    m_ptDialogAdd = new TDialog( true, "Add parameter", this );
+
+    // ловим сигнал от диалога об отмене
+    connect( m_ptDialogAdd, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+
+    // ловим сигнал от диалога с данными
+    connect( m_ptDialogAdd, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
 
     // указатель на родителя
     m_pAncestor = pAncestor;
@@ -69,6 +78,9 @@ void TCategory::clear()
     m_zName.clear();
     m_zBtnName.clear();
 
+    m_zUlink.clear();
+    m_zUname.clear();
+
     m_apParamList.clear();
 
     need_to_add = false;
@@ -79,13 +91,13 @@ void TCategory::clear()
 void  TCategory::onBtnName()
 {
     // диалог с пустыми параметрами
-    m_ptDialog->setDlgEmpty();
+    m_ptDialogSelf->setDlgEmpty();
 
-    m_ptDialog->setDlgEnabled( false );
+    m_ptDialogSelf->setDlgName( getCategoryName() );
+    m_ptDialogSelf->setDlgUlink( getCategoryUlink() );
+    m_ptDialogSelf->setDlgUname( getCategoryUname() );
 
-    m_ptDialog->setDlgName( getCategoryName() );
-
-    m_ptDialog->open();
+    m_ptDialogSelf->open();
 }
 
 void  TCategory::onBtnInc()
@@ -94,13 +106,11 @@ void  TCategory::onBtnInc()
     need_to_add = true;
 
     // диалог с пустыми параметрами
-    m_ptDialog->setDlgEmpty();
+    m_ptDialogAdd->setDlgEmpty();
 
-    m_ptDialog->setDlgEnabled( true );
+    m_ptDialogAdd->setDlgName( "NewParam" );
 
-    m_ptDialog->setDlgName( "NewParam" );
-
-    m_ptDialog->open();
+    m_ptDialogAdd->open();
 }
 
 void  TCategory::onSendCancel()
@@ -117,6 +127,8 @@ void  TCategory::onSendValues( TValues& a_tValues )
         // редактируем текущий набор параметров
 
         setCategoryName( m_tValues.m_zName.toStdString(), true );
+        setCategoryUlink( m_tValues.m_zUlink.toStdString(), true );
+        setCategoryUname( m_tValues.m_zUname.toStdString(), true );
     }
 
     if( true == need_to_add )
@@ -142,8 +154,10 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setParamUlink( m_tValues.m_zUlink.toStdString() );
         pParam->setParamUname( m_tValues.m_zUname.toStdString() );
         pParam->setParamMulti( m_tValues.m_zMulti.toStdString() );
-        pParam->setParamMin( m_tValues.m_uMin );
-        pParam->setParamMax( m_tValues.m_uMax );
+        pParam->setParamMin( m_tValues.m_nMin );
+        pParam->setParamMax( m_tValues.m_nMax );
+        pParam->setParamDMin( m_tValues.m_fMin );
+        pParam->setParamDMax( m_tValues.m_fMax );
 
         YAML::Node  node;
         node.reset();
@@ -151,15 +165,32 @@ void  TCategory::onSendValues( TValues& a_tValues )
         // пишем их в пустой ямл
         __yaml_SetString( node, GoodsNameSection, m_tValues.m_zName.toStdString() );
         __yaml_SetScalar( node, GoodsTypeSection, m_tValues.m_uType );
-        __yaml_SetString( node, GoodsPlaceholderSection, m_tValues.m_zPlaceholder.toStdString() );
-        __yaml_SetString( node, GoodsNewSection, m_tValues.m_zNew.toStdString() );
-        __yaml_SetString( node, GoodsAfterSection, m_tValues.m_zAfter.toStdString() );
-        __yaml_SetString( node, GoodsBeforeSection, m_tValues.m_zBefore.toStdString() );
-        __yaml_SetString( node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
-        __yaml_SetString( node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
-        __yaml_SetString( node, GoodsMultiSection, m_tValues.m_zMulti.toStdString() );
-        __yaml_SetScalar( node, GoodsMinSection, m_tValues.m_uMin );
-        __yaml_SetScalar( node, GoodsMaxSection, m_tValues.m_uMax );
+
+        if( 0 != m_tValues.m_uType )
+        {
+            __yaml_SetString( node, GoodsPlaceholderSection, m_tValues.m_zPlaceholder.toStdString() );
+            __yaml_SetString( node, GoodsNewSection, m_tValues.m_zNew.toStdString() );
+            __yaml_SetString( node, GoodsAfterSection, m_tValues.m_zAfter.toStdString() );
+            __yaml_SetString( node, GoodsBeforeSection, m_tValues.m_zBefore.toStdString() );
+            __yaml_SetString( node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
+            __yaml_SetString( node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
+        }
+
+        if( 2 == m_tValues.m_uType )
+        {
+            __yaml_SetInteger( node, GoodsMinSection, m_tValues.m_nMin );
+            __yaml_SetInteger( node, GoodsMaxSection, m_tValues.m_nMax );
+        }
+        else if( 3 == m_tValues.m_uType )
+        {
+            __yaml_SetDouble( node, GoodsMinSection, m_tValues.m_fMin );
+            __yaml_SetDouble( node, GoodsMaxSection, m_tValues.m_fMax );
+        }
+
+        if( 5 == m_tValues.m_uType )
+        {
+            __yaml_SetString( node, GoodsMultiSection, m_tValues.m_zMulti.toStdString() );
+        }
 
         // добавляем ямл к основному
         m_node[ GoodsParametersSection ].push_back( node );
@@ -314,7 +345,7 @@ void  TCategory::getCategories( const YAML::Node&  node, TCategories  *a_pCatego
 
 void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  depth )
 {
-    unsigned  val;
+    unsigned     type;
     std::string  str;
 
     // имя
@@ -324,11 +355,8 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
     a_pParam->setParamNameColor();
 
     // тип
-    if( __yaml_IsScalar( node[ GoodsTypeSection ] ) )
-    {
-        val = node[ GoodsTypeSection ].as<unsigned>();
-        a_pParam->setParamType( val );
-    }
+    type = __yaml_GetUnsigned( node, GoodsTypeSection );
+    a_pParam->setParamType( type );
 
     //
     str = __yaml_GetString( node, GoodsPlaceholderSection );
@@ -354,18 +382,16 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
     str = __yaml_GetString( node, GoodsUnameSection );
     a_pParam->setParamUname( str );
 
-    // мин
-    if( __yaml_IsScalar( node[ GoodsMinSection ] ) )
+    // мин, макс
+    if( 2 == type )
     {
-        val = node[ GoodsMinSection ].as<unsigned>();
-        a_pParam->setParamMin( val );
+        a_pParam->setParamMin( __yaml_GetInteger( node, GoodsMinSection ) );
+        a_pParam->setParamMax( __yaml_GetInteger( node, GoodsMaxSection ) );
     }
-
-    // макс
-    if( __yaml_IsScalar( node[ GoodsMaxSection ] ) )
+    else if( 3 == type )
     {
-        val = node[ GoodsMaxSection ].as<unsigned>();
-        a_pParam->setParamMax( val );
+        a_pParam->setParamDMin( __yaml_GetDouble( node, GoodsMinSection ) );
+        a_pParam->setParamDMax( __yaml_GetDouble( node, GoodsMaxSection ) );
     }
 
     //
@@ -432,9 +458,39 @@ void  TCategory::setCategoryName( const std::string&  name, bool  set_to_node )
     }
 }
 
-const QString TCategory::getCategoryName()
+void  TCategory::setCategoryUlink( const std::string&  name, bool  set_to_node )
+{
+    m_zUlink = QString::fromStdString(name);
+
+    if( set_to_node )
+    {
+        __yaml_SetString( m_node, GoodsUlinkSection, name );
+    }
+}
+
+void  TCategory::setCategoryUname( const std::string&  name, bool  set_to_node )
+{
+    m_zUname = QString::fromStdString(name);
+
+    if( set_to_node )
+    {
+        __yaml_SetString( m_node, GoodsUnameSection, name );
+    }
+}
+
+QString  TCategory::getCategoryName() noexcept
 {
     return m_zName;
+}
+
+QString  TCategory::getCategoryUlink() noexcept
+{
+    return m_zUlink;
+}
+
+QString  TCategory::getCategoryUname() noexcept
+{
+    return m_zUname;
 }
 
 //------------------------------------------------------------------------------
