@@ -336,6 +336,27 @@ void  TCategory::addCategories( YAML::Node&  node, TParam  *a_pParam, const std:
     pCategories->setNodeIndex( index );
 }
 
+void  TCategory::formCategories( const YAML::Node&  node, TParam  *a_pParam, int  depth )
+{
+    TCategories  *pCategories;
+
+    // создаем categories в интерфейсе
+    for( int i = 0; i < static_cast<int>(node.size()); i++ )
+    {
+        pCategories = new TCategories( a_pParam, depth );
+        pCategories->setNode( node[i] );
+        pCategories->setNodeParent( node );
+        pCategories->setNodeIndex( i );
+
+        a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
+        a_pParam->m_apCategoriesList.append( pCategories );
+
+        YAML::Node  node_cat = node[i];
+
+        getCategories( node_cat, pCategories, pCategories->getCategoriesDepth() );
+    }
+}
+
 void  TCategory::getCategories( YAML::Node&  node, TCategories  *a_pCategories, int  depth )
 {
     std::string  str;
@@ -446,6 +467,8 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
                 // есть записи в values, и есть секция categories
                 // приоритет у записей в values
 
+                formCategories( node[ GoodsCategoriesSection ], a_pParam, depth+1 );
+/*
                 TCategories  *pCategories;
 
                 for( int i = 0; i < static_cast<int>(node[ GoodsCategoriesSection ].size()); i++ )
@@ -462,7 +485,7 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
 
                     getCategories( node_cat, pCategories, pCategories->getCategoriesDepth() );
                 }
-
+*/
                 int  list_size = list.size();
                 int  cat_size = static_cast<int>(node[ GoodsCategoriesSection ].size());
 
@@ -537,6 +560,8 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
             {
                 qDebug() << name << "values is empty, but categories exists!";
 
+                formCategories( node[ GoodsCategoriesSection ], a_pParam, depth+1 );
+/*
                 TCategories  *pCategories;
 
                 // создаем categories в интерфейсе
@@ -554,7 +579,7 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
 
                     getCategories( node_cat, pCategories, pCategories->getCategoriesDepth() );
                 }
-
+*/
                 // формируем values у родителя
                 for( auto& it : a_pParam->m_apCategoriesList )
                 {
