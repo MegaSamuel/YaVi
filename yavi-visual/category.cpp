@@ -308,7 +308,7 @@ int  TCategory::getNodeIndex()
 
 //------------------------------------------------------------------------------
 
-void  TCategory::getCategories( const YAML::Node&  node, TCategories  *a_pCategories, int  depth )
+void  TCategory::getCategories( YAML::Node  node, TCategories  *a_pCategories, int  depth )
 {
     std::string  str;
 
@@ -343,7 +343,7 @@ void  TCategory::getCategories( const YAML::Node&  node, TCategories  *a_pCatego
     }
 }
 
-void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  depth )
+void  TCategory::getParameters( YAML::Node  node, TParam *a_pParam, int  depth )
 {
     unsigned     type;
     std::string  str;
@@ -407,6 +407,10 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
     {
         if( __yaml_IsSequence( node[ GoodsCategoriesSection ] ) )
         {
+            // есть записи в values, и есть секция categories
+            // приоритет у записей в values
+
+            YAML::Node    node_name;
             TCategories  *pCategories;
 
             for( int i = 0; i < static_cast<int>(node[ GoodsCategoriesSection ].size()); i++ )
@@ -420,6 +424,92 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
                 a_pParam->m_apCategoriesList.append( pCategories );
 
                 getCategories( node[ GoodsCategoriesSection ][i], pCategories, pCategories->getCategoriesDepth() );
+            }
+
+            bool exist;
+
+            for( auto& it : list )
+            {
+                exist = false;
+
+                for( auto& cat : a_pParam->m_apCategoriesList )
+                {
+                    if( 0 == QString::compare( it, cat->getCategoriesName() ) )
+                    {
+                        exist = true;
+                        break;
+                    }
+                }
+
+                if( !exist )
+                {
+                    qDebug() << "value" << it << "exist, but there is no record for it";
+
+                    // добавляем категорию
+                    pCategories = new TCategories( a_pParam, depth+1 );
+
+                    // добавляемся к родителю
+                    a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
+                    a_pParam->m_apCategoriesList.append( pCategories );
+
+                    // ставим значение имени
+                    pCategories->setCategoriesName( it.toStdString() );
+
+                    node_name.reset();
+
+                    // пишем в пустой ямл
+                    __yaml_SetString( node_name, GoodsNameSection, it.toStdString() );
+
+                    // добавляем ямл к основному
+                    node[ GoodsCategoriesSection ].push_back( node_name );
+
+                    // берем индекс записи
+                    int index = list.indexOf(it);
+
+                    pCategories->setNode( node[ GoodsCategoriesSection ][index] );
+                    pCategories->setNodeParent( node[ GoodsCategoriesSection ] );
+                    pCategories->setNodeIndex( index );
+                }
+            }
+
+        }
+        else
+        {
+            // есть записи в values, но нет секции categories
+            // создаем секцию categories и пишем в нее значения из values
+            //qDebug() << "there is no categories for" << a_pParam->getParamName();
+
+            YAML::Node    node_name;
+            TCategories  *pCategories;
+
+            for( auto& it : list )
+            {
+                //qDebug() << it << list.indexOf(it);
+
+                // добавляем категорию
+                pCategories = new TCategories( a_pParam, depth+1 );
+
+                // добавляемся к родителю
+                a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
+                a_pParam->m_apCategoriesList.append( pCategories );
+
+                // ставим значение имени
+                pCategories->setCategoriesName( it.toStdString() );
+
+                node_name.reset();
+
+                // пишем в пустой ямл
+                __yaml_SetString( node_name, GoodsNameSection, it.toStdString() );
+
+                // добавляем ямл к основному
+                node[ GoodsCategoriesSection ].push_back( node_name );
+
+                // берем индекс записи
+                int index = list.indexOf(it);
+
+                pCategories->setNode( node[ GoodsCategoriesSection ][index] );
+                pCategories->setNodeParent( node[ GoodsCategoriesSection ] );
+                pCategories->setNodeIndex( index );
             }
         }
     }
