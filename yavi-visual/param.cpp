@@ -152,6 +152,12 @@ void  TCategories::onSendValues( TValues& a_tValues )
         setCategoriesUlink( m_tValues.m_zUlink.toStdString(), true );
         setCategoriesUname( m_tValues.m_zUname.toStdString(), true );
 
+        if( Q_NULLPTR != m_pMentor )
+        {
+            // переименовываем запись в values родителя
+            m_pMentor->renameParamList( m_tValues.m_zName, getNodeIndex(), true );
+        }
+
         //qDebug() << getCategoriesName() << "fix categories";
     }
 
@@ -317,12 +323,12 @@ void  TCategories::CategoriesDelete()
             {
                 m_pMentor->m_apCategoriesList.removeAt(i);
 
+                // удаляем запись в values родителя
+                m_pMentor->removeParamList( item, i, true );
+
                 break;
             }
         }
-
-        // удаляем запись в values родителя
-        m_pMentor->remParamList( item, true );
 
         int  index;
 
@@ -1275,18 +1281,8 @@ void  TParam::setParamNameColor( bool  force )
 
 //------------------------------------------------------------------------------
 
-void  TParam::remParamList( QString& item, bool  set_to_node )
+void  TParam::makeStrByList() noexcept
 {
-    // убираем запись из списка
-    for( auto& it : m_vList )
-    {
-        if( item.simplified() == it.simplified() )
-        {
-            m_vList.removeAt( m_vList.indexOf(it) );
-            break;
-        }
-    }
-
     int  ind = 0;
     m_zList.clear();
 
@@ -1300,8 +1296,13 @@ void  TParam::remParamList( QString& item, bool  set_to_node )
 
         ind++;
     }
+}
 
-    //qDebug() << "новая строка values:" << QString::fromStdString(m_zList);
+void  TParam::renameParamList( QString&  item, int  index, bool  set_to_node )
+{
+    m_vList[ index ] = item;
+
+    makeStrByList();
 
     if( set_to_node )
     {
@@ -1309,7 +1310,21 @@ void  TParam::remParamList( QString& item, bool  set_to_node )
     }
 }
 
-void  TParam::addParamList( QString& item, bool  set_to_node )
+void  TParam::removeParamList( QString&  item, int  index, bool  set_to_node )
+{
+    Q_UNUSED( item );
+
+    m_vList.removeAt( index );
+
+    makeStrByList();
+
+    if( set_to_node )
+    {
+        __yaml_SetString( m_node, GoodsValuesSection, m_zList );
+    }
+}
+
+void  TParam::addParamList( QString&  item, bool  set_to_node )
 {
     // добавляем запись в строку
     if( 0 == m_zList.length() )

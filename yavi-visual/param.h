@@ -141,8 +141,10 @@ public:
 
     void           setParamNameColor( bool  force = false );
 
+    // заменить запись в поле values
+    void           renameParamList( QString&  item, int  index, bool  set_to_node = false );
     // убрать запись из поля values
-    void           remParamList( QString&  item, bool  set_to_node = false );
+    void           removeParamList( QString&  item, int  index, bool  set_to_node = false );
     // добавить запись в поле values
     void           addParamList( QString&  item, bool  set_to_node = false );
     // установить поле values
@@ -208,6 +210,8 @@ private:
     void           setParamValueDMax( double  max ) noexcept;
 
     bool           isChildrenAbsent(); // true если нет детей
+
+    void           makeStrByList() noexcept;
 
     YAML::Node     m_node;        // текущий уровнь дерева ямла
     YAML::Node     m_node_parent; // родительский уровнь дерева ямла

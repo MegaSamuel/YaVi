@@ -29,6 +29,8 @@ public:
     YAML::Node&    getNodeParent();
     int            getNodeIndex();
 
+    void           addCategories( YAML::Node  node, TParam  *a_pParam, const std::string&  name, int  depth, int  index );
+
     void           getCategories( YAML::Node  node, TCategories  *a_pCategories, int  depth );
     void           getParameters( YAML::Node  node, TParam  *a_pParam, int  depth );
 
