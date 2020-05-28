@@ -134,15 +134,14 @@ void  MainWindow::onBtnOpen()
             */
 
             // запоминаем каталог
-            // does it work on Linux?
-            cfgSetLastOpenPath( filename.section( "\\", 0, -2 ) );
+            cfgSetLastOpenPath( filename.section( QDir::separator(), 0, -2 ) );
 
             // запоминаем файл
             cfgSetLastOpenFile( filename );
 
             cfgRefresh();
 
-//            qDebug() << "Open file" << filename;
+//            qDebug() << "Open file" << filename << "separator" << QDir::separator();
         }
     }
     else
@@ -183,8 +182,7 @@ void  MainWindow::onBtnSave()
             setPrgTitleText( filename );
 
             // запоминаем каталог
-            // does it work on Linux?
-            cfgSetLastSavePath( filename.section( "\\", 0, -2 ) );
+            cfgSetLastSavePath( filename.section( QDir::separator(), 0, -2 ) );
 
             cfgRefresh();
 
