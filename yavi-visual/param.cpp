@@ -364,13 +364,9 @@ bool  TCategories::isParamNameRedefined( const QString&  name )
 
     if( Q_NULLPTR != m_pMentor )
     {
+        result = m_pMentor->setParamNameColorByRelative( name );
 
-
-        //result = m_pMentor->setParamNameColorByRelative( name );
-
-        //qDebug() << "call setParamNameColorByRelative by isParamNameRedefined for" << name << result;
-
-
+        qDebug() << "call setParamNameColorByRelative by isParamNameRedefined for" << name << result;
 
         result = m_pMentor->setParamNameColor( name, true );
 
@@ -1277,7 +1273,7 @@ bool  TParam::setParamNameColorByRelative( const QString&  name )
     // берем список параметров у родителя
     if( Q_NULLPTR != m_pMentor )
     {
-        qDebug() << "_mentor name" << m_pMentor->getCategoriesName() << m_pMentor->m_apParamList.size();
+        qDebug() << "_mentor" << m_pMentor->getCategoriesName() << m_pMentor->m_apParamList.size() << name;
 
         list = m_pMentor->m_apParamList;
     }
@@ -1285,20 +1281,18 @@ bool  TParam::setParamNameColorByRelative( const QString&  name )
     // если список не пуст, то просматриваем его
     for( auto& it : list )
     {
-        qDebug() << "_parent ind" << it->getNodeIndex() << it->getParamName() << "ind" << getNodeIndex() << name;
-
         // проверяем у прародителя
         // нашли совпадение -> красим
         if( Q_NULLPTR != m_pMentor )
         {
             if( m_pMentor->isParamNameRedefined( name ) )
             {
-                qDebug() << "yyy color item" << name << "by parent" << it->getParamName();
+                qDebug() << "color item" << name << "by parameter" << it->getParamName() << "yyy" << getParamName();
 
                 // красим имя в зависимости от типа
-                it->colorBtnName( true );
+                //colorBtnName( true );
 
-                result = true;
+                //result = true;
             }
         }
 
@@ -1306,14 +1300,18 @@ bool  TParam::setParamNameColorByRelative( const QString&  name )
         // нашли совпадение -> красим
         if( isStrEqual( name, it->getParamName() ) )
         {
-            qDebug() << "_color item" << it->getParamName() << "by parent" << name;
+            qDebug() << "color item" << name << "by parameter" << it->getParamName() << "zzz" << getParamName();
 
             // красим имя в зависимости от типа
             it->colorBtnName( true );
 
             result = true;
 
-            //break;
+            break;
+        }
+        else
+        {
+            qDebug() << "_ item" << it->getParamName() << "by parent" << name;
         }
     }
 
@@ -1361,7 +1359,7 @@ bool  TParam::setParamNameColor( const QString&  name, bool  force )
                 if( isStrEqual( name, it->getParamName() ) )
                 {
                     if( !force )
-                        qDebug() << "A color item" << name << "by parameter" << it->getParamName() << force;
+                        qDebug() << "color item" << name << "by parameter" << it->getParamName() << force << "A" << getParamName();
 
                     // красим имя в зависимости от типа
                     if( !force )
@@ -1380,7 +1378,7 @@ bool  TParam::setParamNameColor( const QString&  name, bool  force )
             // нашли совпадение -> красим
             if( m_pMentor->isParamNameRedefined( name ) )
             {
-                qDebug() << "xxx color item" << name << "by parameter" << it->getParamName();
+                qDebug() << "color item" << name << "by parameter" << it->getParamName() << force << "xxx" << getParamName();
 
                 // красим имя в зависимости от типа
                 colorBtnName( true );
@@ -1397,7 +1395,7 @@ bool  TParam::setParamNameColor( const QString&  name, bool  force )
                 // нашли совпадение -> красим
                 if( isStrEqual( name, it->getParamName() ) )
                 {
-                    qDebug() << "M color item" << name << "by parent" << it->getParamName();
+                    qDebug() << "color item" << name << "by parameter" << it->getParamName() << force << "M" << getParamName();
 
                     // красим имя в зависимости от типа
                     it->colorBtnName( true );
