@@ -1232,15 +1232,18 @@ void  TParam::colorBtnName( bool  color )
     {
         if( 0 == getParamType() )
         {
+            //qDebug() << getParamName() << "red";
             m_ptBtnName->setStyleSheet( "color: red" );
         }
         else
         {
+            //qDebug() << getParamName() << "green";
             m_ptBtnName->setStyleSheet( "color: green" );
         }
     }
     else
     {
+        //qDebug() << getParamName() << "default";
         m_ptBtnName->setStyleSheet( "color: default" );
     }
 }
@@ -1383,13 +1386,13 @@ bool  TParam::setParamNameColor( const QString&  name, bool  force )
     // берем список параметров у родителя
     if( Q_NULLPTR != m_pMentor )
     {
-        qDebug() << "mentor name" << m_pMentor->getCategoriesName() << m_pMentor->m_apParamList.size();
+        //qDebug() << "mentor name" << m_pMentor->getCategoriesName() << m_pMentor->m_apParamList.size();
 
         list = m_pMentor->m_apParamList;
     }
     else if( Q_NULLPTR != m_pAncestor )
     {
-        qDebug() << "ancestor name" << m_pAncestor->getCategoryName() << m_pAncestor->m_apParamList.size();
+        //qDebug() << "ancestor name" << m_pAncestor->getCategoryName() << m_pAncestor->m_apParamList.size();
 
         list = m_pAncestor->m_apParamList;
     }
@@ -1404,13 +1407,13 @@ bool  TParam::setParamNameColor( const QString&  name, bool  force )
             // смотрим только параметры с индексами меньше чем у нас
             if( ( force ) || ( it->getNodeIndex() < getNodeIndex() ) )
             {
-                qDebug() << "2 parent ind" << it->getNodeIndex() << it->getParamName() << "ind" << getNodeIndex() << name;
+                //qDebug() << "2 parent ind" << it->getNodeIndex() << it->getParamName() << "ind" << getNodeIndex() << name;
 
                 // проверяем у родителя
                 // нашли совпадение -> красим
                 if( isStrEqual( name, it->getParamName() ) )
                 {
-                    qDebug() << "color by parent" << it->getParamName() << name;
+                    //qDebug() << "color by parent" << it->getParamName() << name;
 
                     // красим имя в зависимости от типа
                     colorBtnName( true );
