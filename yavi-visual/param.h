@@ -141,8 +141,11 @@ public:
     void           setParamDMin( double  val, bool  set_to_node = false );
     void           setParamDMax( double  val, bool  set_to_node = false );
 
-    bool           setParamNameColor( const QString&  name );
+    bool           setParamNameColor( const QString&  name, bool  force = false );
     bool           setParamNameColorByRelative( const QString&  name );
+
+//    bool           isStrEqual( QString  str1, QString  str2 );
+    void           colorBtnName( bool  color = false );
 
     // убрать запись из поля values
     void           remParamList( QString&  item, bool  set_to_node = false );
@@ -264,9 +267,6 @@ private:
 
     int            m_width;     // ширина виджета
     int            m_height;    // высота виджета
-
-    bool           isStrEqual( QString  str1, QString  str2 );
-    void           colorBtnName( bool  color = false );
 
     void           widget_parent_stretch( int width, int height, bool add_height = true ) noexcept;  // растягиваем виджет
     void           widget_parent_shrink( int width, int height ) noexcept;   // сжимаем виджет
