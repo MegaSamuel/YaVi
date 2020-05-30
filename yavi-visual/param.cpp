@@ -1360,7 +1360,8 @@ bool  TParam::setParamNameColor( const QString&  name, bool  force )
                 // нашли совпадение -> красим
                 if( isStrEqual( name, it->getParamName() ) )
                 {
-                    qDebug() << "A color item" << name << "by parameter" << it->getParamName() << force;
+                    if( !force )
+                        qDebug() << "A color item" << name << "by parameter" << it->getParamName() << force;
 
                     // красим имя в зависимости от типа
                     if( !force )
@@ -1399,7 +1400,7 @@ bool  TParam::setParamNameColor( const QString&  name, bool  force )
                     qDebug() << "M color item" << name << "by parent" << it->getParamName();
 
                     // красим имя в зависимости от типа
-                    colorBtnName( true );
+                    it->colorBtnName( true );
 
                     result = true;
 
