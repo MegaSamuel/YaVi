@@ -201,7 +201,7 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setNodeParent( m_node[ GoodsParametersSection ] );
         pParam->setNodeIndex( index );
 
-        pParam->setParamNameColor();
+        pParam->setParamNameColor( pParam->getParamName() );
     }
 
     need_to_add = false;
@@ -280,7 +280,7 @@ bool  TCategory::isParamNameRedefined( const QString&  name )
 {
     Q_UNUSED(name);
 
-    qDebug() << "what to do?";
+    //qDebug() << "what to do with" << name << "?";
 
     return false;
 }
@@ -363,7 +363,7 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
     str = __yaml_GetString( node, GoodsNameSection );
     a_pParam->setParamName( str );
 
-    a_pParam->setParamNameColor();
+    a_pParam->setParamNameColor( a_pParam->getParamName() );
 
     // тип
     type = __yaml_GetUnsigned( node, GoodsTypeSection );
