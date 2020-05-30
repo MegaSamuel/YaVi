@@ -367,7 +367,7 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
     type = __yaml_GetUnsigned( node, GoodsTypeSection );
     a_pParam->setParamType( type );
 
-    // красим поле того как прочитали name и type!
+    // красим после того как прочитали name и type!
     a_pParam->setParamNameColor( a_pParam->getParamName() );
 
     //

@@ -141,7 +141,8 @@ public:
     void           setParamDMin( double  val, bool  set_to_node = false );
     void           setParamDMax( double  val, bool  set_to_node = false );
 
-    bool           setParamNameColor( const QString&  name, bool  force = false );
+    bool           setParamNameColor( const QString&  name );
+    bool           setParamNameColorByRelative( const QString&  name );
 
     // убрать запись из поля values
     void           remParamList( QString&  item, bool  set_to_node = false );
