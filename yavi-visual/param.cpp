@@ -368,9 +368,12 @@ bool  TCategories::isParamNameRedefined( const QString&  name )
 
         qDebug() << "call setParamNameColorByRelative by isParamNameRedefined for" << name << result;
 
-        result = m_pMentor->setParamNameColor( name, true );
+        if( false == result )
+        {
+            result = m_pMentor->setParamNameColor( name, true );
 
-        qDebug() << "call setParamNameColor by isParamNameRedefined for" << name << result;
+            qDebug() << "call setParamNameColor by isParamNameRedefined for" << name << result;
+        }
     }
 
     return result;
@@ -1292,7 +1295,9 @@ bool  TParam::setParamNameColorByRelative( const QString&  name )
                 // красим имя в зависимости от типа
                 //colorBtnName( true );
 
-                //result = true;
+                result = true;
+
+                break;
             }
         }
 
@@ -1303,7 +1308,7 @@ bool  TParam::setParamNameColorByRelative( const QString&  name )
             qDebug() << "color item" << name << "by parameter" << it->getParamName() << "zzz" << getParamName();
 
             // красим имя в зависимости от типа
-            it->colorBtnName( true );
+            //it->colorBtnName( true );
 
             result = true;
 
