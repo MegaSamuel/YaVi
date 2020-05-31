@@ -20,6 +20,7 @@ private Q_SLOTS:
     void         onTimerWork();
     void         onBtnOpen();
     void         onBtnSave();
+    void         onYamlChanged();
 
 private:
     QPushButton  *m_ptBtnOpen;
@@ -30,6 +31,15 @@ private:
 
     bool          init( const QString&  filename ); // загружаем ямл из файла
     bool          fini( const QString&  filename ); // выгружаем ямл в файл
+
+    QString       m_zPrgName;
+    QString       m_zPrgTitle;
+    bool          m_bPrgTitleChanged;
+
+    void          setPrgTitleText( const QString&  text = "" );
+
+    bool          getPrgTitleChanged();
+    void          setPrgTitleChanged( bool  changed );
 
     YAML::Node    m_config; // считанный ямл
 
@@ -42,6 +52,40 @@ private:
     unsigned      m_uTimerCounter;
 
     TGoods 	     *m_pGoods;    // товары считанные из файла
+
+    YAML::Node    m_cfg;                 // считанный ямл с настройками
+
+    QString       m_cfg_last_open_path;  // последняя папка из диалога чтения
+    QString       m_cfg_last_save_path;  // последняя папка из диалога записи
+    QString       m_cfg_last_open_file;  // имя последнего загруженного файла
+
+    QString       m_cfg_current_path;    // папка откуда мы запустились
+    QString       m_cfg_filename;        // имя файла с настройками
+
+    unsigned      m_cfg_autoload;        // автоматическая загрузка последнего файла (0 - no / 1 - yes)
+
+    void          actionAfterStart();
+
+    void          cfgReset() noexcept;
+
+    void          cfgRefresh() noexcept;
+
+    bool          cfgRead( const QString&  filename );   // прочитать конфиг
+    bool          cfgWrite( const QString&  filename );  // сохранить конфиг
+
+    void          cfgSetAutoload( unsigned  load ) noexcept;
+    unsigned      cfgGetAutoload() noexcept;
+
+    void          cfgSetCurrentPath( const QString&  path ) noexcept;
+    QString       cfgGetCurrentPath() noexcept;
+
+    void          cfgSetLastOpenPath( const QString&  path = "" ) noexcept;
+    void          cfgSetLastSavePath( const QString&  path = "" ) noexcept;
+    void          cfgSetLastOpenFile( const QString&  file = "" ) noexcept;
+
+    QString       cfgGetLastOpenPath() noexcept;
+    QString       cfgGetLastSavePath() noexcept;
+    QString       cfgGetLastOpenFile() noexcept;
 
     void          closeEvent( QCloseEvent * );
 };

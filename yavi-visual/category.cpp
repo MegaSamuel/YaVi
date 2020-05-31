@@ -8,14 +8,23 @@ TCategory::TCategory( TGoods  *pAncestor )
 {
     clear();
 
-    // диалог
-    m_ptDialog = new TDialog( true, "Category", this );
+    // диалог для себя
+    m_ptDialogSelf = new TDialog( false, "Category", this );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptDialog, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+    connect( m_ptDialogSelf, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
+    connect( m_ptDialogSelf, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
+
+    // диалог для добавления параметра
+    m_ptDialogAdd = new TDialog( true, "Add parameter", this );
+
+    // ловим сигнал от диалога об отмене
+    connect( m_ptDialogAdd, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+
+    // ловим сигнал от диалога с данными
+    connect( m_ptDialogAdd, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
 
     // указатель на родителя
     m_pAncestor = pAncestor;
@@ -69,6 +78,9 @@ void TCategory::clear()
     m_zName.clear();
     m_zBtnName.clear();
 
+    m_zUlink.clear();
+    m_zUname.clear();
+
     m_apParamList.clear();
 
     need_to_add = false;
@@ -79,13 +91,13 @@ void TCategory::clear()
 void  TCategory::onBtnName()
 {
     // диалог с пустыми параметрами
-    m_ptDialog->setDlgEmpty();
+    m_ptDialogSelf->setDlgEmpty();
 
-    m_ptDialog->setDlgEnabled( false );
+    m_ptDialogSelf->setDlgName( getCategoryName() );
+    m_ptDialogSelf->setDlgUlink( getCategoryUlink() );
+    m_ptDialogSelf->setDlgUname( getCategoryUname() );
 
-    m_ptDialog->setDlgName( getCategoryName() );
-
-    m_ptDialog->open();
+    m_ptDialogSelf->open();
 }
 
 void  TCategory::onBtnInc()
@@ -94,13 +106,11 @@ void  TCategory::onBtnInc()
     need_to_add = true;
 
     // диалог с пустыми параметрами
-    m_ptDialog->setDlgEmpty();
+    m_ptDialogAdd->setDlgEmpty();
 
-    m_ptDialog->setDlgEnabled( true );
+    m_ptDialogAdd->setDlgName( "NewParam" );
 
-    m_ptDialog->setDlgName( "NewParam" );
-
-    m_ptDialog->open();
+    m_ptDialogAdd->open();
 }
 
 void  TCategory::onSendCancel()
@@ -117,6 +127,8 @@ void  TCategory::onSendValues( TValues& a_tValues )
         // редактируем текущий набор параметров
 
         setCategoryName( m_tValues.m_zName.toStdString(), true );
+        setCategoryUlink( m_tValues.m_zUlink.toStdString(), true );
+        setCategoryUname( m_tValues.m_zUname.toStdString(), true );
     }
 
     if( true == need_to_add )
@@ -142,8 +154,10 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setParamUlink( m_tValues.m_zUlink.toStdString() );
         pParam->setParamUname( m_tValues.m_zUname.toStdString() );
         pParam->setParamMulti( m_tValues.m_zMulti.toStdString() );
-        pParam->setParamMin( m_tValues.m_uMin );
-        pParam->setParamMax( m_tValues.m_uMax );
+        pParam->setParamMin( m_tValues.m_nMin );
+        pParam->setParamMax( m_tValues.m_nMax );
+        pParam->setParamDMin( m_tValues.m_fMin );
+        pParam->setParamDMax( m_tValues.m_fMax );
 
         YAML::Node  node;
         node.reset();
@@ -151,15 +165,32 @@ void  TCategory::onSendValues( TValues& a_tValues )
         // пишем их в пустой ямл
         __yaml_SetString( node, GoodsNameSection, m_tValues.m_zName.toStdString() );
         __yaml_SetScalar( node, GoodsTypeSection, m_tValues.m_uType );
-        __yaml_SetString( node, GoodsPlaceholderSection, m_tValues.m_zPlaceholder.toStdString() );
-        __yaml_SetString( node, GoodsNewSection, m_tValues.m_zNew.toStdString() );
-        __yaml_SetString( node, GoodsAfterSection, m_tValues.m_zAfter.toStdString() );
-        __yaml_SetString( node, GoodsBeforeSection, m_tValues.m_zBefore.toStdString() );
-        __yaml_SetString( node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
-        __yaml_SetString( node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
-        __yaml_SetString( node, GoodsMultiSection, m_tValues.m_zMulti.toStdString() );
-        __yaml_SetScalar( node, GoodsMinSection, m_tValues.m_uMin );
-        __yaml_SetScalar( node, GoodsMaxSection, m_tValues.m_uMax );
+
+        if( 0 != m_tValues.m_uType )
+        {
+            __yaml_SetString( node, GoodsPlaceholderSection, m_tValues.m_zPlaceholder.toStdString() );
+            __yaml_SetString( node, GoodsNewSection, m_tValues.m_zNew.toStdString() );
+            __yaml_SetString( node, GoodsAfterSection, m_tValues.m_zAfter.toStdString() );
+            __yaml_SetString( node, GoodsBeforeSection, m_tValues.m_zBefore.toStdString() );
+            __yaml_SetString( node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
+            __yaml_SetString( node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
+        }
+
+        if( 2 == m_tValues.m_uType )
+        {
+            __yaml_SetInteger( node, GoodsMinSection, m_tValues.m_nMin );
+            __yaml_SetInteger( node, GoodsMaxSection, m_tValues.m_nMax );
+        }
+        else if( 3 == m_tValues.m_uType )
+        {
+            __yaml_SetDouble( node, GoodsMinSection, m_tValues.m_fMin );
+            __yaml_SetDouble( node, GoodsMaxSection, m_tValues.m_fMax );
+        }
+
+        if( 5 == m_tValues.m_uType )
+        {
+            __yaml_SetString( node, GoodsMultiSection, m_tValues.m_zMulti.toStdString() );
+        }
 
         // добавляем ямл к основному
         m_node[ GoodsParametersSection ].push_back( node );
@@ -170,7 +201,7 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setNodeParent( m_node[ GoodsParametersSection ] );
         pParam->setNodeIndex( index );
 
-        pParam->setParamNameColor();
+        pParam->setParamNameColor( pParam->getParamName() );
     }
 
     need_to_add = false;
@@ -187,6 +218,9 @@ void  TCategory::CategoryDelete()
     {
         // очищаем
         it->ParamDelete();
+
+        // удаляем
+        delete it;
     }
 
     // уничтожаем виджеты
@@ -242,6 +276,17 @@ void  TCategory::CategoryDelete()
 
 //------------------------------------------------------------------------------
 
+bool  TCategory::isParamNameRedefined( const QString&  name )
+{
+    Q_UNUSED(name);
+
+    //qDebug() << "what to do with" << name << "?";
+
+    return false;
+}
+
+//------------------------------------------------------------------------------
+
 void  TCategory::setNode( const YAML::Node&  node )
 {
     m_node = node;
@@ -274,7 +319,56 @@ int  TCategory::getNodeIndex()
 
 //------------------------------------------------------------------------------
 
-void  TCategory::getCategories( const YAML::Node&  node, TCategories  *a_pCategories, int  depth )
+void  TCategory::addCategories( YAML::Node&  node, TParam  *a_pParam, const std::string&  name, int  depth, int  index )
+{
+    YAML::Node    node_name;
+    TCategories  *pCategories;
+
+    // добавляем категорию
+    pCategories = new TCategories( a_pParam, depth );
+
+    // добавляемся к родителю
+    a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
+    a_pParam->m_apCategoriesList.append( pCategories );
+
+    // ставим значение имени
+    pCategories->setCategoriesName( name );
+
+    node_name.reset();
+
+    // пишем в пустой ямл
+    __yaml_SetString( node_name, GoodsNameSection, name );
+
+    // добавляем ямл к основному
+    node[ GoodsCategoriesSection ].push_back( node_name );
+
+    pCategories->setNode( node[ GoodsCategoriesSection ][index] );
+    pCategories->setNodeParent( node[ GoodsCategoriesSection ] );
+    pCategories->setNodeIndex( index );
+}
+
+void  TCategory::formCategories( const YAML::Node&  node, TParam  *a_pParam, int  depth )
+{
+    TCategories  *pCategories;
+
+    // создаем categories в интерфейсе
+    for( int i = 0; i < static_cast<int>(node.size()); i++ )
+    {
+        pCategories = new TCategories( a_pParam, depth );
+        pCategories->setNode( node[i] );
+        pCategories->setNodeParent( node );
+        pCategories->setNodeIndex( i );
+
+        a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
+        a_pParam->m_apCategoriesList.append( pCategories );
+
+        YAML::Node  node_cat = node[i];
+
+        getCategories( node_cat, pCategories, pCategories->getCategoriesDepth() );
+    }
+}
+
+void  TCategory::getCategories( YAML::Node&  node, TCategories  *a_pCategories, int  depth )
 {
     std::string  str;
 
@@ -304,28 +398,30 @@ void  TCategory::getCategories( const YAML::Node&  node, TCategories  *a_pCatego
             a_pCategories->m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
             a_pCategories->m_apParamList.append( pParam );
 
-            getParameters( node[ GoodsParametersSection ][i], pParam, pParam->getParamDepth() );
+            YAML::Node  node_par = node[ GoodsParametersSection ][i];
+
+            getParameters( node_par, pParam, pParam->getParamDepth() );
         }
     }
 }
 
-void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  depth )
+void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth )
 {
-    unsigned  val;
+    unsigned     type;
     std::string  str;
+    QString      name;
 
     // имя
     str = __yaml_GetString( node, GoodsNameSection );
     a_pParam->setParamName( str );
-
-    a_pParam->setParamNameColor();
+    name = QString::fromStdString(str);
 
     // тип
-    if( __yaml_IsScalar( node[ GoodsTypeSection ] ) )
-    {
-        val = node[ GoodsTypeSection ].as<unsigned>();
-        a_pParam->setParamType( val );
-    }
+    type = __yaml_GetUnsigned( node, GoodsTypeSection );
+    a_pParam->setParamType( type );
+
+    // красим после того как прочитали name и type!
+    a_pParam->setParamNameColor( a_pParam->getParamName() );
 
     //
     str = __yaml_GetString( node, GoodsPlaceholderSection );
@@ -351,18 +447,16 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
     str = __yaml_GetString( node, GoodsUnameSection );
     a_pParam->setParamUname( str );
 
-    // мин
-    if( __yaml_IsScalar( node[ GoodsMinSection ] ) )
+    // мин, макс
+    if( 2 == type )
     {
-        val = node[ GoodsMinSection ].as<unsigned>();
-        a_pParam->setParamMin( val );
+        a_pParam->setParamMin( __yaml_GetInteger( node, GoodsMinSection ) );
+        a_pParam->setParamMax( __yaml_GetInteger( node, GoodsMaxSection ) );
     }
-
-    // макс
-    if( __yaml_IsScalar( node[ GoodsMaxSection ] ) )
+    else if( 3 == type )
     {
-        val = node[ GoodsMaxSection ].as<unsigned>();
-        a_pParam->setParamMax( val );
+        a_pParam->setParamDMin( __yaml_GetDouble( node, GoodsMinSection ) );
+        a_pParam->setParamDMax( __yaml_GetDouble( node, GoodsMaxSection ) );
     }
 
     //
@@ -376,21 +470,141 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
 
     if( 0 != QString::fromStdString(str).length() )
     {
+        if( ( 4 == type ) || ( 5 == type ) )
+        {
+            // тип 4 или 5
+
+            if( __yaml_IsSequence( node[ GoodsCategoriesSection ] ) )
+            {
+                // есть записи в values, и есть секция categories
+                // приоритет у записей в values
+
+                formCategories( node[ GoodsCategoriesSection ], a_pParam, depth+1 );
+/*
+                TCategories  *pCategories;
+
+                for( int i = 0; i < static_cast<int>(node[ GoodsCategoriesSection ].size()); i++ )
+                {
+                    pCategories = new TCategories( a_pParam, depth+1 );
+                    pCategories->setNode( node[ GoodsCategoriesSection ][i] );
+                    pCategories->setNodeParent( node[ GoodsCategoriesSection ] );
+                    pCategories->setNodeIndex( i );
+
+                    a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
+                    a_pParam->m_apCategoriesList.append( pCategories );
+
+                    YAML::Node  node_cat = node[ GoodsCategoriesSection ][i];
+
+                    getCategories( node_cat, pCategories, pCategories->getCategoriesDepth() );
+                }
+*/
+                int  list_size = list.size();
+                int  cat_size = static_cast<int>(node[ GoodsCategoriesSection ].size());
+
+                // сравниваем количество записей в values и количество элементов в списке
+                if( list_size > cat_size )
+                {
+                    qDebug() << "value bigger than categories";
+
+                    // дописываем недостающие categories
+
+                    for( int i = cat_size; i < list_size; i++ )
+                    {
+                        addCategories( node, a_pParam, list[i].toStdString(), depth+1, i );
+                    }
+                }
+                else if( list_size < cat_size )
+                {
+                    qDebug() << "value smaller than categories";
+
+                    // дописываем недостающие поля в values
+
+                    for( int i = list_size; i < cat_size; i++ )
+                    {
+                        //qDebug() << i << a_pParam->m_apCategoriesList[i]->getCategoriesName();
+
+                        QString  cat_name = a_pParam->m_apCategoriesList[i]->getCategoriesName();
+
+                        a_pParam->addParamList( cat_name, true );
+                    }
+                }
+            }
+            else
+            {
+                // есть записи в values, но нет секции categories
+                // создаем секцию categories и пишем в нее значения из values
+
+                qDebug() << "there is no categories for" << a_pParam->getParamName();
+
+                for( auto& it : list )
+                {
+                    //qDebug() << it << list.indexOf(it);
+
+                    addCategories( node, a_pParam, it.toStdString(), depth+1, list.indexOf(it) );
+                }
+            }
+        }
+        else
+        {
+            // тип не 4 и не 5
+
+            if( __yaml_IsSequence( node[ GoodsCategoriesSection ] ) )
+            {
+                // есть записи в values, и есть секция categories
+
+                qDebug() << name << "type != 4|5, but values and categories exist!";
+            }
+            else
+            {
+                // есть записи в values, секции categories нет
+
+                qDebug() << name << "type != 4|5, but values exists, categories is empty!";
+            }
+        }
+    }
+    else
+    {
         if( __yaml_IsSequence( node[ GoodsCategoriesSection ] ) )
         {
-            TCategories  *pCategories;
+            // нет записей в values, но есть секция categories
 
-            for( int i = 0; i < static_cast<int>(node[ GoodsCategoriesSection ].size()); i++ )
+            if( ( 4 == type ) || ( 5 == type ) )
             {
-                pCategories = new TCategories( a_pParam, depth+1 );
-                pCategories->setNode( node[ GoodsCategoriesSection ][i] );
-                pCategories->setNodeParent( node[ GoodsCategoriesSection ] );
-                pCategories->setNodeIndex( i );
+                qDebug() << name << "values is empty, but categories exists!";
 
-                a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
-                a_pParam->m_apCategoriesList.append( pCategories );
+                formCategories( node[ GoodsCategoriesSection ], a_pParam, depth+1 );
+/*
+                TCategories  *pCategories;
 
-                getCategories( node[ GoodsCategoriesSection ][i], pCategories, pCategories->getCategoriesDepth() );
+                // создаем categories в интерфейсе
+                for( int i = 0; i < static_cast<int>(node[ GoodsCategoriesSection ].size()); i++ )
+                {
+                    pCategories = new TCategories( a_pParam, depth+1 );
+                    pCategories->setNode( node[ GoodsCategoriesSection ][i] );
+                    pCategories->setNodeParent( node[ GoodsCategoriesSection ] );
+                    pCategories->setNodeIndex( i );
+
+                    a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
+                    a_pParam->m_apCategoriesList.append( pCategories );
+
+                    YAML::Node  node_cat = node[ GoodsCategoriesSection ][i];
+
+                    getCategories( node_cat, pCategories, pCategories->getCategoriesDepth() );
+                }
+*/
+                // формируем values у родителя
+                for( auto& it : a_pParam->m_apCategoriesList )
+                {
+                    //qDebug() << i << a_pParam->m_apCategoriesList[i]->getCategoriesName();
+
+                    QString  cat_name = it->getCategoriesName();
+
+                    a_pParam->addParamList( cat_name, true );
+                }
+            }
+            else
+            {
+                qDebug() << name << "type != 4|5, values is empty, but categories exists!";
             }
         }
     }
@@ -429,9 +643,39 @@ void  TCategory::setCategoryName( const std::string&  name, bool  set_to_node )
     }
 }
 
-const QString TCategory::getCategoryName()
+void  TCategory::setCategoryUlink( const std::string&  name, bool  set_to_node )
+{
+    m_zUlink = QString::fromStdString(name);
+
+    if( set_to_node )
+    {
+        __yaml_SetString( m_node, GoodsUlinkSection, name );
+    }
+}
+
+void  TCategory::setCategoryUname( const std::string&  name, bool  set_to_node )
+{
+    m_zUname = QString::fromStdString(name);
+
+    if( set_to_node )
+    {
+        __yaml_SetString( m_node, GoodsUnameSection, name );
+    }
+}
+
+QString  TCategory::getCategoryName() noexcept
 {
     return m_zName;
+}
+
+QString  TCategory::getCategoryUlink() noexcept
+{
+    return m_zUlink;
+}
+
+QString  TCategory::getCategoryUname() noexcept
+{
+    return m_zUname;
 }
 
 //------------------------------------------------------------------------------

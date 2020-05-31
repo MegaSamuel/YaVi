@@ -43,13 +43,16 @@ TGoods::~TGoods()
 
 void  TGoods::GoodsDelete()
 {
-    QLayoutItem *child;
+//    QLayoutItem *child;
 
     // категории
     for( auto& it : m_apCategoryList )
     {
         // очищаем
         it->CategoryDelete();
+
+        // удаляем
+        delete it;
     }
 
     // таблицы
@@ -57,16 +60,21 @@ void  TGoods::GoodsDelete()
     {
         // очищаем
         it->TableDelete();
-    }
 
+        // удаляем
+        delete it;
+    }
+/*
     // уничтожаем артефакты
     while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
     {
         // остаются, скорее всего, главные layout-ы, т.к. им ставится deletelater?
+        qDebug() << "artefact";
+
         delete child->widget();
         delete child;
     }
-
+*/
     clear();
 
     widget_size_reset();
@@ -97,9 +105,19 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             m_vlayout->addWidget( pCategory );
             m_apCategoryList.append(pCategory);
 
+            std::string name;
+
             // ищем имя
-            std::string cat_name = __yaml_GetString( config[ GoodsCategorySection ][j], GoodsCategoryName );
-            pCategory->setCategoryName( cat_name );
+            name = __yaml_GetString( config[ GoodsCategorySection ][j], GoodsCategoryName );
+            pCategory->setCategoryName( name );
+
+            // ищем ulink
+            name = __yaml_GetString( config[ GoodsCategorySection ][j], GoodsUlinkSection );
+            pCategory->setCategoryUlink( name );
+
+            // ищем uname
+            name = __yaml_GetString( config[ GoodsCategorySection ][j], GoodsUnameSection );
+            pCategory->setCategoryUname( name );
 
             if( __yaml_IsSequence( config[ GoodsCategorySection ][j][ GoodsParametersSection ] ) )
             {
@@ -119,7 +137,9 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     pCategory->m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
                     pCategory->m_apParamList.append( pParam );
 
-                    pCategory->getParameters( config[ GoodsCategorySection ][j][ GoodsParametersSection ][i], pParam, pParam->getParamDepth() );
+                    YAML::Node  node_par = config[ GoodsCategorySection ][j][ GoodsParametersSection ][i];
+
+                    pCategory->getParameters( node_par, pParam, pParam->getParamDepth() );
 
                     type = pParam->getParamType();
 
@@ -140,27 +160,32 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
         // файл не пуст
         m_bEmpty = false;
 
-        for( auto& tab : config[ GoodsTableSection ] )
+        TTable  *pTable;
+
+        for( int j = 0; j < static_cast<int>(config[ GoodsTableSection ].size()); j++ )
         {
             bool  table_fill = false; // признак что таблица не заполнена
 
-            TTable  *pTable;
             pTable = new TTable( this );
+            pTable->setNode( config[ GoodsTableSection ][j] );
+            pTable->setNodeParent( config[ GoodsTableSection ] );
+            pTable->setNodeIndex( j );
+
             m_vlayout->addWidget( pTable );
             m_apTableList.append(pTable);
 
             // ищем секцию id
-            std::string  id = __yaml_GetString( tab, GoodsTableId );
+            std::string  id = __yaml_GetString( config[ GoodsTableSection ][j], GoodsTableId );
             pTable->setTableId( id );
 
             // ищем имя секции id
-            std::string  id_name = __yaml_GetString( tab, GoodsTableName );
+            std::string  id_name = __yaml_GetString( config[ GoodsTableSection ][j], GoodsTableName );
             pTable->setTableName( id_name );
 
             // ищем столбцы
-            if( !table_fill && __yaml_IsSequence( tab[GoodsTableColumn] ) )
+            if( !table_fill && __yaml_IsSequence( config[ GoodsTableSection ][j][GoodsTableColumn] ) )
             {
-                for( auto& col : tab[ GoodsTableColumn ] )
+                for( auto& col : config[ GoodsTableSection ][j][ GoodsTableColumn ] )
                 {
                     QStringList  col_list;
                     col_list.clear();
@@ -185,13 +210,15 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
                 pTable->nextRow();
 
+                pTable->setTableType( TTable::keTypeRow );
+
                 table_fill = true;
             }
 
             // ищем строки
-            if( !table_fill && __yaml_IsSequence( tab[GoodsTableRow] ) )
+            if( !table_fill && __yaml_IsSequence( config[ GoodsTableSection ][j][GoodsTableRow] ) )
             {
-                for( auto& row : tab[ GoodsTableRow ] )
+                for( auto& row : config[ GoodsTableSection ][j][ GoodsTableRow ] )
                 {
                     QStringList  row_list;
                     row_list.clear();
@@ -214,19 +241,19 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     pTable->setTableRow( row_list );
                 }
 
+                pTable->setTableType( TTable::keTypeColumn );
+
                 table_fill = true;
             }
 
             // ищем ссылку
             if( !table_fill )
             {
-                std::string  link = __yaml_GetString( tab, GoodsTableLink );
+                std::string  link = __yaml_GetString( config[ GoodsTableSection ][j], GoodsTableLink );
                 pTable->setTableLink( link );
-            }
 
-            //!bug необходимо убрать
-            // подгоняем размер виджета под содержимое для корректной работы скролла
-            widget_stretch( pTable->getTableWidth(), pTable->getTableHeight() );
+                pTable->setTableType( TTable::keTypeLink );
+            }
         }
     }
 

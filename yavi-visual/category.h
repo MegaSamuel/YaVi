@@ -29,14 +29,25 @@ public:
     YAML::Node&    getNodeParent();
     int            getNodeIndex();
 
-    void           getCategories( const YAML::Node&  node, TCategories  *a_pCategories, int  depth );
-    void           getParameters( const YAML::Node&  node, TParam  *a_pParam, int  depth );
+    void           addCategories( YAML::Node& node, TParam  *a_pParam, const std::string&  name, int  depth, int  index );
+
+    void           formCategories( const YAML::Node&  node, TParam  *a_pParam, int  depth );
+
+    void           getCategories( YAML::Node&  node, TCategories  *a_pCategories, int  depth );
+    void           getParameters( YAML::Node&  node, TParam  *a_pParam, int  depth );
 
     int            getCategoryWidth() noexcept;  // вернуть ширину
     int            getCategoryHeight() noexcept; // вернуть высоту
 
     void           setCategoryName( const std::string&  name, bool  set_to_node = false );
-    const QString  getCategoryName();
+    void           setCategoryUlink( const std::string&  name, bool  set_to_node = false );
+    void           setCategoryUname( const std::string&  name, bool  set_to_node = false );
+
+    QString        getCategoryName() noexcept;
+    QString        getCategoryUlink() noexcept;
+    QString        getCategoryUname() noexcept;
+
+    bool           isParamNameRedefined( const QString&  name );
 
     void           CategoryDelete();
 
@@ -68,9 +79,13 @@ private:
     QString        m_zName;     // category Name
     QString        m_zBtnName;  // текст на кнопке "Имя"
 
+    QString        m_zUlink;
+    QString        m_zUname;
+
     int            m_depth;     // глубина вложения
 
-    TDialog       *m_ptDialog;  // диалог на кнопке "Имя"
+    TDialog       *m_ptDialogSelf; // диалог на кнопке "Имя"
+    TDialog       *m_ptDialogAdd;  // диалог на кнопке "+"
 
     TValues        m_tValues;
 
