@@ -7,6 +7,23 @@
 
 //------------------------------------------------------------------------------
 
+inline bool isStrEqual( QString  str1, QString  str2 )
+{
+    // убираем пробелы
+    str1.replace( " ", "" );
+    str2.replace( " ", "" );
+
+    // сравниваем без учета регистра
+    if( 0 == QString::compare( str1, str2, Qt::CaseInsensitive ) )
+    {
+        return true;
+    }
+
+    return false;
+}
+
+//------------------------------------------------------------------------------
+
 inline bool __yaml_IsScalar( const YAML::Node&  node )
 {
     return ( node.IsDefined() ? ( node.IsScalar() ? true : false ) : false );

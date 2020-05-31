@@ -245,7 +245,7 @@ void  TCategories::onSendValues( TValues& a_tValues )
         pParam->setNodeParent( m_node[ GoodsParametersSection ] );
         pParam->setNodeIndex( index );
 
-        pParam->setParamNameColor();
+        pParam->setParamNameColor( pParam->getParamName() );
 
         //qDebug() << pParam->getParamName() << "index" << index;
     }
@@ -360,6 +360,29 @@ void  TCategories::CategoriesDelete()
             m_pMentor->getNode().remove( GoodsCategoriesSection );
         }
     }
+}
+
+//------------------------------------------------------------------------------
+
+bool  TCategories::isParamNameRedefined( const QString&  name )
+{
+    bool  result = false;
+
+    if( Q_NULLPTR != m_pMentor )
+    {
+        result = m_pMentor->setParamNameColorByRelative( name );
+
+        //qDebug() << "call setParamNameColorByRelative by isParamNameRedefined for" << name << result;
+
+        if( false == result )
+        {
+            result = m_pMentor->setParamNameColor( name, true );
+
+            //qDebug() << "call setParamNameColor by isParamNameRedefined for" << name << result;
+        }
+    }
+
+    return result;
 }
 
 //------------------------------------------------------------------------------
@@ -768,7 +791,11 @@ void  TParam::onSendValues( TValues& a_tValues )
             setParamMulti( m_tValues.m_zMulti.toStdString(), true );
         }
 
-        setParamNameColor();
+        // сброс цвета текста кнопки
+        colorBtnName( false );
+
+        // после рекактирования проверяем раскраску
+        setParamNameColor( getParamName() );
 
         //qDebug() << getParamName() << "fix parameter";
     }
@@ -1052,8 +1079,6 @@ void  TParam::setParamName( const std::string&  name, bool  set_to_node )
         widget_shrink( 0, -1 * height );
     }
 
-    setParamNameColor();
-
     if( set_to_node )
     {
         __yaml_SetString( m_node, GoodsNameSection, name );
@@ -1208,7 +1233,7 @@ void  TParam::setParamDMax( double  val, bool  set_to_node )
 }
 
 //------------------------------------------------------------------------------
-
+/*
 bool  TParam::isStrEqual( QString  str1, QString  str2 )
 {
     // убираем пробелы
@@ -1217,14 +1242,19 @@ bool  TParam::isStrEqual( QString  str1, QString  str2 )
 
     // сравниваем без учета регистра
     if( 0 == QString::compare( str1, str2, Qt::CaseInsensitive ) )
+    {
+        //qDebug() << "    equal" << str1 << str2;
         return true;
+    }
+
+    //qDebug() << "not equal" << str1 << str2;
 
     return false;
 }
-
+*/
 void  TParam::colorBtnName( bool  color )
 {
-    if( color )
+    if( true == color )
     {
         if( 0 == getParamType() )
         {
@@ -1241,43 +1271,148 @@ void  TParam::colorBtnName( bool  color )
     }
 }
 
-void  TParam::setParamNameColor( bool  force )
+bool  TParam::setParamNameColorByRelative( const QString&  name )
 {
+    bool result = false;
     QList<TParam*> list;
 
     list.clear();
 
-    colorBtnName( false );
-
+    // берем список параметров у родителя
     if( Q_NULLPTR != m_pMentor )
     {
-        //qDebug() << "mentor name" << m_pMentor->getCategoriesName();
+        //qDebug() << "_mentor" << m_pMentor->getCategoriesName() << m_pMentor->m_apParamList.size() << name;
+
+        list = m_pMentor->m_apParamList;
+    }
+
+    // если список не пуст, то просматриваем его
+    for( auto& it : list )
+    {
+        // проверяем у прародителя
+        // нашли совпадение -> красим
+        if( Q_NULLPTR != m_pMentor )
+        {
+            if( m_pMentor->isParamNameRedefined( name ) )
+            {
+                //qDebug() << "color item" << name << "by parameter" << it->getParamName() << "yyy" << getParamName();
+
+                result = true;
+
+                break;
+            }
+        }
+
+        // проверяем у родителя
+        // нашли совпадение -> красим
+        if( isStrEqual( name, it->getParamName() ) )
+        {
+            //qDebug() << "color item" << name << "by parameter" << it->getParamName() << "zzz" << getParamName();
+
+            result = true;
+
+            break;
+        }
+    }
+
+    return result;
+}
+
+bool  TParam::setParamNameColor( const QString&  name, bool  force )
+{
+    bool result = false;
+    QList<TParam*> list;
+
+    list.clear();
+
+    // красим имя текущего параметра в серый
+    //colorBtnName( false );
+
+    // берем список параметров у родителя
+    if( Q_NULLPTR != m_pMentor )
+    {
+        //qDebug() << "mentor" << m_pMentor->getCategoriesName() << m_pMentor->m_apParamList.size() << name;
 
         list = m_pMentor->m_apParamList;
     }
     else if( Q_NULLPTR != m_pAncestor )
     {
-        //qDebug() << "ancestor name" << m_pAncestor->getCategoryName();
+        //qDebug() << "ancestor" << m_pAncestor->getCategoryName() << m_pAncestor->m_apParamList.size() << name;
 
         list = m_pAncestor->m_apParamList;
     }
 
-    if( list.size() )
+    // если список не пуст, то просматриваем его
+    for( auto& it : list )
     {
-        for( auto& it : list )
+        //qDebug() << "0 parent ind" << it->getNodeIndex() << it->getParamName() << "ind" << getNodeIndex() << name;
+
+        if( Q_NULLPTR != m_pAncestor )
         {
+            // для родителя смотрим только параметры с индексами меньше чем у нас
             if( ( force ) || ( it->getNodeIndex() < getNodeIndex() ) )
             {
-                if( isStrEqual( getParamName(), it->getParamName() ) )
+                //qDebug() << "1 parent ind" << it->getNodeIndex() << it->getParamName() << "ind" << getNodeIndex() << name << force;
+
+                // проверяем у родителя
+                // нашли совпадение -> красим
+                if( isStrEqual( name, it->getParamName() ) )
                 {
-                    colorBtnName( true );
+                    //if( !force )
+                    //    qDebug() << "color item" << name << "by parameter" << it->getParamName() << force << "A" << getParamName();
+
+                    // красим имя в зависимости от типа
+                    if( !force )
+                        colorBtnName( true );
+
+                    result = true;
+
+                    break;
+                }
+            }
+        }
+
+        if( Q_NULLPTR != m_pMentor )
+        {
+            // проверяем у прародителя
+            // нашли совпадение -> красим
+            if( m_pMentor->isParamNameRedefined( name ) )
+            {
+                //qDebug() << "color item" << name << "by parameter" << it->getParamName() << force << "xxx" << getParamName();
+
+                // красим имя в зависимости от типа
+                colorBtnName( true );
+
+                result = true;
+            }
+
+            // для родителя смотрим только параметры с индексами меньше или равным чем у нас
+            if( it->getNodeIndex() < getNodeIndex() )
+            {
+                //qDebug() << "2 parent ind" << it->getNodeIndex() << it->getParamName() << "ind" << getNodeIndex() << name  << force;
+
+                // проверяем у родителя
+                // нашли совпадение -> красим
+                if( isStrEqual( name, it->getParamName() ) )
+                {
+                    //qDebug() << "color item" << name << "by parameter" << it->getParamName() << force << "M" << getParamName();
+
+                    // красим имя в зависимости от типа
+                    it->colorBtnName( true );
+
+                    result = true;
 
                     break;
                 }
             }
         }
     }
+
+    //qDebug() << "end" << result;
+
+    return result;
 }
+
 
 //------------------------------------------------------------------------------
 
