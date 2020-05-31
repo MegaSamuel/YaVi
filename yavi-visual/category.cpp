@@ -308,7 +308,56 @@ int  TCategory::getNodeIndex()
 
 //------------------------------------------------------------------------------
 
-void  TCategory::getCategories( const YAML::Node&  node, TCategories  *a_pCategories, int  depth )
+void  TCategory::addCategories( YAML::Node&  node, TParam  *a_pParam, const std::string&  name, int  depth, int  index )
+{
+    YAML::Node    node_name;
+    TCategories  *pCategories;
+
+    // добавляем категорию
+    pCategories = new TCategories( a_pParam, depth );
+
+    // добавляемся к родителю
+    a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
+    a_pParam->m_apCategoriesList.append( pCategories );
+
+    // ставим значение имени
+    pCategories->setCategoriesName( name );
+
+    node_name.reset();
+
+    // пишем в пустой ямл
+    __yaml_SetString( node_name, GoodsNameSection, name );
+
+    // добавляем ямл к основному
+    node[ GoodsCategoriesSection ].push_back( node_name );
+
+    pCategories->setNode( node[ GoodsCategoriesSection ][index] );
+    pCategories->setNodeParent( node[ GoodsCategoriesSection ] );
+    pCategories->setNodeIndex( index );
+}
+
+void  TCategory::formCategories( const YAML::Node&  node, TParam  *a_pParam, int  depth )
+{
+    TCategories  *pCategories;
+
+    // создаем categories в интерфейсе
+    for( int i = 0; i < static_cast<int>(node.size()); i++ )
+    {
+        pCategories = new TCategories( a_pParam, depth );
+        pCategories->setNode( node[i] );
+        pCategories->setNodeParent( node );
+        pCategories->setNodeIndex( i );
+
+        a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
+        a_pParam->m_apCategoriesList.append( pCategories );
+
+        YAML::Node  node_cat = node[i];
+
+        getCategories( node_cat, pCategories, pCategories->getCategoriesDepth() );
+    }
+}
+
+void  TCategory::getCategories( YAML::Node&  node, TCategories  *a_pCategories, int  depth )
 {
     std::string  str;
 
@@ -338,19 +387,23 @@ void  TCategory::getCategories( const YAML::Node&  node, TCategories  *a_pCatego
             a_pCategories->m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
             a_pCategories->m_apParamList.append( pParam );
 
-            getParameters( node[ GoodsParametersSection ][i], pParam, pParam->getParamDepth() );
+            YAML::Node  node_par = node[ GoodsParametersSection ][i];
+
+            getParameters( node_par, pParam, pParam->getParamDepth() );
         }
     }
 }
 
-void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  depth )
+void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth )
 {
     unsigned     type;
     std::string  str;
+    QString      name;
 
     // имя
     str = __yaml_GetString( node, GoodsNameSection );
     a_pParam->setParamName( str );
+    name = QString::fromStdString(str);
 
     a_pParam->setParamNameColor();
 
@@ -405,21 +458,141 @@ void  TCategory::getParameters( const YAML::Node&  node, TParam *a_pParam, int  
 
     if( 0 != QString::fromStdString(str).length() )
     {
+        if( ( 4 == type ) || ( 5 == type ) )
+        {
+            // тип 4 или 5
+
+            if( __yaml_IsSequence( node[ GoodsCategoriesSection ] ) )
+            {
+                // есть записи в values, и есть секция categories
+                // приоритет у записей в values
+
+                formCategories( node[ GoodsCategoriesSection ], a_pParam, depth+1 );
+/*
+                TCategories  *pCategories;
+
+                for( int i = 0; i < static_cast<int>(node[ GoodsCategoriesSection ].size()); i++ )
+                {
+                    pCategories = new TCategories( a_pParam, depth+1 );
+                    pCategories->setNode( node[ GoodsCategoriesSection ][i] );
+                    pCategories->setNodeParent( node[ GoodsCategoriesSection ] );
+                    pCategories->setNodeIndex( i );
+
+                    a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
+                    a_pParam->m_apCategoriesList.append( pCategories );
+
+                    YAML::Node  node_cat = node[ GoodsCategoriesSection ][i];
+
+                    getCategories( node_cat, pCategories, pCategories->getCategoriesDepth() );
+                }
+*/
+                int  list_size = list.size();
+                int  cat_size = static_cast<int>(node[ GoodsCategoriesSection ].size());
+
+                // сравниваем количество записей в values и количество элементов в списке
+                if( list_size > cat_size )
+                {
+                    qDebug() << "value bigger than categories";
+
+                    // дописываем недостающие categories
+
+                    for( int i = cat_size; i < list_size; i++ )
+                    {
+                        addCategories( node, a_pParam, list[i].toStdString(), depth+1, i );
+                    }
+                }
+                else if( list_size < cat_size )
+                {
+                    qDebug() << "value smaller than categories";
+
+                    // дописываем недостающие поля в values
+
+                    for( int i = list_size; i < cat_size; i++ )
+                    {
+                        //qDebug() << i << a_pParam->m_apCategoriesList[i]->getCategoriesName();
+
+                        QString  cat_name = a_pParam->m_apCategoriesList[i]->getCategoriesName();
+
+                        a_pParam->addParamList( cat_name, true );
+                    }
+                }
+            }
+            else
+            {
+                // есть записи в values, но нет секции categories
+                // создаем секцию categories и пишем в нее значения из values
+
+                qDebug() << "there is no categories for" << a_pParam->getParamName();
+
+                for( auto& it : list )
+                {
+                    //qDebug() << it << list.indexOf(it);
+
+                    addCategories( node, a_pParam, it.toStdString(), depth+1, list.indexOf(it) );
+                }
+            }
+        }
+        else
+        {
+            // тип не 4 и не 5
+
+            if( __yaml_IsSequence( node[ GoodsCategoriesSection ] ) )
+            {
+                // есть записи в values, и есть секция categories
+
+                qDebug() << name << "type != 4|5, but values and categories exist!";
+            }
+            else
+            {
+                // есть записи в values, секции categories нет
+
+                qDebug() << name << "type != 4|5, but values exists, categories is empty!";
+            }
+        }
+    }
+    else
+    {
         if( __yaml_IsSequence( node[ GoodsCategoriesSection ] ) )
         {
-            TCategories  *pCategories;
+            // нет записей в values, но есть секция categories
 
-            for( int i = 0; i < static_cast<int>(node[ GoodsCategoriesSection ].size()); i++ )
+            if( ( 4 == type ) || ( 5 == type ) )
             {
-                pCategories = new TCategories( a_pParam, depth+1 );
-                pCategories->setNode( node[ GoodsCategoriesSection ][i] );
-                pCategories->setNodeParent( node[ GoodsCategoriesSection ] );
-                pCategories->setNodeIndex( i );
+                qDebug() << name << "values is empty, but categories exists!";
 
-                a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
-                a_pParam->m_apCategoriesList.append( pCategories );
+                formCategories( node[ GoodsCategoriesSection ], a_pParam, depth+1 );
+/*
+                TCategories  *pCategories;
 
-                getCategories( node[ GoodsCategoriesSection ][i], pCategories, pCategories->getCategoriesDepth() );
+                // создаем categories в интерфейсе
+                for( int i = 0; i < static_cast<int>(node[ GoodsCategoriesSection ].size()); i++ )
+                {
+                    pCategories = new TCategories( a_pParam, depth+1 );
+                    pCategories->setNode( node[ GoodsCategoriesSection ][i] );
+                    pCategories->setNodeParent( node[ GoodsCategoriesSection ] );
+                    pCategories->setNodeIndex( i );
+
+                    a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
+                    a_pParam->m_apCategoriesList.append( pCategories );
+
+                    YAML::Node  node_cat = node[ GoodsCategoriesSection ][i];
+
+                    getCategories( node_cat, pCategories, pCategories->getCategoriesDepth() );
+                }
+*/
+                // формируем values у родителя
+                for( auto& it : a_pParam->m_apCategoriesList )
+                {
+                    //qDebug() << i << a_pParam->m_apCategoriesList[i]->getCategoriesName();
+
+                    QString  cat_name = it->getCategoriesName();
+
+                    a_pParam->addParamList( cat_name, true );
+                }
+            }
+            else
+            {
+                qDebug() << name << "type != 4|5, values is empty, but categories exists!";
             }
         }
     }

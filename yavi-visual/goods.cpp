@@ -137,7 +137,9 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     pCategory->m_vlayout->addWidget( pParam, 0, Qt::AlignLeft | Qt::AlignTop );
                     pCategory->m_apParamList.append( pParam );
 
-                    pCategory->getParameters( config[ GoodsCategorySection ][j][ GoodsParametersSection ][i], pParam, pParam->getParamDepth() );
+                    YAML::Node  node_par = config[ GoodsCategorySection ][j][ GoodsParametersSection ][i];
+
+                    pCategory->getParameters( node_par, pParam, pParam->getParamDepth() );
 
                     type = pParam->getParamType();
 
