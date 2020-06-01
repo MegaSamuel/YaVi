@@ -1383,7 +1383,8 @@ bool  TParam::setParamNameColor( const QString&  name, bool  force )
                     //qDebug() << "color item" << name << "by parameter" << it->getParamName() << force << "M" << getParamName();
 
                     // красим имя в зависимости от типа
-                    it->colorBtnName( true );
+                    //it->colorBtnName( true );
+                    colorBtnName( true );
 
                     result = true;
 
