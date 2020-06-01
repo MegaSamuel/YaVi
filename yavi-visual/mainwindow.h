@@ -18,14 +18,19 @@ public:
 
     static MainWindow *getMainWinPtr();
 
-private Q_SLOTS:
-    void         onTimerWork();
-    void         onBtnOpen();
-    void         onBtnSave();
     void         onYamlChanged();
+
+//private Q_SLOTS:
+//    void         onTimerWork();
+//    void         onBtnOpen();
+//    void         onBtnSave();
 
 private:
     static MainWindow *pMainWindow;
+
+    void         onTimerWork();
+    void         onBtnOpen();
+    void         onBtnSave();
 
     QPushButton  *m_ptBtnOpen;
     QPushButton  *m_ptBtnSave;

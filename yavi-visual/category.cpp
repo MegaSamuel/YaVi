@@ -13,19 +13,19 @@ TCategory::TCategory( TGoods  *pAncestor )
     m_ptDialogSelf = new TDialog( false, "Category", this );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptDialogSelf, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+    connect( m_ptDialogSelf, &TDialog::sendCancel, this, &TCategory::onSendCancel );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialogSelf, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
+    connect( m_ptDialogSelf, &TDialog::sendValues, this, &TCategory::onSendValues );
 
     // диалог для добавления параметра
     m_ptDialogAdd = new TDialog( true, "Add parameter", this );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptDialogAdd, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+    connect( m_ptDialogAdd, &TDialog::sendCancel, this, &TCategory::onSendCancel );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialogAdd, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
+    connect( m_ptDialogAdd, &TDialog::sendValues, this, &TCategory::onSendValues );
 
     // указатель на родителя
     m_pAncestor = pAncestor;
@@ -37,7 +37,7 @@ TCategory::TCategory( TGoods  *pAncestor )
     m_node_index = -1;
 
     // цепляем местный сигнал к слоту MainWindow
-    connect( this, SIGNAL(sendChanged()), MainWindow::getMainWinPtr(), SLOT(onYamlChanged()) );
+    connect( this, &TCategory::sendChanged, MainWindow::getMainWinPtr(), &MainWindow::onYamlChanged );
 
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
@@ -50,14 +50,14 @@ TCategory::TCategory( TGoods  *pAncestor )
     // кнопка с именем
     m_ptBtnName = new QPushButton( "button" );
     m_ptBtnName->setFixedWidth( 93 );
-    connect( m_ptBtnName, SIGNAL(clicked()), this, SLOT(onBtnName()) );
+    connect( m_ptBtnName, &QPushButton::clicked, this, &TCategory::onBtnName );
     m_hlayout->addWidget( m_ptBtnName, 0, Qt::AlignLeft );
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+" );
     m_ptBtnInc->setToolTip( "Добавить параметр" );
     m_ptBtnInc->setFixedWidth( 93 );
-    connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
+    connect( m_ptBtnInc, &QPushButton::clicked, this, &TCategory::onBtnInc );
     m_hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
 
     m_vlayout->addLayout( m_hlayout, 0 );

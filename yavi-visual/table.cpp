@@ -12,10 +12,10 @@ TTable::TTable( TGoods  *pAncestor )
     m_ptDialog = new TDialog( true, "Table", this );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptDialog, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+    connect( m_ptDialog, &TDialog::sendCancel, this, &TTable::onSendCancel );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialog, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
+    connect( m_ptDialog, &TDialog::sendValues, this, &TTable::onSendValues );
 
     // указатель на родителя
     m_pAncestor = pAncestor;

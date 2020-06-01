@@ -86,6 +86,9 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
     // иконка формы
     setWindowIcon( QIcon( ":/favicon.ico" ) );
 
+    // цепляем местный сигнал к слоту MainWindow
+    connect( this, &TDialog::sendChanged, MainWindow::getMainWinPtr(), &MainWindow::onYamlChanged );
+
     row_min = 0;
     row_max = 0;
 
@@ -189,9 +192,6 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
     setLayout( priv__->m_grid );
 
     setMinimumSize( priv__->m_grid->minimumSize().width(), priv__->m_grid->minimumSize().height() );
-
-    // цепляем местный сигнал к слоту MainWindow
-    connect( this, SIGNAL(sendChanged()), MainWindow::getMainWinPtr(), SLOT(onYamlChanged()) );
 }
 
 TDialog::~TDialog()

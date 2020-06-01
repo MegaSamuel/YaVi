@@ -54,14 +54,20 @@ public:
     QVBoxLayout   *m_vlayout;   // главный layout класса
     QList<TParam*> m_apParamList;
 
-protected Q_SLOTS :
+//protected Q_SLOTS :
+//    void           onBtnDec();
+//    void           onBtnInc();
+//    void           onBtnName();
+//    void           onSendCancel();
+//    void           onSendValues( TValues& );
+
+private:
     void           onBtnDec();
     void           onBtnInc();
     void           onBtnName();
     void           onSendCancel();
     void           onSendValues( TValues& );
 
-private:
     void           clear();
 
     void           clearNodeSequence();
@@ -189,18 +195,28 @@ public:
     QVBoxLayout   *m_vlayout;   // главный layout класса
     QList<TCategories*>  m_apCategoriesList;
 
-protected Q_SLOTS :
+//protected Q_SLOTS :
+//    void           onBtnDec();
+//    void           onBtnValDec();
+//    void           onBtnInc();
+//    void           onBtnName();
+//    void           onSendCancel();
+//    void           onSendValues( TValues& );
+//    void           onSendValue( QString );
+//    void           onSendValue( int );
+//    void           onSendValue( double );
+
+private:
     void           onBtnDec();
     void           onBtnValDec();
     void           onBtnInc();
     void           onBtnName();
     void           onSendCancel();
     void           onSendValues( TValues& );
-    void           onSendValue( QString );
-    void           onSendValue( int );
-    void           onSendValue( double );
+    void           onSendValueS( QString );
+    void           onSendValueI( int );
+    void           onSendValueD( double );
 
-private:
     void           clear();
 
     void           clearNodeSequence();

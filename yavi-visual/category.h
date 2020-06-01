@@ -60,13 +60,18 @@ public:
 Q_SIGNALS:
     void           sendChanged();
 
-private Q_SLOTS :
+//private Q_SLOTS :
+//    void           onBtnName();
+//    void           onBtnInc();
+//    void           onSendCancel();
+//    void           onSendValues( TValues& );
+
+private:
     void           onBtnName();
     void           onBtnInc();
     void           onSendCancel();
     void           onSendValues( TValues& );
 
-private:
     void           clear();
 
     YAML::Node     m_node;        // текущий уровнь дерева ямла

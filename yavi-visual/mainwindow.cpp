@@ -20,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     // создаем и запускаем основной таймер
     m_uTimerCounter = 0;
     m_ptTimer = new QTimer( this );
-    connect( m_ptTimer, SIGNAL(timeout()), this, SLOT(onTimerWork()) );
+    connect( m_ptTimer, &QTimer::timeout, this, &MainWindow::onTimerWork );
     m_ptTimer->start(1000); // 1 Hz
 
     // ставим стиль
@@ -42,12 +42,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     // кнопка "загрузить yaml из файла"
     m_ptBtnOpen = new QPushButton( "Open" );
-    connect( m_ptBtnOpen, SIGNAL(clicked()), this, SLOT(onBtnOpen()) );
+    connect( m_ptBtnOpen, &QPushButton::clicked, this, &MainWindow::onBtnOpen );
     hlayout->addWidget( m_ptBtnOpen, 0, Qt::AlignLeft );
 
     // кнопка "сохранить все в yaml"
     m_ptBtnSave = new QPushButton( "Save" );
-    connect( m_ptBtnSave, SIGNAL(clicked()), this, SLOT(onBtnSave()) );
+    connect( m_ptBtnSave, &QPushButton::clicked, this, &MainWindow::onBtnSave );
     hlayout->addWidget( m_ptBtnSave, 0, Qt::AlignLeft );
 
     // лэйбл
@@ -72,8 +72,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     vlayout->addWidget( scroll );
     // <-
-
-    //connect( m_pGoods, sendAction(), this, onYamlChanged() );
 
     // добавляем вертикальный layout в frame
     frmBase->setLayout( vlayout );
