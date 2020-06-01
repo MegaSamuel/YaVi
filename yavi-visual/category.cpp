@@ -1,6 +1,7 @@
 #include "func.h"
 #include "goods.h"
 #include "category.h"
+#include "mainwindow.h"
 
 //------------------------------------------------------------------------------
 
@@ -34,6 +35,9 @@ TCategory::TCategory( TGoods  *pAncestor )
     m_node.reset();
     m_node_parent.reset();
     m_node_index = -1;
+
+    // цепляем местный сигнал к слоту MainWindow
+    connect( this, SIGNAL(sendChanged()), MainWindow::getMainWinPtr(), SLOT(onYamlChanged()) );
 
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
@@ -512,6 +516,8 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
                     {
                         addCategories( node, a_pParam, list[i].toStdString(), depth+1, i );
                     }
+
+                    Q_EMIT  sendChanged();
                 }
                 else if( list_size < cat_size )
                 {
@@ -527,6 +533,8 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
 
                         a_pParam->addParamList( cat_name, true );
                     }
+
+                    Q_EMIT  sendChanged();
                 }
             }
             else
@@ -542,6 +550,8 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
 
                     addCategories( node, a_pParam, it.toStdString(), depth+1, list.indexOf(it) );
                 }
+
+                Q_EMIT  sendChanged();
             }
         }
         else

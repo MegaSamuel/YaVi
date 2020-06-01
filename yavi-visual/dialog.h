@@ -58,6 +58,7 @@ public :
 
 Q_SIGNALS:
     void    sendCancel();
+    void    sendChanged();
     void    sendValues( TValues&  values );
 
 protected Q_SLOTS:

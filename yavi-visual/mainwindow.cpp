@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "func.h"
+#include "dialog.h"
 
 //------------------------------------------------------------------------------
 
@@ -7,6 +8,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     m_fBeginTime = cpu_time();
+
+    pMainWindow = this;
 
     m_zPrgName.clear();
     m_zPrgTitle.clear();
@@ -70,6 +73,8 @@ MainWindow::MainWindow(QWidget *parent)
     vlayout->addWidget( scroll );
     // <-
 
+    //connect( m_pGoods, sendAction(), this, onYamlChanged() );
+
     // добавляем вертикальный layout в frame
     frmBase->setLayout( vlayout );
 
@@ -83,6 +88,13 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
 
+}
+
+MainWindow *MainWindow::pMainWindow = nullptr;
+
+MainWindow *MainWindow::getMainWinPtr()
+{
+    return pMainWindow;
 }
 
 //------------------------------------------------------------------------------
@@ -178,6 +190,8 @@ void  MainWindow::onBtnSave()
         }
         else
         {
+            m_bPrgTitleChanged = false;
+
             // заголовок формы
             setPrgTitleText( filename );
 
@@ -354,6 +368,11 @@ void  MainWindow::setPrgTitleText( const QString&  text )
     if( 0 != text.length() )
     {
         m_zPrgTitle = text + " - " + m_zPrgName;
+
+        if( m_bPrgTitleChanged )
+        {
+            m_zPrgTitle.prepend( "*" );
+        }
     }
     else
     {
@@ -363,15 +382,8 @@ void  MainWindow::setPrgTitleText( const QString&  text )
     setWindowTitle( m_zPrgTitle );
 }
 
-bool  MainWindow::getPrgTitleChanged()
-{
-    return m_bPrgTitleChanged;
-}
-
 void  MainWindow::setPrgTitleChanged( bool  changed )
 {
-    m_bPrgTitleChanged = changed;
-
     if( changed )
     {
         m_zPrgTitle.prepend( "*" );
@@ -388,10 +400,15 @@ void  MainWindow::setPrgTitleChanged( bool  changed )
 
 void  MainWindow::onYamlChanged()
 {
-    if( !getPrgTitleChanged() )
+    // если признака что ямл изменился еще нет
+    if( !m_bPrgTitleChanged )
     {
+        // рисуем "*" перед именем файла
         setPrgTitleChanged( true );
     }
+
+    // признак что ямл изменился
+    m_bPrgTitleChanged = true;
 }
 
 //------------------------------------------------------------------------------

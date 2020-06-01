@@ -1,4 +1,5 @@
 #include "dialog.h"
+#include "mainwindow.h"
 
 //------------------------------------------------------------------------------
 
@@ -188,6 +189,9 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
     setLayout( priv__->m_grid );
 
     setMinimumSize( priv__->m_grid->minimumSize().width(), priv__->m_grid->minimumSize().height() );
+
+    // цепляем местный сигнал к слоту MainWindow
+    connect( this, SIGNAL(sendChanged()), MainWindow::getMainWinPtr(), SLOT(onYamlChanged()) );
 }
 
 TDialog::~TDialog()
@@ -459,6 +463,9 @@ void  TDialog::onBtnAction( QAbstractButton*  btn )
 
         // шлем сигнал с данными
         Q_EMIT sendValues( priv__->m_tValues );
+
+        // шлем сигнал что мы что-то поменяли
+        Q_EMIT sendChanged();
     }
 
     // нажали Reset
