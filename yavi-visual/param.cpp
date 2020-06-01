@@ -847,21 +847,6 @@ void  TParam::onSendValues( TValues& a_tValues )
     need_to_add = false;
 }
 
-void  TParam::onSendValueS( QString  val )
-{
-    m_tValues.m_zVal = val;
-}
-
-void  TParam::onSendValueI( int  val )
-{
-    m_tValues.m_nVal = val;
-}
-
-void  TParam::onSendValueD( double  val )
-{
-    m_tValues.m_fVal = val;
-}
-
 //------------------------------------------------------------------------------
 
 void  TParam::clearNodeSequence()
@@ -1621,20 +1606,29 @@ void  TParam::setParamValueAdd( unsigned  type )
     m_ptLineValue = new QLineEdit();
     m_ptLineValue->setToolTip( "Значение" );
     m_ptLineValue->setFixedWidth( 93 );
-    connect( m_ptLineValue, &QLineEdit::textChanged, this, &TParam::onSendValueS );
+    connect( m_ptLineValue, &QLineEdit::textChanged, [=](QString val)
+        {
+            m_tValues.m_zVal = val;
+        } );
 
     // спин со значением
     m_ptSpinValue = new QSpinBox();
     m_ptSpinValue->setToolTip( "Значение" );
     m_ptSpinValue->setFixedWidth( 93 );
-//    connect( m_ptSpinValue, &QSpinBox::valueChanged, this, &TParam::onSendValueI );
+    connect( m_ptSpinValue, QOverload<int>::of(&QSpinBox::valueChanged), [=](int val)
+        {
+            m_tValues.m_nVal = val;
+        } );
 
     // дабл спин со значением
     m_ptDSpinValue = new QDoubleSpinBox();
     m_ptDSpinValue->setToolTip( "Значение" );
     m_ptDSpinValue->setFixedWidth( 93 );
     m_ptDSpinValue->setDecimals( 1 );
-//    connect( m_ptDSpinValue, &QDoubleSpinBox::valueChanged, this, &TParam::onSendValueD );
+    connect( m_ptDSpinValue, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double val)
+        {
+            m_tValues.m_fVal = val;
+        } );
 
     m_second_row_type = type;
 

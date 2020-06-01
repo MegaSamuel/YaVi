@@ -111,7 +111,7 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
         QLabel *lblType = new QLabel( QString( "%1%2" ).arg("Type").arg(":"), this );
         priv__->m_grid->addWidget( lblType, row, 0, 1, 1 );
         priv__->m_grid->addWidget( priv__->m_ptSpinType, row, 1, 1, 1 );
-        connect( priv__->m_ptSpinType, SIGNAL(valueChanged(int)), this, SLOT(onTypeChanged(int)) );
+        connect( priv__->m_ptSpinType, QOverload<int>::of(&QSpinBox::valueChanged), this, &TDialog::onTypeChanged );
         row++;
 
         QLabel *lblPlaceholder = new QLabel( QString( "%1%2" ).arg("Placeholder").arg(":"), this );
@@ -177,11 +177,13 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
     // создаем диалоговые кнопки
     QDialogButtonBox  *box = new QDialogButtonBox( QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this );
 
-    connect( box, SIGNAL(accepted()), this, SIGNAL(accepted()) );
-    connect( box, SIGNAL(rejected()), this, SIGNAL(rejected()) );
-    connect( box, SIGNAL(accepted()), this, SLOT(close()) );
-    connect( box, SIGNAL(rejected()), this, SLOT(close()) );
-    connect( box, SIGNAL(clicked(QAbstractButton*)), this, SLOT(onBtnAction(QAbstractButton*)) );
+    //connect( box, &QDialogButtonBox::accepted, this, &TDialog::accepted );
+    //connect( box, &QDialogButtonBox::rejected, this, &TDialog::rejected );
+
+    connect( box, &QDialogButtonBox::accepted, this, &TDialog::close );
+    connect( box, &QDialogButtonBox::rejected, this, &TDialog::close );
+
+    connect( box, &QDialogButtonBox::clicked, this, &TDialog::onBtnAction );
 
     // добавляем диалоговые кнопки в окно
     priv__->m_ptBtnBox = box;

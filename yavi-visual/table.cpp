@@ -1,6 +1,7 @@
 #include "func.h"
 #include "goods.h"
 #include "table.h"
+#include "mainwindow.h"
 
 //------------------------------------------------------------------------------
 
@@ -20,6 +21,9 @@ TTable::TTable( TGoods  *pAncestor )
     // указатель на родителя
     m_pAncestor = pAncestor;
 
+    // цепляем местный сигнал к слоту MainWindow
+    connect( this, &TTable::sendChanged, MainWindow::getMainWinPtr(), &MainWindow::onYamlChanged );
+
     resetRow();
     resetColumn();
 
@@ -30,14 +34,14 @@ TTable::TTable( TGoods  *pAncestor )
     // кнопка с именем
     m_ptBtnName = new QPushButton( "button" );
     m_ptBtnName->setFixedWidth( 93 );
-    connect( m_ptBtnName, SIGNAL(clicked()), this, SLOT(onBtnName()) );
+    connect( m_ptBtnName, &QPushButton::clicked, this, &TTable::onBtnName );
     m_grid->addWidget( m_ptBtnName, m_row, 0, Qt::AlignLeft );
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+" );
     m_ptBtnInc->setToolTip( "Добавить запись" );
     m_ptBtnInc->setFixedWidth( 93 );
-    connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
+    connect( m_ptBtnInc, &QPushButton::clicked, this, &TTable::onBtnInc );
     m_grid->addWidget( m_ptBtnInc, m_row, 1, Qt::AlignLeft );
 
     // перевод строки и колонки в grid для следующих добавлений

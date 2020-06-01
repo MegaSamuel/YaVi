@@ -484,34 +484,16 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
                 // приоритет у записей в values
 
                 formCategories( node[ GoodsCategoriesSection ], a_pParam, depth+1 );
-/*
-                TCategories  *pCategories;
 
-                for( int i = 0; i < static_cast<int>(node[ GoodsCategoriesSection ].size()); i++ )
-                {
-                    pCategories = new TCategories( a_pParam, depth+1 );
-                    pCategories->setNode( node[ GoodsCategoriesSection ][i] );
-                    pCategories->setNodeParent( node[ GoodsCategoriesSection ] );
-                    pCategories->setNodeIndex( i );
-
-                    a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
-                    a_pParam->m_apCategoriesList.append( pCategories );
-
-                    YAML::Node  node_cat = node[ GoodsCategoriesSection ][i];
-
-                    getCategories( node_cat, pCategories, pCategories->getCategoriesDepth() );
-                }
-*/
                 int  list_size = list.size();
                 int  cat_size = static_cast<int>(node[ GoodsCategoriesSection ].size());
 
                 // сравниваем количество записей в values и количество элементов в списке
                 if( list_size > cat_size )
                 {
-                    qDebug() << "value bigger than categories";
+                    qDebug() << "there is value bigger than categories for" << a_pParam->getParamName();
 
                     // дописываем недостающие categories
-
                     for( int i = cat_size; i < list_size; i++ )
                     {
                         addCategories( node, a_pParam, list[i].toStdString(), depth+1, i );
@@ -521,14 +503,11 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
                 }
                 else if( list_size < cat_size )
                 {
-                    qDebug() << "value smaller than categories";
+                    qDebug() << "there is value smaller than categories for" << a_pParam->getParamName();
 
                     // дописываем недостающие поля в values
-
                     for( int i = list_size; i < cat_size; i++ )
                     {
-                        //qDebug() << i << a_pParam->m_apCategoriesList[i]->getCategoriesName();
-
                         QString  cat_name = a_pParam->m_apCategoriesList[i]->getCategoriesName();
 
                         a_pParam->addParamList( cat_name, true );
@@ -546,8 +525,6 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
 
                 for( auto& it : list )
                 {
-                    //qDebug() << it << list.indexOf(it);
-
                     addCategories( node, a_pParam, it.toStdString(), depth+1, list.indexOf(it) );
                 }
 
@@ -583,30 +560,10 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
                 qDebug() << name << "values is empty, but categories exists!";
 
                 formCategories( node[ GoodsCategoriesSection ], a_pParam, depth+1 );
-/*
-                TCategories  *pCategories;
 
-                // создаем categories в интерфейсе
-                for( int i = 0; i < static_cast<int>(node[ GoodsCategoriesSection ].size()); i++ )
-                {
-                    pCategories = new TCategories( a_pParam, depth+1 );
-                    pCategories->setNode( node[ GoodsCategoriesSection ][i] );
-                    pCategories->setNodeParent( node[ GoodsCategoriesSection ] );
-                    pCategories->setNodeIndex( i );
-
-                    a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
-                    a_pParam->m_apCategoriesList.append( pCategories );
-
-                    YAML::Node  node_cat = node[ GoodsCategoriesSection ][i];
-
-                    getCategories( node_cat, pCategories, pCategories->getCategoriesDepth() );
-                }
-*/
                 // формируем values у родителя
                 for( auto& it : a_pParam->m_apCategoriesList )
                 {
-                    //qDebug() << i << a_pParam->m_apCategoriesList[i]->getCategoriesName();
-
                     QString  cat_name = it->getCategoriesName();
 
                     a_pParam->addParamList( cat_name, true );
