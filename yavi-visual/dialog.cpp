@@ -142,6 +142,12 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
         row_min = row;
         row++;
 
+        QDoubleSpinBox *ptDSpinMin = new QDoubleSpinBox( this );
+        ptDSpinMin->setMinimum( -999 );
+        ptDSpinMin->setMaximum( 999 );
+        priv__->m_ptDSpinMin = ptDSpinMin;
+        priv__->m_ptDSpinMin->hide();
+
         QLabel *lblMax = new QLabel( QString( "%1%2" ).arg("Max").arg(":"), this );
         priv__->m_grid->addWidget( lblMax, row, 0, 1, 1 );
         QSpinBox *ptSpinMax = new QSpinBox( this );
@@ -151,6 +157,12 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
         priv__->m_grid->addWidget( ptSpinMax, row, 1, 1, 1 );
         row_max = row;
         row++;
+
+        QDoubleSpinBox *ptDSpinMax = new QDoubleSpinBox( this );
+        ptDSpinMax->setMinimum( -999 );
+        ptDSpinMax->setMaximum( 999 );
+        priv__->m_ptDSpinMax = ptDSpinMax;
+        priv__->m_ptDSpinMax->hide();
 
         QLabel *lblMulti = new QLabel( QString( "%1%2" ).arg("Multi").arg(":"), this );
         priv__->m_grid->addWidget( lblMulti, row, 0, 1, 1 );

@@ -338,7 +338,8 @@ void  TCategory::addCategories( YAML::Node&  node, TParam  *a_pParam, const std:
     // ставим значение имени
     pCategories->setCategoriesName( name );
 
-    node_name.reset();
+    // пустой ямл
+    node_name = YAML::Node();
 
     // пишем в пустой ямл
     __yaml_SetString( node_name, GoodsNameSection, name );
