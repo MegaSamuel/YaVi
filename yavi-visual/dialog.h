@@ -68,6 +68,8 @@ protected Q_SLOTS:
 private:
     std::unique_ptr<TPrivDialog> priv__;
 
+    bool    m_bFullSize;
+
     int     row_min;
     int     row_max;
 
