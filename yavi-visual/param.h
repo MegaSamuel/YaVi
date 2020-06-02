@@ -54,7 +54,7 @@ public:
     QVBoxLayout   *m_vlayout;   // главный layout класса
     QList<TParam*> m_apParamList;
 
-protected Q_SLOTS :
+private Q_SLOTS:
     void           onBtnDec();
     void           onBtnInc();
     void           onBtnName();
@@ -189,16 +189,13 @@ public:
     QVBoxLayout   *m_vlayout;   // главный layout класса
     QList<TCategories*>  m_apCategoriesList;
 
-protected Q_SLOTS :
+private Q_SLOTS:
     void           onBtnDec();
     void           onBtnValDec();
     void           onBtnInc();
     void           onBtnName();
     void           onSendCancel();
     void           onSendValues( TValues& );
-    void           onSendValue( QString );
-    void           onSendValue( int );
-    void           onSendValue( double );
 
 private:
     void           clear();

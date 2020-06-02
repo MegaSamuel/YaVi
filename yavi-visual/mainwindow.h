@@ -16,13 +16,19 @@ public:
     explicit MainWindow( QWidget *parent = Q_NULLPTR );
     ~MainWindow();
 
+    static MainWindow *getMainWinPtr();
+
+public Q_SLOTS:
+    void         onYamlChanged();
+
 private Q_SLOTS:
     void         onTimerWork();
     void         onBtnOpen();
     void         onBtnSave();
-    void         onYamlChanged();
 
 private:
+    static MainWindow *pMainWindow;
+
     QPushButton  *m_ptBtnOpen;
     QPushButton  *m_ptBtnSave;
     QLabel       *m_ptLblNotice;
@@ -38,7 +44,6 @@ private:
 
     void          setPrgTitleText( const QString&  text = "" );
 
-    bool          getPrgTitleChanged();
     void          setPrgTitleChanged( bool  changed );
 
     YAML::Node    m_config; // считанный ямл

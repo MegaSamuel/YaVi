@@ -62,7 +62,10 @@ public:
     void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет
     void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
 
-private Q_SLOTS :
+Q_SIGNALS:
+    void           sendChanged();
+
+private Q_SLOTS:
     void           onBtnName();
     void           onBtnInc();
     void           onSendCancel();

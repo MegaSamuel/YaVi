@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "func.h"
+#include "dialog.h"
 
 //------------------------------------------------------------------------------
 
@@ -7,6 +8,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     m_fBeginTime = cpu_time();
+
+    pMainWindow = this;
 
     m_zPrgName.clear();
     m_zPrgTitle.clear();
@@ -17,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     // создаем и запускаем основной таймер
     m_uTimerCounter = 0;
     m_ptTimer = new QTimer( this );
-    connect( m_ptTimer, SIGNAL(timeout()), this, SLOT(onTimerWork()) );
+    connect( m_ptTimer, &QTimer::timeout, this, &MainWindow::onTimerWork );
     m_ptTimer->start(1000); // 1 Hz
 
     // ставим стиль
@@ -39,12 +42,12 @@ MainWindow::MainWindow(QWidget *parent)
 
     // кнопка "загрузить yaml из файла"
     m_ptBtnOpen = new QPushButton( "Open" );
-    connect( m_ptBtnOpen, SIGNAL(clicked()), this, SLOT(onBtnOpen()) );
+    connect( m_ptBtnOpen, &QPushButton::clicked, this, &MainWindow::onBtnOpen );
     hlayout->addWidget( m_ptBtnOpen, 0, Qt::AlignLeft );
 
     // кнопка "сохранить все в yaml"
     m_ptBtnSave = new QPushButton( "Save" );
-    connect( m_ptBtnSave, SIGNAL(clicked()), this, SLOT(onBtnSave()) );
+    connect( m_ptBtnSave, &QPushButton::clicked, this, &MainWindow::onBtnSave );
     hlayout->addWidget( m_ptBtnSave, 0, Qt::AlignLeft );
 
     // лэйбл
@@ -83,6 +86,13 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
 
+}
+
+MainWindow *MainWindow::pMainWindow = nullptr;
+
+MainWindow *MainWindow::getMainWinPtr()
+{
+    return pMainWindow;
 }
 
 //------------------------------------------------------------------------------
@@ -178,6 +188,8 @@ void  MainWindow::onBtnSave()
         }
         else
         {
+            m_bPrgTitleChanged = false;
+
             // заголовок формы
             setPrgTitleText( filename );
 
@@ -354,6 +366,11 @@ void  MainWindow::setPrgTitleText( const QString&  text )
     if( 0 != text.length() )
     {
         m_zPrgTitle = text + " - " + m_zPrgName;
+
+        if( m_bPrgTitleChanged )
+        {
+            m_zPrgTitle.prepend( "*" );
+        }
     }
     else
     {
@@ -363,15 +380,8 @@ void  MainWindow::setPrgTitleText( const QString&  text )
     setWindowTitle( m_zPrgTitle );
 }
 
-bool  MainWindow::getPrgTitleChanged()
-{
-    return m_bPrgTitleChanged;
-}
-
 void  MainWindow::setPrgTitleChanged( bool  changed )
 {
-    m_bPrgTitleChanged = changed;
-
     if( changed )
     {
         m_zPrgTitle.prepend( "*" );
@@ -388,10 +398,15 @@ void  MainWindow::setPrgTitleChanged( bool  changed )
 
 void  MainWindow::onYamlChanged()
 {
-    if( !getPrgTitleChanged() )
+    // если признака что ямл изменился еще нет
+    if( !m_bPrgTitleChanged )
     {
+        // рисуем "*" перед именем файла
         setPrgTitleChanged( true );
     }
+
+    // признак что ямл изменился
+    m_bPrgTitleChanged = true;
 }
 
 //------------------------------------------------------------------------------

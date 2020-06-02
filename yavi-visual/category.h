@@ -57,7 +57,10 @@ public:
     QVBoxLayout   *m_vlayout;   // главный layout класса
     QList<TParam*> m_apParamList;
 
-private Q_SLOTS :
+Q_SIGNALS:
+    void           sendChanged();
+
+private Q_SLOTS:
     void           onBtnName();
     void           onBtnInc();
     void           onSendCancel();

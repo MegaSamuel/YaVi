@@ -1,6 +1,7 @@
 #include "func.h"
 #include "goods.h"
 #include "category.h"
+#include "mainwindow.h"
 
 //------------------------------------------------------------------------------
 
@@ -12,19 +13,19 @@ TCategory::TCategory( TGoods  *pAncestor )
     m_ptDialogSelf = new TDialog( false, "Category", this );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptDialogSelf, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+    connect( m_ptDialogSelf, &TDialog::sendCancel, this, &TCategory::onSendCancel );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialogSelf, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
+    connect( m_ptDialogSelf, &TDialog::sendValues, this, &TCategory::onSendValues );
 
     // диалог для добавления параметра
     m_ptDialogAdd = new TDialog( true, "Add parameter", this );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptDialogAdd, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+    connect( m_ptDialogAdd, &TDialog::sendCancel, this, &TCategory::onSendCancel );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialogAdd, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&) ) );
+    connect( m_ptDialogAdd, &TDialog::sendValues, this, &TCategory::onSendValues );
 
     // указатель на родителя
     m_pAncestor = pAncestor;
@@ -34,6 +35,9 @@ TCategory::TCategory( TGoods  *pAncestor )
     m_node.reset();
     m_node_parent.reset();
     m_node_index = -1;
+
+    // цепляем местный сигнал к слоту MainWindow
+    connect( this, &TCategory::sendChanged, MainWindow::getMainWinPtr(), &MainWindow::onYamlChanged );
 
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
@@ -46,14 +50,14 @@ TCategory::TCategory( TGoods  *pAncestor )
     // кнопка с именем
     m_ptBtnName = new QPushButton( "button" );
     m_ptBtnName->setFixedWidth( 93 );
-    connect( m_ptBtnName, SIGNAL(clicked()), this, SLOT(onBtnName()) );
+    connect( m_ptBtnName, &QPushButton::clicked, this, &TCategory::onBtnName );
     m_hlayout->addWidget( m_ptBtnName, 0, Qt::AlignLeft );
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+" );
     m_ptBtnInc->setToolTip( "Добавить параметр" );
     m_ptBtnInc->setFixedWidth( 93 );
-    connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
+    connect( m_ptBtnInc, &QPushButton::clicked, this, &TCategory::onBtnInc );
     m_hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
 
     m_vlayout->addLayout( m_hlayout, 0 );
@@ -334,7 +338,8 @@ void  TCategory::addCategories( YAML::Node&  node, TParam  *a_pParam, const std:
     // ставим значение имени
     pCategories->setCategoriesName( name );
 
-    node_name.reset();
+    // пустой ямл
+    node_name = YAML::Node();
 
     // пишем в пустой ямл
     __yaml_SetString( node_name, GoodsNameSection, name );
@@ -480,53 +485,36 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
                 // приоритет у записей в values
 
                 formCategories( node[ GoodsCategoriesSection ], a_pParam, depth+1 );
-/*
-                TCategories  *pCategories;
 
-                for( int i = 0; i < static_cast<int>(node[ GoodsCategoriesSection ].size()); i++ )
-                {
-                    pCategories = new TCategories( a_pParam, depth+1 );
-                    pCategories->setNode( node[ GoodsCategoriesSection ][i] );
-                    pCategories->setNodeParent( node[ GoodsCategoriesSection ] );
-                    pCategories->setNodeIndex( i );
-
-                    a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
-                    a_pParam->m_apCategoriesList.append( pCategories );
-
-                    YAML::Node  node_cat = node[ GoodsCategoriesSection ][i];
-
-                    getCategories( node_cat, pCategories, pCategories->getCategoriesDepth() );
-                }
-*/
                 int  list_size = list.size();
                 int  cat_size = static_cast<int>(node[ GoodsCategoriesSection ].size());
 
                 // сравниваем количество записей в values и количество элементов в списке
                 if( list_size > cat_size )
                 {
-                    qDebug() << "value bigger than categories";
+                    qDebug() << "there is value bigger than categories for" << a_pParam->getParamName();
 
                     // дописываем недостающие categories
-
                     for( int i = cat_size; i < list_size; i++ )
                     {
                         addCategories( node, a_pParam, list[i].toStdString(), depth+1, i );
                     }
+
+                    Q_EMIT  sendChanged();
                 }
                 else if( list_size < cat_size )
                 {
-                    qDebug() << "value smaller than categories";
+                    qDebug() << "there is value smaller than categories for" << a_pParam->getParamName();
 
                     // дописываем недостающие поля в values
-
                     for( int i = list_size; i < cat_size; i++ )
                     {
-                        //qDebug() << i << a_pParam->m_apCategoriesList[i]->getCategoriesName();
-
                         QString  cat_name = a_pParam->m_apCategoriesList[i]->getCategoriesName();
 
                         a_pParam->addParamList( cat_name, true );
                     }
+
+                    Q_EMIT  sendChanged();
                 }
             }
             else
@@ -538,10 +526,10 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
 
                 for( auto& it : list )
                 {
-                    //qDebug() << it << list.indexOf(it);
-
                     addCategories( node, a_pParam, it.toStdString(), depth+1, list.indexOf(it) );
                 }
+
+                Q_EMIT  sendChanged();
             }
         }
         else
@@ -573,30 +561,10 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
                 qDebug() << name << "values is empty, but categories exists!";
 
                 formCategories( node[ GoodsCategoriesSection ], a_pParam, depth+1 );
-/*
-                TCategories  *pCategories;
 
-                // создаем categories в интерфейсе
-                for( int i = 0; i < static_cast<int>(node[ GoodsCategoriesSection ].size()); i++ )
-                {
-                    pCategories = new TCategories( a_pParam, depth+1 );
-                    pCategories->setNode( node[ GoodsCategoriesSection ][i] );
-                    pCategories->setNodeParent( node[ GoodsCategoriesSection ] );
-                    pCategories->setNodeIndex( i );
-
-                    a_pParam->m_vlayout->addWidget( pCategories, 0, Qt::AlignLeft | Qt::AlignTop );
-                    a_pParam->m_apCategoriesList.append( pCategories );
-
-                    YAML::Node  node_cat = node[ GoodsCategoriesSection ][i];
-
-                    getCategories( node_cat, pCategories, pCategories->getCategoriesDepth() );
-                }
-*/
                 // формируем values у родителя
                 for( auto& it : a_pParam->m_apCategoriesList )
                 {
-                    //qDebug() << i << a_pParam->m_apCategoriesList[i]->getCategoriesName();
-
                     QString  cat_name = it->getCategoriesName();
 
                     a_pParam->addParamList( cat_name, true );
