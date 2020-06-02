@@ -41,17 +41,17 @@ MainWindow::MainWindow(QWidget *parent)
     hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
     // кнопка "загрузить yaml из файла"
-    m_ptBtnOpen = new QPushButton( "Open" );
+    m_ptBtnOpen = new QPushButton( "Open", this );
     connect( m_ptBtnOpen, &QPushButton::clicked, this, &MainWindow::onBtnOpen );
     hlayout->addWidget( m_ptBtnOpen, 0, Qt::AlignLeft );
 
     // кнопка "сохранить все в yaml"
-    m_ptBtnSave = new QPushButton( "Save" );
+    m_ptBtnSave = new QPushButton( "Save", this );
     connect( m_ptBtnSave, &QPushButton::clicked, this, &MainWindow::onBtnSave );
     hlayout->addWidget( m_ptBtnSave, 0, Qt::AlignLeft );
 
     // лэйбл
-    m_ptLblNotice = new QLabel( Q_NULLPTR );
+    m_ptLblNotice = new QLabel( this, Q_NULLPTR );
     //By default, the contents of the label are left-aligned and vertically-centered.
     //m_ptLblNotice->setAlignment( Qt::AlignLeft );
     m_ptLblNotice->setFrameStyle( QFrame::NoFrame );
