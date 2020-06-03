@@ -1633,17 +1633,24 @@ void  TParam::setParamValueAdd( unsigned  type )
 
     m_second_row_type = type;
 
+    m_hlayout2->addWidget( m_ptLineValue, 0, Qt::AlignLeft );
+    m_hlayout2->addWidget( m_ptSpinValue, 0, Qt::AlignLeft );
+    m_hlayout2->addWidget( m_ptDSpinValue, 0, Qt::AlignLeft );
+
     if( 1 == type )
     {
-        m_hlayout2->addWidget( m_ptLineValue, 0, Qt::AlignLeft );
+        m_ptSpinValue->hide();
+        m_ptDSpinValue->hide();
     }
     else if( 2 == type )
     {
-        m_hlayout2->addWidget( m_ptSpinValue, 0, Qt::AlignLeft );
+        m_ptLineValue->hide();
+        m_ptDSpinValue->hide();
     }
     else if( 3 == type )
     {
-        m_hlayout2->addWidget( m_ptDSpinValue, 0, Qt::AlignLeft );
+        m_ptLineValue->hide();
+        m_ptSpinValue->hide();
     }
 
     m_vlayout->addLayout( m_hlayout2 );
