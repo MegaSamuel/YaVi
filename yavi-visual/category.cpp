@@ -36,7 +36,7 @@ TCategory::TCategory( TGoods  *pAncestor )
     m_node_parent.reset();
     m_node_index = -1;
 
-    // внутри вызова YAML::Node() есть new, чтобы избежать утечек памяти заводим одну переменную
+    // внутри вызова YAML::Node() есть new, чтобы избежать утечек памяти заводим переменную в классе
     m_temporary_node = YAML::Node();
 
     // цепляем местный сигнал к слоту MainWindow
@@ -166,8 +166,7 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setParamDMin( m_tValues.m_fMin );
         pParam->setParamDMax( m_tValues.m_fMax );
 
-        //YAML::Node  node;
-        //node.reset();
+        // очищаем ямл
         m_temporary_node.reset();
 
         // пишем их в пустой ямл
@@ -329,7 +328,6 @@ int  TCategory::getNodeIndex()
 
 void  TCategory::addCategories( YAML::Node&  node, TParam  *a_pParam, const std::string&  name, int  depth, int  index )
 {
-    //YAML::Node    node_name;
     TCategories  *pCategories;
 
     // добавляем категорию
@@ -342,8 +340,7 @@ void  TCategory::addCategories( YAML::Node&  node, TParam  *a_pParam, const std:
     // ставим значение имени
     pCategories->setCategoriesName( name );
 
-    // пустой ямл
-    //node_name = YAML::Node();
+    // очищаем ямл
     m_temporary_node.reset();
 
     // пишем в пустой ямл

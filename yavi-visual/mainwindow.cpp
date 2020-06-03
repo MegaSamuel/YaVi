@@ -135,28 +135,19 @@ void  MainWindow::onBtnOpen()
             // заголовок формы
             setPrgTitleText( filename );
 
-            /*
-            QString file = filename.section("\\",-1,-1);
-            qDebug() << file;
-
-            QString dir = filename.section("\\",0,-2);
-            qDebug() << dir;
-            */
-
             // запоминаем каталог
             cfgSetLastOpenPath( filename.section( QDir::separator(), 0, -2 ) );
 
             // запоминаем файл
             cfgSetLastOpenFile( filename );
 
+            // обновляем ini
             cfgRefresh();
-
-//            qDebug() << "Open file" << filename << "separator" << QDir::separator();
         }
     }
     else
     {
-        // долбоящер не ввел имя файла
+        // не ввели имя файла
 
         //qDebug() << "Cannot open: no filename";
     }
@@ -198,14 +189,13 @@ void  MainWindow::onBtnSave()
             // запоминаем каталог
             cfgSetLastSavePath( filename.section( QDir::separator(), 0, -2 ) );
 
+            // обновляем ini
             cfgRefresh();
-
-//            qDebug() << "Save file" << filename;
         }
     }
     else
     {
-        // долбоящер не ввел имя файла
+        // не ввели имя файла
 
 //        qDebug() << "Cannot save: no filename";
     }
@@ -230,8 +220,6 @@ void  MainWindow::onTimerWork()
     m_uTimerCounter = ( m_uTimerCounter + 1 ) & 3;
 
 //    qDebug() << current_time() << __func__ << __LINE__ << "->" << "counter" << m_uTimerCounter;
-
-//    qDebug() << current_time() << __func__ << __LINE__ << "->" << m_pGoods->get_table_size();
 }
 
 //------------------------------------------------------------------------------
@@ -295,59 +283,9 @@ bool  MainWindow::fini( const QString&  filename )
         return false;
     }
 
-/*
-    YAML::Node node1;
-    node1["name"] = "node 1";
-    node1["type"] = 0;
-
-    YAML::Node node2;
-    node2["name"] = "node 2";
-    node2["type"] = 0;
-
-    YAML::Node node3;
-    node3["name"] = "node 3";
-    node3["type"] = 0;
-
-    YAML::Node node4;
-    node4["name"] = "node 4";
-    node4["type"] = 0;
-
-    YAML::Node node_name;
-    node_name[ "name" ] = "NameStr";
-    node_name[ "parameters" ].push_back(node1);
-    node_name[ "parameters" ].push_back(node2);
-    node_name[ "parameters" ].push_back(node3);
-    node_name[ "parameters" ].push_back(node4);
-
-    YAML::Node node_main;
-    node_main["category"].push_back( node_name );
-
-    qDebug() << "category count" << node_main["category"].size();
-
-    qDebug() << QString::fromStdString(node_main["category"][0][ "name" ].as<std::string>());
-
-    qDebug() << "parameters count" << node_main["category"][0]["parameters"].size();
-
-    for( int i = 0; i < static_cast<int>(node_main["category"][0]["parameters"].size()); i++ )
-    {
-        qDebug() << i << QString::fromStdString(node_main["category"][0]["parameters"][i]["name"].as<std::string>());
-    }
-
-    // удаляем узел с именем node 2
-    node_main["category"][0]["parameters"].remove(1);
-
-    qDebug() << "parameters count" << node_main["category"][0]["parameters"].size();
-
-    for( int i = 0; i < static_cast<int>(node_main["category"][0]["parameters"].size()); i++ )
-    {
-        qDebug() << i << QString::fromStdString(node_main["category"][0]["parameters"][i]["name"].as<std::string>());
-    }
-*/
-
     // пробуем выгрузить ямл в строку
     try {
         str = YAML::Dump( m_config );
-//        str = YAML::Dump( node_main );
     } catch ( const YAML::Exception&  e ) {
         // что-то пошло не так, а что смотрим в e.what()
         m_zFailReason = QString::fromStdString( e.what() );
