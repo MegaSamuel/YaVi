@@ -160,6 +160,8 @@ void  MainWindow::onBtnOpen()
 
         //qDebug() << "Cannot open: no filename";
     }
+
+    delete pDir;
 }
 
 void  MainWindow::onBtnSave()
@@ -207,6 +209,8 @@ void  MainWindow::onBtnSave()
 
 //        qDebug() << "Cannot save: no filename";
     }
+
+    delete pDir;
 }
 
 //------------------------------------------------------------------------------
@@ -457,6 +461,8 @@ void  MainWindow::actionAfterStart()
             }
         }
     }
+
+    delete pDir;
 }
 
 //------------------------------------------------------------------------------

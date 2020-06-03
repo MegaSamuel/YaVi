@@ -34,6 +34,8 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     m_node_parent.reset();
     m_node_index = -1;
 
+    m_temporary_node = YAML::Node();
+
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
     m_vlayout->setMargin( 0 );
@@ -611,6 +613,8 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     m_node.reset();
     m_node_parent.reset();
     m_node_index = -1;
+
+    m_temporary_node = YAML::Node();
 
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
