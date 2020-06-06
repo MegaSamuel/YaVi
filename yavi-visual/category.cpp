@@ -494,7 +494,7 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
                 // сравниваем количество записей в values и количество элементов в списке
                 if( list_size > cat_size )
                 {
-                    qDebug() << "there is value bigger than categories for" << a_pParam->getParamName();
+                    //qDebug() << "there is value bigger than categories for" << a_pParam->getParamName();
 
                     // дописываем недостающие categories
                     for( int i = cat_size; i < list_size; i++ )
@@ -506,7 +506,7 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
                 }
                 else if( list_size < cat_size )
                 {
-                    qDebug() << "there is value smaller than categories for" << a_pParam->getParamName();
+                    //qDebug() << "there is value smaller than categories for" << a_pParam->getParamName();
 
                     // дописываем недостающие поля в values
                     for( int i = list_size; i < cat_size; i++ )
@@ -524,7 +524,7 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
                 // есть записи в values, но нет секции categories
                 // создаем секцию categories и пишем в нее значения из values
 
-                qDebug() << "there is no categories for" << a_pParam->getParamName();
+                //qDebug() << "there is no categories for" << a_pParam->getParamName();
 
                 for( auto& it : list )
                 {
@@ -542,13 +542,13 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
             {
                 // есть записи в values, и есть секция categories
 
-                qDebug() << name << "type != 4|5, but values and categories exist!";
+                //qDebug() << name << "type != 4|5, but values and categories exist!";
             }
             else
             {
                 // есть записи в values, секции categories нет
 
-                qDebug() << name << "type != 4|5, but values exists, categories is empty!";
+                //qDebug() << name << "type != 4|5, but values exists, categories is empty!";
             }
         }
     }
@@ -560,7 +560,7 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
 
             if( ( 4 == type ) || ( 5 == type ) )
             {
-                qDebug() << name << "values is empty, but categories exists!";
+                //qDebug() << name << "values is empty, but categories exists!";
 
                 formCategories( node[ GoodsCategoriesSection ], a_pParam, depth+1 );
 
@@ -574,7 +574,7 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
             }
             else
             {
-                qDebug() << name << "type != 4|5, values is empty, but categories exists!";
+                //qDebug() << name << "type != 4|5, values is empty, but categories exists!";
             }
         }
     }
