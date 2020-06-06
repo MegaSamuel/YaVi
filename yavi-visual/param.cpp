@@ -34,6 +34,8 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     m_node_parent.reset();
     m_node_index = -1;
 
+    m_temporary_node = YAML::Node();
+
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
     m_vlayout->setMargin( 0 );
@@ -203,41 +205,41 @@ void  TCategories::onSendValues( TValues& a_tValues )
             pParam->setParamMulti( m_tValues.m_zMulti.toStdString() );
         }
 
-        YAML::Node  node;
-        node.reset();
+        // очищаем ямл
+        m_temporary_node.reset();
 
         // пишем их в пустой ямл
-        __yaml_SetString( node, GoodsNameSection, m_tValues.m_zName.toStdString() );
-        __yaml_SetScalar( node, GoodsTypeSection, m_tValues.m_uType );
+        __yaml_SetString( m_temporary_node, GoodsNameSection, m_tValues.m_zName.toStdString() );
+        __yaml_SetScalar( m_temporary_node, GoodsTypeSection, m_tValues.m_uType );
 
         if( 0 != m_tValues.m_uType )
         {
-            __yaml_SetString( node, GoodsPlaceholderSection, m_tValues.m_zPlaceholder.toStdString() );
-            __yaml_SetString( node, GoodsNewSection, m_tValues.m_zNew.toStdString() );
-            __yaml_SetString( node, GoodsAfterSection, m_tValues.m_zAfter.toStdString() );
-            __yaml_SetString( node, GoodsBeforeSection, m_tValues.m_zBefore.toStdString() );
-            __yaml_SetString( node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
-            __yaml_SetString( node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
+            __yaml_SetString( m_temporary_node, GoodsPlaceholderSection, m_tValues.m_zPlaceholder.toStdString() );
+            __yaml_SetString( m_temporary_node, GoodsNewSection, m_tValues.m_zNew.toStdString() );
+            __yaml_SetString( m_temporary_node, GoodsAfterSection, m_tValues.m_zAfter.toStdString() );
+            __yaml_SetString( m_temporary_node, GoodsBeforeSection, m_tValues.m_zBefore.toStdString() );
+            __yaml_SetString( m_temporary_node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
+            __yaml_SetString( m_temporary_node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
         }
 
         if( 2 == m_tValues.m_uType )
         {
-            __yaml_SetInteger( node, GoodsMinSection, m_tValues.m_nMin );
-            __yaml_SetInteger( node, GoodsMaxSection, m_tValues.m_nMax );
+            __yaml_SetInteger( m_temporary_node, GoodsMinSection, m_tValues.m_nMin );
+            __yaml_SetInteger( m_temporary_node, GoodsMaxSection, m_tValues.m_nMax );
         }
         else if( 3 == m_tValues.m_uType )
         {
-            __yaml_SetDouble( node, GoodsMinSection, m_tValues.m_fMin );
-            __yaml_SetDouble( node, GoodsMaxSection, m_tValues.m_fMax );
+            __yaml_SetDouble( m_temporary_node, GoodsMinSection, m_tValues.m_fMin );
+            __yaml_SetDouble( m_temporary_node, GoodsMaxSection, m_tValues.m_fMax );
         }
 
         if( 5 == m_tValues.m_uType )
         {
-            __yaml_SetString( node, GoodsMultiSection, m_tValues.m_zMulti.toStdString() );
+            __yaml_SetString( m_temporary_node, GoodsMultiSection, m_tValues.m_zMulti.toStdString() );
         }
 
         // добавляем ямл к основному
-        m_node[ GoodsParametersSection ].push_back( node );
+        m_node[ GoodsParametersSection ].push_back( m_temporary_node );
 
         int index = static_cast<int>(m_node[ GoodsParametersSection ].size()) - 1;
 
@@ -612,6 +614,8 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     m_node_parent.reset();
     m_node_index = -1;
 
+    m_temporary_node = YAML::Node();
+
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
     m_vlayout->setMargin( 0 );
@@ -824,16 +828,16 @@ void  TParam::onSendValues( TValues& a_tValues )
         pCategories->setCategoriesUlink( m_tValues.m_zUlink.toStdString() );
         pCategories->setCategoriesUname( m_tValues.m_zUname.toStdString() );
 
-        YAML::Node  node;
-        node.reset();
+        // очищаем ямл
+        m_temporary_node.reset();
 
         // пишем их в пустой ямл
-        __yaml_SetString( node, GoodsNameSection, m_tValues.m_zName.toStdString() );
-        __yaml_SetString( node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
-        __yaml_SetString( node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
+        __yaml_SetString( m_temporary_node, GoodsNameSection, m_tValues.m_zName.toStdString() );
+        __yaml_SetString( m_temporary_node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
+        __yaml_SetString( m_temporary_node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
 
         // добавляем ямл к основному
-        m_node[ GoodsCategoriesSection ].push_back( node );
+        m_node[ GoodsCategoriesSection ].push_back( m_temporary_node );
 
         int index = static_cast<int>(m_node[ GoodsCategoriesSection ].size()) - 1;
 
@@ -1633,17 +1637,24 @@ void  TParam::setParamValueAdd( unsigned  type )
 
     m_second_row_type = type;
 
+    m_hlayout2->addWidget( m_ptLineValue, 0, Qt::AlignLeft );
+    m_hlayout2->addWidget( m_ptSpinValue, 0, Qt::AlignLeft );
+    m_hlayout2->addWidget( m_ptDSpinValue, 0, Qt::AlignLeft );
+
     if( 1 == type )
     {
-        m_hlayout2->addWidget( m_ptLineValue, 0, Qt::AlignLeft );
+        m_ptSpinValue->hide();
+        m_ptDSpinValue->hide();
     }
     else if( 2 == type )
     {
-        m_hlayout2->addWidget( m_ptSpinValue, 0, Qt::AlignLeft );
+        m_ptLineValue->hide();
+        m_ptDSpinValue->hide();
     }
     else if( 3 == type )
     {
-        m_hlayout2->addWidget( m_ptDSpinValue, 0, Qt::AlignLeft );
+        m_ptLineValue->hide();
+        m_ptSpinValue->hide();
     }
 
     m_vlayout->addLayout( m_hlayout2 );

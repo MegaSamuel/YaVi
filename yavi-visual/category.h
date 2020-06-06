@@ -73,6 +73,8 @@ private:
     YAML::Node     m_node_parent; // родительский уровнь дерева ямла
     int            m_node_index;  // номер перечисления у родителя
 
+    YAML::Node     m_temporary_node;  // временный ямл для правки основного
+
     //QVBoxLayout   *m_vlayout;   // главный layout класса
     QHBoxLayout   *m_hlayout;   // вложенный layout
 
