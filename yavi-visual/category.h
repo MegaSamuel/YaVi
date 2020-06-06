@@ -57,7 +57,10 @@ public:
     QVBoxLayout   *m_vlayout;   // главный layout класса
     QList<TParam*> m_apParamList;
 
-private Q_SLOTS :
+Q_SIGNALS:
+    void           sendChanged();
+
+private Q_SLOTS:
     void           onBtnName();
     void           onBtnInc();
     void           onSendCancel();
@@ -69,6 +72,8 @@ private:
     YAML::Node     m_node;        // текущий уровнь дерева ямла
     YAML::Node     m_node_parent; // родительский уровнь дерева ямла
     int            m_node_index;  // номер перечисления у родителя
+
+    YAML::Node     m_temporary_node;  // временный ямл для правки основного
 
     //QVBoxLayout   *m_vlayout;   // главный layout класса
     QHBoxLayout   *m_hlayout;   // вложенный layout

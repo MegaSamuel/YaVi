@@ -54,7 +54,7 @@ public:
     QVBoxLayout   *m_vlayout;   // главный layout класса
     QList<TParam*> m_apParamList;
 
-protected Q_SLOTS :
+private Q_SLOTS:
     void           onBtnDec();
     void           onBtnInc();
     void           onBtnName();
@@ -71,6 +71,8 @@ private:
     YAML::Node     m_node;        // текущий уровнь дерева ямла
     YAML::Node     m_node_parent; // родительский уровнь дерева ямла
     int            m_node_index;  // номер перечисления у родителя
+
+    YAML::Node     m_temporary_node;  // временный ямл для правки основного
 
     //QVBoxLayout   *m_vlayout;   // главный layout класса
     QHBoxLayout   *m_hlayout;   // вложенный layout
@@ -189,16 +191,13 @@ public:
     QVBoxLayout   *m_vlayout;   // главный layout класса
     QList<TCategories*>  m_apCategoriesList;
 
-protected Q_SLOTS :
+private Q_SLOTS:
     void           onBtnDec();
     void           onBtnValDec();
     void           onBtnInc();
     void           onBtnName();
     void           onSendCancel();
     void           onSendValues( TValues& );
-    void           onSendValue( QString );
-    void           onSendValue( int );
-    void           onSendValue( double );
 
 private:
     void           clear();
@@ -222,6 +221,8 @@ private:
     YAML::Node     m_node;        // текущий уровнь дерева ямла
     YAML::Node     m_node_parent; // родительский уровнь дерева ямла
     int            m_node_index;  // номер перечисления у родителя
+
+    YAML::Node     m_temporary_node;  // временный ямл для правки основного
 
     QString        m_zName;
     QString        m_zPlaceholder;

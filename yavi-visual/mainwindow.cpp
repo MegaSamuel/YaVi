@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "func.h"
+#include "dialog.h"
 
 //------------------------------------------------------------------------------
 
@@ -7,6 +8,8 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     m_fBeginTime = cpu_time();
+
+    pMainWindow = this;
 
     m_zPrgName.clear();
     m_zPrgTitle.clear();
@@ -17,7 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     // создаем и запускаем основной таймер
     m_uTimerCounter = 0;
     m_ptTimer = new QTimer( this );
-    connect( m_ptTimer, SIGNAL(timeout()), this, SLOT(onTimerWork()) );
+    connect( m_ptTimer, &QTimer::timeout, this, &MainWindow::onTimerWork );
     m_ptTimer->start(1000); // 1 Hz
 
     // ставим стиль
@@ -39,16 +42,16 @@ MainWindow::MainWindow(QWidget *parent)
 
     // кнопка "загрузить yaml из файла"
     m_ptBtnOpen = new QPushButton( "Open" );
-    connect( m_ptBtnOpen, SIGNAL(clicked()), this, SLOT(onBtnOpen()) );
+    connect( m_ptBtnOpen, &QPushButton::clicked, this, &MainWindow::onBtnOpen );
     hlayout->addWidget( m_ptBtnOpen, 0, Qt::AlignLeft );
 
     // кнопка "сохранить все в yaml"
     m_ptBtnSave = new QPushButton( "Save" );
-    connect( m_ptBtnSave, SIGNAL(clicked()), this, SLOT(onBtnSave()) );
+    connect( m_ptBtnSave, &QPushButton::clicked, this, &MainWindow::onBtnSave );
     hlayout->addWidget( m_ptBtnSave, 0, Qt::AlignLeft );
 
     // лэйбл
-    m_ptLblNotice = new QLabel( Q_NULLPTR );
+    m_ptLblNotice = new QLabel( this, Q_NULLPTR );
     //By default, the contents of the label are left-aligned and vertically-centered.
     //m_ptLblNotice->setAlignment( Qt::AlignLeft );
     m_ptLblNotice->setFrameStyle( QFrame::NoFrame );
@@ -83,6 +86,13 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
 
+}
+
+MainWindow *MainWindow::pMainWindow = nullptr;
+
+MainWindow *MainWindow::getMainWinPtr()
+{
+    return pMainWindow;
 }
 
 //------------------------------------------------------------------------------
@@ -125,31 +135,24 @@ void  MainWindow::onBtnOpen()
             // заголовок формы
             setPrgTitleText( filename );
 
-            /*
-            QString file = filename.section("\\",-1,-1);
-            qDebug() << file;
-
-            QString dir = filename.section("\\",0,-2);
-            qDebug() << dir;
-            */
-
             // запоминаем каталог
             cfgSetLastOpenPath( filename.section( QDir::separator(), 0, -2 ) );
 
             // запоминаем файл
             cfgSetLastOpenFile( filename );
 
+            // обновляем ini
             cfgRefresh();
-
-//            qDebug() << "Open file" << filename << "separator" << QDir::separator();
         }
     }
     else
     {
-        // долбоящер не ввел имя файла
+        // не ввели имя файла
 
         //qDebug() << "Cannot open: no filename";
     }
+
+    delete pDir;
 }
 
 void  MainWindow::onBtnSave()
@@ -178,23 +181,26 @@ void  MainWindow::onBtnSave()
         }
         else
         {
+            m_bPrgTitleChanged = false;
+
             // заголовок формы
             setPrgTitleText( filename );
 
             // запоминаем каталог
             cfgSetLastSavePath( filename.section( QDir::separator(), 0, -2 ) );
 
+            // обновляем ini
             cfgRefresh();
-
-//            qDebug() << "Save file" << filename;
         }
     }
     else
     {
-        // долбоящер не ввел имя файла
+        // не ввели имя файла
 
 //        qDebug() << "Cannot save: no filename";
     }
+
+    delete pDir;
 }
 
 //------------------------------------------------------------------------------
@@ -214,8 +220,6 @@ void  MainWindow::onTimerWork()
     m_uTimerCounter = ( m_uTimerCounter + 1 ) & 3;
 
 //    qDebug() << current_time() << __func__ << __LINE__ << "->" << "counter" << m_uTimerCounter;
-
-//    qDebug() << current_time() << __func__ << __LINE__ << "->" << m_pGoods->get_table_size();
 }
 
 //------------------------------------------------------------------------------
@@ -279,59 +283,9 @@ bool  MainWindow::fini( const QString&  filename )
         return false;
     }
 
-/*
-    YAML::Node node1;
-    node1["name"] = "node 1";
-    node1["type"] = 0;
-
-    YAML::Node node2;
-    node2["name"] = "node 2";
-    node2["type"] = 0;
-
-    YAML::Node node3;
-    node3["name"] = "node 3";
-    node3["type"] = 0;
-
-    YAML::Node node4;
-    node4["name"] = "node 4";
-    node4["type"] = 0;
-
-    YAML::Node node_name;
-    node_name[ "name" ] = "NameStr";
-    node_name[ "parameters" ].push_back(node1);
-    node_name[ "parameters" ].push_back(node2);
-    node_name[ "parameters" ].push_back(node3);
-    node_name[ "parameters" ].push_back(node4);
-
-    YAML::Node node_main;
-    node_main["category"].push_back( node_name );
-
-    qDebug() << "category count" << node_main["category"].size();
-
-    qDebug() << QString::fromStdString(node_main["category"][0][ "name" ].as<std::string>());
-
-    qDebug() << "parameters count" << node_main["category"][0]["parameters"].size();
-
-    for( int i = 0; i < static_cast<int>(node_main["category"][0]["parameters"].size()); i++ )
-    {
-        qDebug() << i << QString::fromStdString(node_main["category"][0]["parameters"][i]["name"].as<std::string>());
-    }
-
-    // удаляем узел с именем node 2
-    node_main["category"][0]["parameters"].remove(1);
-
-    qDebug() << "parameters count" << node_main["category"][0]["parameters"].size();
-
-    for( int i = 0; i < static_cast<int>(node_main["category"][0]["parameters"].size()); i++ )
-    {
-        qDebug() << i << QString::fromStdString(node_main["category"][0]["parameters"][i]["name"].as<std::string>());
-    }
-*/
-
     // пробуем выгрузить ямл в строку
     try {
         str = YAML::Dump( m_config );
-//        str = YAML::Dump( node_main );
     } catch ( const YAML::Exception&  e ) {
         // что-то пошло не так, а что смотрим в e.what()
         m_zFailReason = QString::fromStdString( e.what() );
@@ -354,6 +308,11 @@ void  MainWindow::setPrgTitleText( const QString&  text )
     if( 0 != text.length() )
     {
         m_zPrgTitle = text + " - " + m_zPrgName;
+
+        if( m_bPrgTitleChanged )
+        {
+            m_zPrgTitle.prepend( "*" );
+        }
     }
     else
     {
@@ -363,15 +322,8 @@ void  MainWindow::setPrgTitleText( const QString&  text )
     setWindowTitle( m_zPrgTitle );
 }
 
-bool  MainWindow::getPrgTitleChanged()
-{
-    return m_bPrgTitleChanged;
-}
-
 void  MainWindow::setPrgTitleChanged( bool  changed )
 {
-    m_bPrgTitleChanged = changed;
-
     if( changed )
     {
         m_zPrgTitle.prepend( "*" );
@@ -388,10 +340,15 @@ void  MainWindow::setPrgTitleChanged( bool  changed )
 
 void  MainWindow::onYamlChanged()
 {
-    if( !getPrgTitleChanged() )
+    // если признака что ямл изменился еще нет
+    if( !m_bPrgTitleChanged )
     {
+        // рисуем "*" перед именем файла
         setPrgTitleChanged( true );
     }
+
+    // признак что ямл изменился
+    m_bPrgTitleChanged = true;
 }
 
 //------------------------------------------------------------------------------
@@ -442,6 +399,8 @@ void  MainWindow::actionAfterStart()
             }
         }
     }
+
+    delete pDir;
 }
 
 //------------------------------------------------------------------------------

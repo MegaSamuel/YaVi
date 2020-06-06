@@ -12,19 +12,19 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     m_ptDialogSelf = new TDialog( false, "Value",  this );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptDialogSelf, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+    connect( m_ptDialogSelf, &TDialog::sendCancel, this, &TCategories::onSendCancel );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialogSelf, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
+    connect( m_ptDialogSelf, &TDialog::sendValues, this, &TCategories::onSendValues );
 
     // диалог для добавления параметра
     m_ptDialogAdd = new TDialog( true, "Add parameter",  this );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptDialogAdd, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+    connect( m_ptDialogAdd, &TDialog::sendCancel, this, &TCategories::onSendCancel );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialogAdd, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
+    connect( m_ptDialogAdd, &TDialog::sendValues, this, &TCategories::onSendValues );
 
     m_pMentor = pMentor;
 
@@ -33,6 +33,8 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     m_node.reset();
     m_node_parent.reset();
     m_node_index = -1;
+
+    m_temporary_node = YAML::Node();
 
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
@@ -54,13 +56,13 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     m_ptBtnDec = new QPushButton( "-" );
     m_ptBtnDec->setToolTip( "Удалить значение" );
     m_ptBtnDec->setFixedWidth( 93 );
-    connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
+    connect( m_ptBtnDec, &QPushButton::clicked, this, &TCategories::onBtnDec );
     m_hlayout->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
 
     // кнопка с именем
     m_ptBtnName = new QPushButton( "button" );
     m_ptBtnName->setFixedWidth( 93 );
-    connect( m_ptBtnName, SIGNAL(clicked()), this, SLOT(onBtnName()) );
+    connect( m_ptBtnName, &QPushButton::clicked, this, &TCategories::onBtnName );
     m_hlayout->addWidget( m_ptBtnName, 0, Qt::AlignLeft );
 
     // кнопка плюс
@@ -68,7 +70,7 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     m_ptBtnInc->setToolTip( "Добавить параметр" );
     m_ptBtnInc->setFixedWidth( 93 );
     //setIncBtnVisible( false );
-    connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
+    connect( m_ptBtnInc, &QPushButton::clicked, this, &TCategories::onBtnInc );
     m_hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
 
     m_vlayout->addLayout( m_hlayout, 0 );
@@ -203,41 +205,41 @@ void  TCategories::onSendValues( TValues& a_tValues )
             pParam->setParamMulti( m_tValues.m_zMulti.toStdString() );
         }
 
-        YAML::Node  node;
-        node.reset();
+        // очищаем ямл
+        m_temporary_node.reset();
 
         // пишем их в пустой ямл
-        __yaml_SetString( node, GoodsNameSection, m_tValues.m_zName.toStdString() );
-        __yaml_SetScalar( node, GoodsTypeSection, m_tValues.m_uType );
+        __yaml_SetString( m_temporary_node, GoodsNameSection, m_tValues.m_zName.toStdString() );
+        __yaml_SetScalar( m_temporary_node, GoodsTypeSection, m_tValues.m_uType );
 
         if( 0 != m_tValues.m_uType )
         {
-            __yaml_SetString( node, GoodsPlaceholderSection, m_tValues.m_zPlaceholder.toStdString() );
-            __yaml_SetString( node, GoodsNewSection, m_tValues.m_zNew.toStdString() );
-            __yaml_SetString( node, GoodsAfterSection, m_tValues.m_zAfter.toStdString() );
-            __yaml_SetString( node, GoodsBeforeSection, m_tValues.m_zBefore.toStdString() );
-            __yaml_SetString( node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
-            __yaml_SetString( node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
+            __yaml_SetString( m_temporary_node, GoodsPlaceholderSection, m_tValues.m_zPlaceholder.toStdString() );
+            __yaml_SetString( m_temporary_node, GoodsNewSection, m_tValues.m_zNew.toStdString() );
+            __yaml_SetString( m_temporary_node, GoodsAfterSection, m_tValues.m_zAfter.toStdString() );
+            __yaml_SetString( m_temporary_node, GoodsBeforeSection, m_tValues.m_zBefore.toStdString() );
+            __yaml_SetString( m_temporary_node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
+            __yaml_SetString( m_temporary_node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
         }
 
         if( 2 == m_tValues.m_uType )
         {
-            __yaml_SetInteger( node, GoodsMinSection, m_tValues.m_nMin );
-            __yaml_SetInteger( node, GoodsMaxSection, m_tValues.m_nMax );
+            __yaml_SetInteger( m_temporary_node, GoodsMinSection, m_tValues.m_nMin );
+            __yaml_SetInteger( m_temporary_node, GoodsMaxSection, m_tValues.m_nMax );
         }
         else if( 3 == m_tValues.m_uType )
         {
-            __yaml_SetDouble( node, GoodsMinSection, m_tValues.m_fMin );
-            __yaml_SetDouble( node, GoodsMaxSection, m_tValues.m_fMax );
+            __yaml_SetDouble( m_temporary_node, GoodsMinSection, m_tValues.m_fMin );
+            __yaml_SetDouble( m_temporary_node, GoodsMaxSection, m_tValues.m_fMax );
         }
 
         if( 5 == m_tValues.m_uType )
         {
-            __yaml_SetString( node, GoodsMultiSection, m_tValues.m_zMulti.toStdString() );
+            __yaml_SetString( m_temporary_node, GoodsMultiSection, m_tValues.m_zMulti.toStdString() );
         }
 
         // добавляем ямл к основному
-        m_node[ GoodsParametersSection ].push_back( node );
+        m_node[ GoodsParametersSection ].push_back( m_temporary_node );
 
         int index = static_cast<int>(m_node[ GoodsParametersSection ].size()) - 1;
 
@@ -585,19 +587,19 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     m_ptDialogSelf = new TDialog( true, "Parameter",  this );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptDialogSelf, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+    connect( m_ptDialogSelf, &TDialog::sendCancel, this, &TParam::onSendCancel );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialogSelf, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
+    connect( m_ptDialogSelf, &TDialog::sendValues, this, &TParam::onSendValues );
 
     // диалог для добавления values
     m_ptDialogAdd = new TDialog( false, "Add value",  this );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptDialogAdd, SIGNAL(sendCancel()), this, SLOT(onSendCancel()) );
+    connect( m_ptDialogAdd, &TDialog::sendCancel, this, &TParam::onSendCancel );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialogAdd, SIGNAL(sendValues(TValues&)), this, SLOT(onSendValues(TValues&)) );
+    connect( m_ptDialogAdd, &TDialog::sendValues, this, &TParam::onSendValues );
 
     // указатель на прародителя (имеется у первого, по дереву, TParam)
     m_pAncestor = pAncestor;
@@ -611,6 +613,8 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     m_node.reset();
     m_node_parent.reset();
     m_node_index = -1;
+
+    m_temporary_node = YAML::Node();
 
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
@@ -632,13 +636,13 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     m_ptBtnDec = new QPushButton( "-" );
     m_ptBtnDec->setToolTip( "Удалить параметр" );
     m_ptBtnDec->setFixedWidth( 93 );
-    connect( m_ptBtnDec, SIGNAL(clicked()), this, SLOT(onBtnDec()) );
+    connect( m_ptBtnDec, &QPushButton::clicked, this, &TParam::onBtnDec );
     m_hlayout1->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
 
     // кнопка с именем
     m_ptBtnName = new QPushButton( "button" );
     m_ptBtnName->setFixedWidth( 93 );
-    connect( m_ptBtnName, SIGNAL(clicked()), this, SLOT(onBtnName()) );
+    connect( m_ptBtnName, &QPushButton::clicked, this, &TParam::onBtnName );
     m_hlayout1->addWidget( m_ptBtnName, 0, Qt::AlignLeft );
 
     // кнопка плюс
@@ -646,7 +650,7 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     m_ptBtnInc->setToolTip( "Добавить значение" );
     m_ptBtnInc->setFixedWidth( 93 );
     setIncBtnVisible( false );  // по умолчанию кнопка невидимая
-    connect( m_ptBtnInc, SIGNAL(clicked()), this, SLOT(onBtnInc()) );
+    connect( m_ptBtnInc, &QPushButton::clicked, this, &TParam::onBtnInc );
     m_hlayout1->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
 
     m_vlayout->addLayout( m_hlayout1, 0 );
@@ -824,16 +828,16 @@ void  TParam::onSendValues( TValues& a_tValues )
         pCategories->setCategoriesUlink( m_tValues.m_zUlink.toStdString() );
         pCategories->setCategoriesUname( m_tValues.m_zUname.toStdString() );
 
-        YAML::Node  node;
-        node.reset();
+        // очищаем ямл
+        m_temporary_node.reset();
 
         // пишем их в пустой ямл
-        __yaml_SetString( node, GoodsNameSection, m_tValues.m_zName.toStdString() );
-        __yaml_SetString( node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
-        __yaml_SetString( node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
+        __yaml_SetString( m_temporary_node, GoodsNameSection, m_tValues.m_zName.toStdString() );
+        __yaml_SetString( m_temporary_node, GoodsUlinkSection, m_tValues.m_zUlink.toStdString() );
+        __yaml_SetString( m_temporary_node, GoodsUnameSection, m_tValues.m_zUname.toStdString() );
 
         // добавляем ямл к основному
-        m_node[ GoodsCategoriesSection ].push_back( node );
+        m_node[ GoodsCategoriesSection ].push_back( m_temporary_node );
 
         int index = static_cast<int>(m_node[ GoodsCategoriesSection ].size()) - 1;
 
@@ -845,21 +849,6 @@ void  TParam::onSendValues( TValues& a_tValues )
     }
 
     need_to_add = false;
-}
-
-void  TParam::onSendValue( QString  val )
-{
-    m_tValues.m_zVal = val;
-}
-
-void  TParam::onSendValue( int  val )
-{
-    m_tValues.m_nVal = val;
-}
-
-void  TParam::onSendValue( double  val )
-{
-    m_tValues.m_fVal = val;
 }
 
 //------------------------------------------------------------------------------
@@ -1398,7 +1387,8 @@ bool  TParam::setParamNameColor( const QString&  name, bool  force )
                     //qDebug() << "color item" << name << "by parameter" << it->getParamName() << force << "M" << getParamName();
 
                     // красим имя в зависимости от типа
-                    it->colorBtnName( true );
+                    //it->colorBtnName( true );
+                    colorBtnName( true );
 
                     result = true;
 
@@ -1614,41 +1604,57 @@ void  TParam::setParamValueAdd( unsigned  type )
     m_ptBtnValDec = new QPushButton( "-" );
     m_ptBtnValDec->setToolTip( "Удалить значение" );
     m_ptBtnValDec->setFixedWidth( 93 );
-    connect( m_ptBtnValDec, SIGNAL(clicked()), this, SLOT(onBtnValDec()) );
+    connect( m_ptBtnValDec, &QPushButton::clicked, this, &TParam::onBtnValDec );
     m_hlayout2->addWidget( m_ptBtnValDec, 0, Qt::AlignLeft );
 
     // поле со значением
     m_ptLineValue = new QLineEdit();
     m_ptLineValue->setToolTip( "Значение" );
     m_ptLineValue->setFixedWidth( 93 );
-    connect( m_ptLineValue, SIGNAL(textChanged(QString)), this, SLOT(onSendValue(QString)) );
+    connect( m_ptLineValue, &QLineEdit::textChanged, [=](QString val)
+        {
+            m_tValues.m_zVal = val;
+        } );
 
     // спин со значением
     m_ptSpinValue = new QSpinBox();
     m_ptSpinValue->setToolTip( "Значение" );
     m_ptSpinValue->setFixedWidth( 93 );
-    connect( m_ptSpinValue, SIGNAL(valueChanged(int)), this, SLOT(onSendValue(int)) );
+    connect( m_ptSpinValue, QOverload<int>::of(&QSpinBox::valueChanged), [=](int val)
+        {
+            m_tValues.m_nVal = val;
+        } );
 
     // дабл спин со значением
     m_ptDSpinValue = new QDoubleSpinBox();
     m_ptDSpinValue->setToolTip( "Значение" );
     m_ptDSpinValue->setFixedWidth( 93 );
     m_ptDSpinValue->setDecimals( 1 );
-    connect( m_ptDSpinValue, SIGNAL(valueChanged(double)), this, SLOT(onSendValue(double)) );
+    connect( m_ptDSpinValue, QOverload<double>::of(&QDoubleSpinBox::valueChanged), [=](double val)
+        {
+            m_tValues.m_fVal = val;
+        } );
 
     m_second_row_type = type;
 
+    m_hlayout2->addWidget( m_ptLineValue, 0, Qt::AlignLeft );
+    m_hlayout2->addWidget( m_ptSpinValue, 0, Qt::AlignLeft );
+    m_hlayout2->addWidget( m_ptDSpinValue, 0, Qt::AlignLeft );
+
     if( 1 == type )
     {
-        m_hlayout2->addWidget( m_ptLineValue, 0, Qt::AlignLeft );
+        m_ptSpinValue->hide();
+        m_ptDSpinValue->hide();
     }
     else if( 2 == type )
     {
-        m_hlayout2->addWidget( m_ptSpinValue, 0, Qt::AlignLeft );
+        m_ptLineValue->hide();
+        m_ptDSpinValue->hide();
     }
     else if( 3 == type )
     {
-        m_hlayout2->addWidget( m_ptDSpinValue, 0, Qt::AlignLeft );
+        m_ptLineValue->hide();
+        m_ptSpinValue->hide();
     }
 
     m_vlayout->addLayout( m_hlayout2 );
