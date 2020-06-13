@@ -31,18 +31,26 @@ TTable::TTable( TGoods  *pAncestor )
     m_grid->setAlignment( Qt::AlignLeft | Qt::AlignTop );
     m_grid->setMargin(0);
 
+    // кнопка с id
+    m_ptBtnId = new QPushButton( "id" );
+    m_ptBtnId->setToolTip( "ID таблицы" );
+    //m_ptBtnId->setFixedWidth( 93 );
+    connect( m_ptBtnId, &QPushButton::clicked, this, &TTable::onBtnId );
+    m_grid->addWidget( m_ptBtnId, m_row, 0, Qt::AlignLeft );
+
     // кнопка с именем
-    m_ptBtnName = new QPushButton( "button" );
-    m_ptBtnName->setFixedWidth( 93 );
+    m_ptBtnName = new QPushButton( "name" );
+    m_ptBtnName->setToolTip( "Название таблицы" );
+    //m_ptBtnName->setFixedWidth( 93 );
     connect( m_ptBtnName, &QPushButton::clicked, this, &TTable::onBtnName );
-    m_grid->addWidget( m_ptBtnName, m_row, 0, Qt::AlignLeft );
+    m_grid->addWidget( m_ptBtnName, m_row, 1, Qt::AlignLeft );
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+" );
-    m_ptBtnInc->setToolTip( "Добавить запись" );
-    m_ptBtnInc->setFixedWidth( 93 );
+    m_ptBtnInc->setToolTip( "Добавить таблицу" );
+    //m_ptBtnInc->setFixedWidth( 93 );
     connect( m_ptBtnInc, &QPushButton::clicked, this, &TTable::onBtnInc );
-    m_grid->addWidget( m_ptBtnInc, m_row, 1, Qt::AlignLeft );
+    m_grid->addWidget( m_ptBtnInc, m_row+1, 0, Qt::AlignLeft );
 
     // перевод строки и колонки в grid для следующих добавлений
     nextRow();
@@ -52,7 +60,10 @@ TTable::TTable( TGoods  *pAncestor )
 
     widget_size_reset();
 
-    widget_stretch( m_grid->minimumSize().width(), m_grid->minimumSize().height() );
+    int  width = 2*m_grid->margin() + m_ptBtnId->minimumSize().width() + m_ptBtnName->minimumSize().width() + m_grid->spacing();
+    int  height = 2*m_grid->margin() + m_ptBtnId->minimumSizeHint().height() + m_ptBtnInc->minimumSizeHint().height() + m_grid->spacing();
+
+    widget_stretch( width, height );
 }
 
 TTable::~TTable()
@@ -76,6 +87,11 @@ void  TTable::clear()
 }
 
 //------------------------------------------------------------------------------
+
+void  TTable::onBtnId()
+{
+
+}
 
 void  TTable::onBtnName()
 {
@@ -212,7 +228,28 @@ int  TTable::getNodeIndex()
 
 void  TTable::setTableId( const std::string&  name, bool  set_to_node )
 {
+    int  height;
+
     m_zId = QString::fromStdString(name);
+
+    height = m_ptBtnId->minimumSizeHint().height();
+
+    m_zBtnId = QString::fromStdString(name);
+    m_zBtnId.replace( QRegExp("[ ]{2,}"), " " );     // убираем подряд идущие пробелы на один
+    m_zBtnId.replace( " ", "\n" );                   // заменяем пробелы на перевод строки
+    m_ptBtnId->setText( m_zBtnId );                  // правленное имя кнопки
+    m_ptBtnId->setToolTip( "Таблица: " + m_zId );    // подсказка с оригинальным именем
+
+    height = m_ptBtnId->minimumSizeHint().height() - height;
+
+    if( 0 < height )
+    {
+        widget_stretch( 0, height, false );
+    }
+    else
+    {
+        widget_shrink( 0, -1 * height );
+    }
 
     if( set_to_node )
     {
@@ -227,13 +264,28 @@ const QString TTable::getTableId()
 
 void  TTable::setTableName( const std::string&  name, bool  set_to_node )
 {
+    int  height;
+
     m_zName = QString::fromStdString(name);
+
+    height = m_ptBtnName->minimumSizeHint().height();
 
     m_zBtnName = QString::fromStdString(name);
     m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );       // убираем подряд идущие пробелы на один
     m_zBtnName.replace( " ", "\n" );                     // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );                  // правленное имя кнопки
     m_ptBtnName->setToolTip( "Таблица: " + m_zName );    // подсказка с оригинальным именем
+
+    height = m_ptBtnName->minimumSizeHint().height() - height;
+
+    if( 0 < height )
+    {
+        widget_stretch( 0, height, false );
+    }
+    else
+    {
+        widget_shrink( 0, -1 * height );
+    }
 
     if( set_to_node )
     {
@@ -348,10 +400,10 @@ void  TTable::widget_stretch( int width, int height, bool add_height ) noexcept
     if( width > m_width )
         m_width = width;
 
+    //qDebug() << "stretch" << width << height;
+
     // высоту увеличиваем на каждый элемент
     m_height += height;
-
-    //qDebug() << "table" << getTableName() << m_width << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );
@@ -378,6 +430,8 @@ void  TTable::widget_parent_stretch( int width, int height, bool add_height ) no
 void  TTable::widget_shrink( int width, int height ) noexcept
 {
     Q_UNUSED( width );
+
+    //qDebug() << "shrink" << width << height;
 
     m_height -= height;
 

@@ -66,6 +66,7 @@ Q_SIGNALS:
     void           sendChanged();
 
 private Q_SLOTS:
+    void           onBtnId();
     void           onBtnName();
     void           onBtnInc();
     void           onSendCancel();
@@ -81,6 +82,7 @@ private:
     QGridLayout   *m_grid;
 
     QPushButton   *m_ptBtnInc;
+    QPushButton   *m_ptBtnId;
     QPushButton   *m_ptBtnName;
 
     QLabel        *m_ptLblLink;
@@ -88,6 +90,7 @@ private:
     unsigned       m_uTableType;
 
     QString        m_zId;      // table Id
+    QString        m_zBtnId;   // текст на кнопке
     QString        m_zName;    // table Name
     QString        m_zBtnName; // текст на кнопке
     QString        m_zLink;    // table Link

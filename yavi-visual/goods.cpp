@@ -43,7 +43,7 @@ TGoods::~TGoods()
 
 void  TGoods::GoodsDelete()
 {
-//    QLayoutItem *child;
+    QLayoutItem *child;
 
     // категории
     for( auto& it : m_apCategoryList )
@@ -64,17 +64,14 @@ void  TGoods::GoodsDelete()
         // удаляем
         delete it;
     }
-/*
-    // уничтожаем артефакты
+
+    // убираем все ранее созданное (например, лейбл Таблицы)
     while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
     {
-        // остаются, скорее всего, главные layout-ы, т.к. им ставится deletelater?
-        qDebug() << "artefact";
-
         delete child->widget();
         delete child;
     }
-*/
+
     clear();
 
     widget_size_reset();
@@ -160,8 +157,19 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
         // файл не пуст
         m_bEmpty = false;
 
+        // рисуем лейбл Таблицы
+        QLabel *label = new QLabel();
+        label->setFixedWidth( 93 );
+        label->setFixedHeight( 40 );
+        label->setFrameStyle( QFrame::NoFrame );
+        label->setText( "Таблицы" );
+        m_vlayout->addWidget( label, 0, Qt::AlignLeft );
+
         TTable  *pTable;
 
+        int height = m_vlayout->spacing();
+
+        // перебираем все таблицы
         for( int j = 0; j < static_cast<int>(config[ GoodsTableSection ].size()); j++ )
         {
             bool  table_fill = false; // признак что таблица не заполнена
@@ -182,6 +190,9 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             std::string  id_name = __yaml_GetString( config[ GoodsTableSection ][j], GoodsTableName );
             pTable->setTableName( id_name );
 
+            widget_stretch( 0, height );
+
+#if 0
             // ищем столбцы
             if( !table_fill && __yaml_IsSequence( config[ GoodsTableSection ][j][GoodsTableColumn] ) )
             {
@@ -254,6 +265,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
                 pTable->setTableType( TTable::keTypeLink );
             }
+#endif
         }
     }
 
