@@ -10,13 +10,22 @@ TTable::TTable( TGoods  *pAncestor )
     clear();
 
     // диалог
-    m_ptDialog = new TDialog( true, "Table", this );
+    m_ptTabDialogSelf = new TTabDialog( false, "Table", this );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptDialog, &TDialog::sendCancel, this, &TTable::onSendCancel );
+    connect( m_ptTabDialogSelf, &TTabDialog::sendCancel, this, &TTable::onSendCancel );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialog, &TDialog::sendValues, this, &TTable::onSendValues );
+    connect( m_ptTabDialogSelf, &TTabDialog::sendValues, this, &TTable::onSendValues );
+
+    // диалог
+    m_ptTabDialogAdd = new TTabDialog( true, "Add table", this );
+
+    // ловим сигнал от диалога об отмене
+    connect( m_ptTabDialogAdd, &TTabDialog::sendCancel, this, &TTable::onSendCancel );
+
+    // ловим сигнал от диалога с данными
+    connect( m_ptTabDialogAdd, &TTabDialog::sendValues, this, &TTable::onSendValues );
 
     // указатель на родителя
     m_pAncestor = pAncestor;
@@ -98,13 +107,11 @@ void  TTable::onBtnName()
     //qDebug() << getTableName() << "button";
 
     // диалог с пустыми параметрами
-    m_ptDialog->setDlgEmpty();
+    m_ptTabDialogSelf->setDlgEmpty();
 
-    m_ptDialog->setDlgEnabled( false );
+    m_ptTabDialogSelf->setDlgName( getTableName() );
 
-    m_ptDialog->setDlgName( getTableName() );
-
-    m_ptDialog->open();
+    m_ptTabDialogSelf->open();
 }
 
 void  TTable::onBtnInc()
@@ -115,11 +122,12 @@ void  TTable::onBtnInc()
     need_to_add = true;
 
     // диалог с пустыми параметрами
-    m_ptDialog->setDlgEmpty();
+    m_ptTabDialogAdd->setDlgEmpty();
 
-    m_ptDialog->setDlgName( "NewRecord" );
+    m_ptTabDialogAdd->setDlgId( "Id" );
+    m_ptTabDialogAdd->setDlgName( "Table" );
 
-    m_ptDialog->open();
+    m_ptTabDialogAdd->open();
 }
 
 void  TTable::onSendCancel()
@@ -133,7 +141,7 @@ void  TTable::onSendValues( TValues& a_tValues )
 
     if( false == need_to_add )
     {
-        // редактируем текущий набор параметров
+        // редактируем текущую таблицу
 
         setTableName( m_tValues.m_zName.toStdString(), true );
 
@@ -142,7 +150,7 @@ void  TTable::onSendValues( TValues& a_tValues )
 
     if( true == need_to_add )
     {
-        // создаем новый набор параметров
+        // создаем новую таблицу
 
     }
 

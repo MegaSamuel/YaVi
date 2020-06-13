@@ -3,7 +3,7 @@
 
 #include <QtWidgets>
 
-#include "dialog.h"
+#include "tabdialog.h"
 #include "values.h"
 
 //------------------------------------------------------------------------------
@@ -25,8 +25,8 @@ public:
     {
         keTypeNone   = 0,
         keTypeLink   = 1,
-        keTypeColumn = 2,
-        keTypeRow    = 3,
+        keTypeRow    = 2,
+        keTypeColumn = 3,
     };
 
     void           setTableType( unsigned  type ) noexcept;
@@ -95,7 +95,8 @@ private:
     QString        m_zBtnName; // текст на кнопке
     QString        m_zLink;    // table Link
 
-    TDialog       *m_ptDialog;
+    TTabDialog    *m_ptTabDialogSelf;
+    TTabDialog    *m_ptTabDialogAdd;
 
     TValues        m_tValues;
 

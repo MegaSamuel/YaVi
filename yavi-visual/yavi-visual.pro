@@ -37,7 +37,8 @@ SOURCES += \
     table.cpp \
     category.cpp \
     param.cpp \
-    dialog.cpp
+    dialog.cpp \
+    tabdialog.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -47,7 +48,8 @@ HEADERS += \
     func.h \
     param.h \
     dialog.h \
-    values.h
+    values.h \
+    tabdialog.h
 
 win32: RC_ICONS = $$PWD/favicon.ico
 

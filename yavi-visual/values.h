@@ -12,6 +12,7 @@ class TValues
 public:
     TValues()
     {
+        m_zId.clear();
         m_zName.clear();
         m_uType = 0;
         m_zPlaceholder.clear();
@@ -68,6 +69,7 @@ public:
     #define  GoodsValuesSection      "values"
 
     // набор параметров
+    QString      m_zId;
     QString      m_zName;
     unsigned     m_uType;
     QString      m_zPlaceholder;
