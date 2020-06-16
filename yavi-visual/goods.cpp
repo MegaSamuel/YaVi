@@ -172,7 +172,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
         // перебираем все таблицы
         for( int j = 0; j < static_cast<int>(config[ GoodsTableSection ].size()); j++ )
         {
-            bool  table_fill = false; // признак что таблица не заполнена
+            //bool  table_fill = false; // признак что таблица не заполнена
 
             pTable = new TTable( this );
             pTable->setNode( config[ GoodsTableSection ][j] );
@@ -189,6 +189,11 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             // ищем имя секции id
             std::string  id_name = __yaml_GetString( config[ GoodsTableSection ][j], GoodsTableName );
             pTable->setTableName( id_name );
+
+            //if( ( 0 != id.length() ) && ( 0 != id_name.length() ) )
+            //{
+            //    table_fill = true;
+            //}
 
             widget_stretch( 0, height );
 

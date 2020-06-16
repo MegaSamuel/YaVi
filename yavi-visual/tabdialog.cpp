@@ -17,6 +17,7 @@ public:
 
     QGridLayout      *m_grid;
 
+    QString           m_zValue;
     TValues           m_tValues;
 
     inline TPrivTabDialog()
@@ -32,7 +33,7 @@ public:
 
 //------------------------------------------------------------------------------
 
-TTabDialog::TTabDialog( bool fullsize, QString name, QWidget *parent )
+TTabDialog::TTabDialog( bool fullsize, QString name, QWidget *parent, QString value )
     : QDialog( parent )
 {
     int  row = 0;
@@ -83,7 +84,18 @@ TTabDialog::TTabDialog( bool fullsize, QString name, QWidget *parent )
     }
     else
     {
-        QLabel *lblName = new QLabel( QString( "%1%2" ).arg("Name").arg(":"), this );
+        QString  str;
+
+        if( 0 != value.length() )
+        {
+            str = value;
+        }
+        else
+        {
+            str = "Name";
+        }
+
+        QLabel *lblName = new QLabel( QString( "%1%2" ).arg(str).arg(":"), this );
         priv__->m_grid->addWidget( lblName, row, 0, 1, 1 );
         QLineEdit *ptLineName = new QLineEdit( this );
         priv__->m_ptLineName = ptLineName;
@@ -134,10 +146,8 @@ void  TTabDialog::setDlgName( const QString& name )
 
 void  TTabDialog::setDlgEmpty()
 {
-    int  val;
     QString  name;
 
-    val = 0;
     name.clear();
 
     if( m_bFullSize )
@@ -165,17 +175,21 @@ void  TTabDialog::onBtnAction( QAbstractButton*  btn )
             priv__->m_tValues.m_zId = priv__->m_ptLineId->text();
             priv__->m_tValues.m_zName = priv__->m_ptLineName->text();
             priv__->m_tValues.m_uType = static_cast<unsigned>(priv__->m_ptComboType->currentIndex());
+
+            // шлем сигнал с данными
+            Q_EMIT sendValues( priv__->m_tValues );
         }
         else
         {
-            priv__->m_tValues.m_zName = priv__->m_ptLineName->text();
+            priv__->m_zValue = priv__->m_ptLineName->text();
 
+            priv__->m_tValues.m_zName.clear();
             priv__->m_tValues.m_zId.clear();
             priv__->m_tValues.m_uType = 0;
-        }
 
-        // шлем сигнал с данными
-        Q_EMIT sendValues( priv__->m_tValues );
+            // шлем сигнал с данными
+            Q_EMIT sendValue( priv__->m_zValue );
+        }
 
         // шлем сигнал что мы что-то поменяли
         Q_EMIT sendChanged();

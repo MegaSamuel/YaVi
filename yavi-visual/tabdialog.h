@@ -18,7 +18,7 @@ class TTabDialog : public QDialog
     Q_OBJECT
 
 public :
-    explicit TTabDialog( bool fullsize = true, QString name = "Unknown", QWidget *parent = Q_NULLPTR );
+    explicit TTabDialog( bool fullsize = true, QString name = "Unknown", QWidget *parent = Q_NULLPTR, QString value = "" );
     ~TTabDialog();
 
     void    setDlgId( const QString&  name );
@@ -29,6 +29,7 @@ public :
 Q_SIGNALS:
     void    sendCancel();
     void    sendChanged();
+    void    sendValue( QString&  value );
     void    sendValues( TValues&  values );
 
 protected Q_SLOTS:

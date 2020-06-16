@@ -9,16 +9,25 @@ TTable::TTable( TGoods  *pAncestor )
 {
     clear();
 
-    // диалог
-    m_ptTabDialogSelf = new TTabDialog( false, "Table", this );
+    // диалог для айди
+    m_ptTabDialogId = new TTabDialog( false, "Table", this, "ID" );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptTabDialogSelf, &TTabDialog::sendCancel, this, &TTable::onSendCancel );
+    connect( m_ptTabDialogId, &TTabDialog::sendCancel, this, &TTable::onSendCancel );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptTabDialogSelf, &TTabDialog::sendValues, this, &TTable::onSendValues );
+    connect( m_ptTabDialogId, &TTabDialog::sendValue, this, &TTable::onSendValue );
 
-    // диалог
+    // диалог для имени
+    m_ptTabDialogName = new TTabDialog( false, "Table", this );
+
+    // ловим сигнал от диалога об отмене
+    connect( m_ptTabDialogName, &TTabDialog::sendCancel, this, &TTable::onSendCancel );
+
+    // ловим сигнал от диалога с данными
+    connect( m_ptTabDialogName, &TTabDialog::sendValue, this, &TTable::onSendValue );
+
+    // диалог для новой таблицы
     m_ptTabDialogAdd = new TTabDialog( true, "Add table", this );
 
     // ловим сигнал от диалога об отмене
@@ -93,31 +102,41 @@ void  TTable::clear()
     m_zLink.clear();
 
     need_to_add = false;
+
+    edit_id = false;
+    edit_name = false;
 }
 
 //------------------------------------------------------------------------------
 
 void  TTable::onBtnId()
 {
+    // признак что хотим отредактировать имя
+    edit_id = true;
 
+    // диалог с пустыми параметрами
+    m_ptTabDialogId->setDlgEmpty();
+
+    m_ptTabDialogId->setDlgName( getTableId() );
+
+    m_ptTabDialogId->open();
 }
 
 void  TTable::onBtnName()
 {
-    //qDebug() << getTableName() << "button";
+    // признак что хотим отредактировать имя
+    edit_name = true;
 
     // диалог с пустыми параметрами
-    m_ptTabDialogSelf->setDlgEmpty();
+    m_ptTabDialogName->setDlgEmpty();
 
-    m_ptTabDialogSelf->setDlgName( getTableName() );
+    m_ptTabDialogName->setDlgName( getTableName() );
 
-    m_ptTabDialogSelf->open();
+    m_ptTabDialogName->open();
 }
 
 void  TTable::onBtnInc()
 {
-    //qDebug() << "Inc button" << getTableId() << getTableName();
-
     // признак что хотим создать новый набор параметров
     need_to_add = true;
 
@@ -133,6 +152,31 @@ void  TTable::onBtnInc()
 void  TTable::onSendCancel()
 {
     need_to_add = false;
+
+    edit_id = false;
+    edit_name = false;
+}
+
+void  TTable::onSendValue( QString& a_zValue )
+{
+    // редактируем текущую таблицу
+
+    if( edit_id )
+    {
+        m_tValues.m_zId = a_zValue;
+
+        setTableId( m_tValues.m_zId.toStdString(), true );
+    }
+
+    if( edit_name )
+    {
+        m_tValues.m_zName = a_zValue;
+
+        setTableName( m_tValues.m_zName.toStdString(), true );
+    }
+
+    edit_id = false;
+    edit_name = false;
 }
 
 void  TTable::onSendValues( TValues& a_tValues )
@@ -141,11 +185,7 @@ void  TTable::onSendValues( TValues& a_tValues )
 
     if( false == need_to_add )
     {
-        // редактируем текущую таблицу
-
-        setTableName( m_tValues.m_zName.toStdString(), true );
-
-        //qDebug() << getCategoriesName() << "fix categories";
+        qDebug() << "it has gone wrong!";
     }
 
     if( true == need_to_add )

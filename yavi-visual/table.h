@@ -70,6 +70,7 @@ private Q_SLOTS:
     void           onBtnName();
     void           onBtnInc();
     void           onSendCancel();
+    void           onSendValue( QString& );
     void           onSendValues( TValues& );
 
 private:
@@ -95,7 +96,8 @@ private:
     QString        m_zBtnName; // текст на кнопке
     QString        m_zLink;    // table Link
 
-    TTabDialog    *m_ptTabDialogSelf;
+    TTabDialog    *m_ptTabDialogId;
+    TTabDialog    *m_ptTabDialogName;
     TTabDialog    *m_ptTabDialogAdd;
 
     TValues        m_tValues;
@@ -114,6 +116,9 @@ private:
     void           widget_size_reset() noexcept;  // сброс размера виджета
 
     bool           need_to_add; // необходимость создать новый набор параметров в ямле
+
+    bool           edit_id;
+    bool           edit_name;
 };
 
 //------------------------------------------------------------------------------
