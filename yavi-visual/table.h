@@ -42,8 +42,8 @@ public:
     void           setTableId( const std::string&  name, bool  set_to_node = false );
     void           setTableName( const std::string&  name, bool  set_to_node = false );
     void           setTableLink( const std::string&  name, bool  set_to_node = false );
-    void           setTableRow( QStringList& list );
-    void           setTableColumn( QStringList& list );
+    void           setTableRow( const std::string&  name, QStringList& list );
+    void           setTableColumn( const std::string&  name, QStringList& list );
 
     void           resetRow() noexcept;
     void           resetColumn() noexcept;
@@ -71,6 +71,14 @@ private Q_SLOTS:
     void           onBtnLink();
     void           onBtnDec();
     void           onBtnInc();
+    void           onBtnRowInc();
+    void           onBtnRowName();
+    void           onBtnRowValInc();
+    void           onBtnRowValName();
+    void           onBtnColumnInc();
+    void           onBtnColumnName();
+    void           onBtnColumnValInc();
+    void           onBtnColumnValName();
     void           onSendCancel();
     void           onSendValue( QString& );
     void           onSendValues( TValues& );

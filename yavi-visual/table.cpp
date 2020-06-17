@@ -49,21 +49,21 @@ TTable::TTable( TGoods  *pAncestor )
     // кнопка с id
     m_ptBtnId = new QPushButton( "id" );
     m_ptBtnId->setToolTip( "ID таблицы" );
-    //m_ptBtnId->setFixedWidth( 93 );
+    m_ptBtnId->setFixedWidth( 93 );
     connect( m_ptBtnId, &QPushButton::clicked, this, &TTable::onBtnId );
     m_grid->addWidget( m_ptBtnId, m_row, 0, Qt::AlignLeft );
 
     // кнопка с именем
     m_ptBtnName = new QPushButton( "name" );
     m_ptBtnName->setToolTip( "Название таблицы" );
-    //m_ptBtnName->setFixedWidth( 93 );
+    m_ptBtnName->setFixedWidth( 93 );
     connect( m_ptBtnName, &QPushButton::clicked, this, &TTable::onBtnName );
     m_grid->addWidget( m_ptBtnName, m_row, 1, Qt::AlignLeft );
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+" );
     m_ptBtnInc->setToolTip( "Добавить таблицу" );
-    //m_ptBtnInc->setFixedWidth( 93 );
+    m_ptBtnInc->setFixedWidth( 93 );
     connect( m_ptBtnInc, &QPushButton::clicked, this, &TTable::onBtnInc );
     m_grid->addWidget( m_ptBtnInc, m_row+1, 0, Qt::AlignLeft );
 
@@ -171,6 +171,46 @@ void  TTable::onBtnInc()
     m_ptTabDialogAdd->setDlgName( "Table" );
 
     m_ptTabDialogAdd->open();
+}
+
+void  TTable::onBtnRowInc()
+{
+    qDebug() << __func__;
+}
+
+void  TTable::onBtnRowName()
+{
+    qDebug() << __func__;
+}
+
+void  TTable::onBtnRowValInc()
+{
+    qDebug() << __func__;
+}
+
+void  TTable::onBtnRowValName()
+{
+    qDebug() << __func__;
+}
+
+void  TTable::onBtnColumnInc()
+{
+    qDebug() << __func__;
+}
+
+void  TTable::onBtnColumnName()
+{
+    qDebug() << __func__;
+}
+
+void  TTable::onBtnColumnValInc()
+{
+    qDebug() << __func__;
+}
+
+void  TTable::onBtnColumnValName()
+{
+    qDebug() << __func__;
 }
 
 void  TTable::onSendCancel()
@@ -402,7 +442,8 @@ void  TTable::setTableType( unsigned type ) noexcept
         connect( m_ptBtnLink, &QPushButton::clicked, this, &TTable::onBtnLink );
         m_grid->addWidget( m_ptBtnLink, m_row, 2, Qt::AlignLeft );
 
-        widget_stretch( m_grid->minimumSize().width(), m_grid->minimumSize().height() );
+        // эта кнопка на второй строке, высоту этой строки учли в конструкторе класса
+        //widget_stretch( m_grid->minimumSize().width(), m_ptBtnLink->minimumSizeHint().height() );
     }
     else if( keTypeColumn == m_uTableType )
     {
@@ -538,44 +579,104 @@ const QString TTable::getTableLink()
     return m_zLink;
 }
 
-void TTable::setTableRow( QStringList& list )
+void TTable::setTableRow( const std::string&  name, QStringList& list )
 {
     int column = 0;
 
+    // кнопка плюс для добавления значения
+    QPushButton *ptBtnRowValInc = new QPushButton( "+" );
+    ptBtnRowValInc->setToolTip( "Добавить значение" );
+    ptBtnRowValInc->setFixedWidth( 93 );
+    connect( ptBtnRowValInc, &QPushButton::clicked, this, &TTable::onBtnRowValInc );
+    m_grid->addWidget( ptBtnRowValInc, m_row, m_column + column, Qt::AlignLeft );
+
+    column += 1;
+
+    // кнопка с именем строки
+    QPushButton *ptBtnRowName = new QPushButton( QString::fromStdString(name) );
+    ptBtnRowName->setToolTip( "Строка: " + QString::fromStdString(name) );
+    ptBtnRowName->setFixedWidth( 93 );
+    connect( ptBtnRowName, &QPushButton::clicked, this, &TTable::onBtnRowName );
+    m_grid->addWidget( ptBtnRowName, m_row, m_column + column, Qt::AlignLeft );
+
+    column += 1;
+
+    int  i = 0;
+
     for( auto& it : list )
     {
-        QLabel  *label = new QLabel();
-        label->setText( it );
-        label->setFixedWidth( 93 );
-        label->setAlignment( Qt::AlignCenter );
-        label->setFrameStyle( QFrame::Panel | QFrame::Raised );
-        m_grid->addWidget( label, m_row, m_column + column, Qt::AlignLeft );
+        i++;
 
-        widget_stretch( m_grid->minimumSize().width(), label->minimumSize().height() + m_grid->spacing() );
+        // кнопки со значениями
+        QPushButton  *button = new QPushButton( it );
+        button->setToolTip( "Значение: " + it );
+        button->setFixedWidth( 93 );
+        connect( button, &QPushButton::clicked, this, &TTable::onBtnRowValName );
+        m_grid->addWidget( button, m_row, m_column + column, Qt::AlignLeft );
 
         column += 1;
     }
 
+    // кнопка плюс для добавления строки
+    QPushButton *ptBtnRowInc = new QPushButton( "+" );
+    ptBtnRowInc->setToolTip( "Добавить строку" );
+    ptBtnRowInc->setFixedWidth( 93 );
+    connect( ptBtnRowInc, &QPushButton::clicked, this, &TTable::onBtnRowInc );
+    m_grid->addWidget( ptBtnRowInc, m_row, m_column + column, Qt::AlignLeft );
+
+    column += 1;
+
+    widget_stretch( m_grid->minimumSize().width() + i * m_grid->spacing(), 0 );
+
     nextRow();
 }
 
-void TTable::setTableColumn( QStringList& list )
+void TTable::setTableColumn( const std::string&  name, QStringList& list )
 {
     int row = 0;
 
+    // кнопка плюс для добавления значения
+    QPushButton *ptBtnColumnValInc = new QPushButton( "+" );
+    ptBtnColumnValInc->setToolTip( "Добавить значение" );
+    ptBtnColumnValInc->setFixedWidth( 93 );
+    connect( ptBtnColumnValInc, &QPushButton::clicked, this, &TTable::onBtnColumnValInc );
+    m_grid->addWidget( ptBtnColumnValInc, m_row + row, m_column, Qt::AlignLeft );
+
+    row += 1;
+
+    // кнопка с именем столбца
+    QPushButton *ptBtnColumnName = new QPushButton( QString::fromStdString(name) );
+    ptBtnColumnName->setToolTip( "Столбец: " + QString::fromStdString(name) );
+    ptBtnColumnName->setFixedWidth( 93 );
+    connect( ptBtnColumnName, &QPushButton::clicked, this, &TTable::onBtnColumnName );
+    m_grid->addWidget( ptBtnColumnName, m_row + row, m_column, Qt::AlignLeft );
+
+    row += 1;
+
+    int  i = 0;
+
     for( auto& it : list )
     {
-        QLabel  *label = new QLabel();
-        label->setText( it );
-        label->setFixedWidth( 93 );
-        label->setAlignment( Qt::AlignCenter );
-        label->setFrameStyle( QFrame::Panel | QFrame::Raised );
-        m_grid->addWidget( label, m_row + row, m_column, Qt::AlignLeft );
+        i++;
 
-        widget_stretch( m_grid->minimumSize().width(), label->minimumSize().height() + m_grid->spacing() );
+        // кнопки со значениями
+        QPushButton  *button = new QPushButton( it );
+        button->setToolTip( "Значение: " + it );
+        button->setFixedWidth( 93 );
+        connect( button, &QPushButton::clicked, this, &TTable::onBtnColumnValName );
+        m_grid->addWidget( button, m_row + row, m_column, Qt::AlignLeft );
 
         row += 1;
     }
+
+    // кнопка плюс для добавления строки
+    QPushButton *ptBtnColumnInc = new QPushButton( "+" );
+    ptBtnColumnInc->setToolTip( "Добавить столбец" );
+    ptBtnColumnInc->setFixedWidth( 93 );
+    connect( ptBtnColumnInc, &QPushButton::clicked, this, &TTable::onBtnColumnInc );
+    m_grid->addWidget( ptBtnColumnInc, m_row + row, m_column, Qt::AlignLeft );
+
+    //widget_stretch( m_grid->minimumSize().width(), label->minimumSize().height() + m_grid->spacing() );
 
     nextColumn();
 }

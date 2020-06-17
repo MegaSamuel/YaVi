@@ -167,13 +167,9 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
         TTable  *pTable;
 
-        int height = m_vlayout->spacing();
-
         // перебираем все таблицы
         for( int j = 0; j < static_cast<int>(config[ GoodsTableSection ].size()); j++ )
         {
-            //bool  table_fill = false; // признак что таблица не заполнена
-
             pTable = new TTable( this );
             pTable->setNode( config[ GoodsTableSection ][j] );
             pTable->setNodeParent( config[ GoodsTableSection ] );
@@ -202,30 +198,10 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
                 pTable->setTableLink( link );
             }
-            else if( __yaml_IsSequence( config[ GoodsTableSection ][j][GoodsTableRow] ) )
-            {
-                pTable->setTableType( TTable::keTypeRow );
-            }
             else if( __yaml_IsSequence( config[ GoodsTableSection ][j][GoodsTableColumn] ) )
             {
                 pTable->setTableType( TTable::keTypeColumn );
-            }
-            else
-            {
-                pTable->setTableType( TTable::keTypeNone );
-            }
 
-            //if( ( 0 != id.length() ) && ( 0 != id_name.length() ) )
-            //{
-            //    table_fill = true;
-            //}
-
-            widget_stretch( 0, height );
-
-#if 0
-            // ищем столбцы
-            if( !table_fill && __yaml_IsSequence( config[ GoodsTableSection ][j][GoodsTableColumn] ) )
-            {
                 for( auto& col : config[ GoodsTableSection ][j][ GoodsTableColumn ] )
                 {
                     QStringList  col_list;
@@ -233,7 +209,6 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
                     // имя
                     std::string  col_name = __yaml_GetString( col, GoodsTableName );
-                    col_list.append( QString::fromStdString(col_name) );
 
                     // значение
                     QStringList  vValues;
@@ -246,19 +221,13 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                         col_list.append( it );
                     }
 
-                    pTable->setTableColumn( col_list );
+                    pTable->setTableColumn( col_name, col_list );
                 }
-
-                pTable->nextRow();
-
+            }
+            else if( __yaml_IsSequence( config[ GoodsTableSection ][j][GoodsTableRow] ) )
+            {
                 pTable->setTableType( TTable::keTypeRow );
 
-                table_fill = true;
-            }
-
-            // ищем строки
-            if( !table_fill && __yaml_IsSequence( config[ GoodsTableSection ][j][GoodsTableRow] ) )
-            {
                 for( auto& row : config[ GoodsTableSection ][j][ GoodsTableRow ] )
                 {
                     QStringList  row_list;
@@ -266,7 +235,6 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
                     // имя
                     std::string  row_name = __yaml_GetString( row, GoodsTableName );
-                    row_list.append( QString::fromStdString(row_name) );
 
                     // значение
                     QStringList  vValues;
@@ -279,23 +247,15 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                         row_list.append( it );
                     }
 
-                    pTable->setTableRow( row_list );
+                    pTable->setTableRow( row_name, row_list );
                 }
-
-                pTable->setTableType( TTable::keTypeColumn );
-
-                table_fill = true;
             }
-
-            // ищем ссылку
-            if( !table_fill )
+            else
             {
-                std::string  link = __yaml_GetString( config[ GoodsTableSection ][j], GoodsTableLink );
-                pTable->setTableLink( link );
-
-                pTable->setTableType( TTable::keTypeLink );
+                pTable->setTableType( TTable::keTypeNone );
             }
-#endif
+
+            widget_stretch( 0, m_vlayout->spacing() );
         }
     }
 
