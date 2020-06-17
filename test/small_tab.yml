@@ -1,0 +1,41 @@
+category:
+  - name: NameStr1
+    parameters:
+      - name: node 1
+        type: 0
+      - name: node 2
+        type: 1
+      - name: node 3
+        type: 2
+      - name: node 4
+        type: 3
+      - name: node 5
+        type: 4
+      - name: node 6
+        type: 5
+tables: 
+  - id: table-1
+    name: Размеры бюстгалтеров
+    colums:
+      - name: Россия
+        values: |- 
+          65
+          70
+      - name: РоссиЯ
+        values: |- 
+          66
+          71
+  - id: table-2
+    name: Размеры мужской одежды
+    rows:
+      - name: Россия
+        values: |- 
+          65
+          70
+      - name: РоссиЯ
+        values: |- 
+          66
+          71
+  - id: table-3
+    name: Размеры одежды
+    link: www.link.com
