@@ -68,6 +68,7 @@ Q_SIGNALS:
 private Q_SLOTS:
     void           onBtnId();
     void           onBtnName();
+    void           onBtnLink();
     void           onBtnDec();
     void           onBtnInc();
     void           onSendCancel();
@@ -90,8 +91,7 @@ private:
     QPushButton   *m_ptBtnInc;
     QPushButton   *m_ptBtnId;
     QPushButton   *m_ptBtnName;
-
-    QLabel        *m_ptLblLink;
+    QPushButton   *m_ptBtnLink;
 
     unsigned       m_uTableType;
 
@@ -100,9 +100,11 @@ private:
     QString        m_zName;    // table Name
     QString        m_zBtnName; // текст на кнопке
     QString        m_zLink;    // table Link
+    QString        m_zBtnLink; // текст на кнопке
 
     TTabDialog    *m_ptTabDialogId;
     TTabDialog    *m_ptTabDialogName;
+    TTabDialog    *m_ptTabDialogLink;
     TTabDialog    *m_ptTabDialogAdd;
 
     TValues        m_tValues;
@@ -124,6 +126,7 @@ private:
 
     bool           edit_id;
     bool           edit_name;
+    bool           edit_link;
 };
 
 //------------------------------------------------------------------------------

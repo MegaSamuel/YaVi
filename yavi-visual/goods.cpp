@@ -190,7 +190,29 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             std::string  id_name = __yaml_GetString( config[ GoodsTableSection ][j], GoodsTableName );
             pTable->setTableName( id_name );
 
-            qDebug() << j << pTable->getTableId();
+            //qDebug() << j << pTable->getTableId();
+
+            // определяем тип таблицы (ссылка, строка, столбец)
+
+            std::string  link = __yaml_GetString( config[ GoodsTableSection ][j], GoodsTableLink );
+
+            if( 0 != link.length() )
+            {
+                pTable->setTableType( TTable::keTypeLink );
+
+                pTable->setTableLink( link );
+            }
+            else if( __yaml_IsSequence( config[ GoodsTableSection ][j][GoodsTableRow] ) )
+            {
+                pTable->setTableType( TTable::keTypeRow );
+            }
+            else if( __yaml_IsSequence( config[ GoodsTableSection ][j][GoodsTableColumn] ) )
+            {
+                pTable->setTableType( TTable::keTypeColumn );
+            }
+            {
+                pTable->setTableType( TTable::keTypeNone );
+            }
 
             //if( ( 0 != id.length() ) && ( 0 != id_name.length() ) )
             //{

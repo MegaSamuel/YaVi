@@ -107,6 +107,7 @@ void  TTable::clear()
 
     edit_id = false;
     edit_name = false;
+    edit_link = false;
 }
 
 //------------------------------------------------------------------------------
@@ -137,6 +138,19 @@ void  TTable::onBtnName()
     m_ptTabDialogName->open();
 }
 
+void  TTable::onBtnLink()
+{
+    // признак что хотим отредактировать ссылку
+    edit_link = true;
+
+    // диалог с пустыми параметрами
+    m_ptTabDialogLink->setDlgEmpty();
+
+    m_ptTabDialogLink->setDlgName( getTableLink() );
+
+    m_ptTabDialogLink->open();
+}
+
 void  TTable::onBtnDec()
 {
     widget_shrink( getTableWidth(), getTableHeight() + m_grid->spacing() );
@@ -164,6 +178,7 @@ void  TTable::onSendCancel()
 
     edit_id = false;
     edit_name = false;
+    edit_link = false;
 }
 
 void  TTable::onSendValue( QString& a_zValue )
@@ -190,8 +205,14 @@ void  TTable::onSendValue( QString& a_zValue )
         }
     }
 
+    if( edit_link )
+    {
+        setTableLink( a_zValue.toStdString(), true );
+    }
+
     edit_id = false;
     edit_name = false;
+    edit_link = false;
 }
 
 void  TTable::onSendValues( TValues& a_tValues )
@@ -327,6 +348,26 @@ void  TTable::setTableType( unsigned type ) noexcept
 {
     m_uTableType = type;
 
+    if( keTypeLink == m_uTableType )
+    {
+        // диалог для ссылки
+        m_ptTabDialogLink = new TTabDialog( false, "Table", this, "Link" );
+
+        // ловим сигнал от диалога об отмене
+        connect( m_ptTabDialogLink, &TTabDialog::sendCancel, this, &TTable::onSendCancel );
+
+        // ловим сигнал от диалога с данными
+        connect( m_ptTabDialogLink, &TTabDialog::sendValue, this, &TTable::onSendValue );
+
+        m_ptBtnLink = new QPushButton( "link" );
+        connect( m_ptBtnLink, &QPushButton::clicked, this, &TTable::onBtnLink );
+        m_grid->addWidget( m_ptBtnLink, m_row, 2, Qt::AlignLeft );
+
+        widget_stretch( m_grid->minimumSize().width(), m_grid->minimumSize().height() );
+
+        nextRow();
+    }
+
     //qDebug() << "table" << getTableName() << "type" << m_uTableType;
 }
 
@@ -440,15 +481,8 @@ void  TTable::setTableLink( const std::string&  name, bool  set_to_node )
 {
     m_zLink = QString::fromStdString(name);
 
-    m_ptLblLink = new QLabel( this, Q_NULLPTR );
-    m_ptLblLink->setText( m_zLink );
-//    m_ptLblLink->setMinimumSize(95,25);
-    m_ptLblLink->setFrameStyle( QFrame::Panel | QFrame::Raised );
-    m_grid->addWidget( m_ptLblLink, m_row, 1, 1, -1, Qt::AlignLeft );
-
-    widget_stretch( m_grid->minimumSize().width(), m_grid->minimumSize().height() );
-
-    nextRow();
+    m_ptBtnLink->setText( m_zLink );
+    m_ptBtnLink->setToolTip( "Внешняя ссылка" );
 
     if( set_to_node )
     {
