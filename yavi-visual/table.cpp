@@ -579,6 +579,8 @@ const QString TTable::getTableLink()
     return m_zLink;
 }
 
+//------------------------------------------------------------------------------
+
 void TTable::setTableRow( const std::string&  name, QStringList& list )
 {
     int column = 0;
@@ -626,6 +628,7 @@ void TTable::setTableRow( const std::string&  name, QStringList& list )
 
     column += 1;
 
+    // подгоняем ширину
     widget_stretch( m_grid->minimumSize().width() + i * m_grid->spacing(), 0 );
 
     nextRow();
@@ -680,6 +683,15 @@ void TTable::setTableColumn( const std::string&  name, QStringList& list )
 
     nextColumn();
 }
+
+//------------------------------------------------------------------------------
+
+void TTable::fixTableHeight( unsigned  row_count )
+{
+    widget_stretch( 0, static_cast<int>(row_count) * ( m_ptBtnInc->minimumSizeHint().height() + m_grid->spacing() ) );
+}
+
+//------------------------------------------------------------------------------
 
 void TTable::resetRow() noexcept
 {

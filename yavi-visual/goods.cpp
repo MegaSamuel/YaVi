@@ -186,8 +186,6 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             std::string  id_name = __yaml_GetString( config[ GoodsTableSection ][j], GoodsTableName );
             pTable->setTableName( id_name );
 
-            //qDebug() << j << pTable->getTableId();
-
             // определяем тип таблицы (ссылка, строка, столбец)
 
             std::string  link = __yaml_GetString( config[ GoodsTableSection ][j], GoodsTableLink );
@@ -201,6 +199,8 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             else if( __yaml_IsSequence( config[ GoodsTableSection ][j][GoodsTableColumn] ) )
             {
                 pTable->setTableType( TTable::keTypeColumn );
+
+                int  max_row_count = 0;
 
                 for( auto& col : config[ GoodsTableSection ][j][ GoodsTableColumn ] )
                 {
@@ -222,11 +222,20 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     }
 
                     pTable->setTableColumn( col_name, col_list );
+
+                    if( col_list.size() > max_row_count )
+                    {
+                        max_row_count = col_list.size();
+                    }
                 }
+
+                pTable->fixTableHeight( 2 + static_cast<unsigned>(max_row_count) );
             }
             else if( __yaml_IsSequence( config[ GoodsTableSection ][j][GoodsTableRow] ) )
             {
                 pTable->setTableType( TTable::keTypeRow );
+
+                unsigned  row_count = 0;
 
                 for( auto& row : config[ GoodsTableSection ][j][ GoodsTableRow ] )
                 {
@@ -248,6 +257,13 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     }
 
                     pTable->setTableRow( row_name, row_list );
+
+                    row_count++;
+                }
+
+                if( row_count > 0 )
+                {
+                    pTable->fixTableHeight( row_count - 1 );
                 }
             }
             else
@@ -255,7 +271,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                 pTable->setTableType( TTable::keTypeNone );
             }
 
-            widget_stretch( 0, m_vlayout->spacing() );
+            //widget_stretch( 0, m_vlayout->spacing() );
         }
     }
 
