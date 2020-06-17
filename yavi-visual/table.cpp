@@ -95,6 +95,8 @@ void  TTable::clear()
     m_node_parent.reset();
     m_node_index = -1;
 
+    m_temporary_node = YAML::Node();
+
     m_uTableType = keTypeNone;
 
     m_zId.clear();
@@ -135,6 +137,13 @@ void  TTable::onBtnName()
     m_ptTabDialogName->open();
 }
 
+void  TTable::onBtnDec()
+{
+    widget_shrink( getTableWidth(), getTableHeight() + m_grid->spacing() );
+
+    TableDelete();
+}
+
 void  TTable::onBtnInc()
 {
     // признак что хотим создать новый набор параметров
@@ -173,6 +182,12 @@ void  TTable::onSendValue( QString& a_zValue )
         m_tValues.m_zName = a_zValue;
 
         setTableName( m_tValues.m_zName.toStdString(), true );
+
+        if( 0 == m_tValues.m_zName.length() )
+        {
+            // если имя пустое, то удаляем таблицу
+            onBtnDec();
+        }
     }
 
     edit_id = false;
@@ -192,12 +207,67 @@ void  TTable::onSendValues( TValues& a_tValues )
     {
         // создаем новую таблицу
 
+        if( 0 == m_tValues.m_zName.length() )
+        {
+            // если имя пустое, то ставим дефолтное имя
+            m_tValues.m_zName = "noname";
+        }
+
+        // добавляем таблицу
+        TTable  *pTable;
+        pTable = new TTable( m_pAncestor );
+
+        // добавляемся к родителю
+        m_pAncestor->m_vlayout->addWidget( pTable );
+        m_pAncestor->m_apTableList.append(pTable);
+
+        // ставим значения параметров
+        pTable->setTableId( m_tValues.m_zId.toStdString() );
+        pTable->setTableName( m_tValues.m_zName.toStdString() );
+
+        // очищаем ямл
+        m_temporary_node.reset();
+
+        // пишем их в пустой ямл
+        __yaml_SetString( m_temporary_node, GoodsTableId, m_tValues.m_zId.toStdString() );
+        __yaml_SetString( m_temporary_node, GoodsTableName, m_tValues.m_zName.toStdString() );
+
+        // добавляем ямл к основному
+        m_node_parent.push_back( m_temporary_node );
+
+        int index = static_cast<int>(m_node_parent.size()) - 1;
+
+        pTable->setNode( m_node_parent[index] );
+        pTable->setNodeParent( m_node_parent );
+        pTable->setNodeIndex( index );
+
+        qDebug() << pTable->getTableName() << "index" << index;
     }
 
     need_to_add = false;
 }
 
 //------------------------------------------------------------------------------
+
+void  TTable::clearNodeSequence()
+{
+    // если не знаем индекс, то удаляем поля
+    if( -1 == m_node_index )
+    {
+        m_node.remove( GoodsTableId );
+        m_node.remove( GoodsTableName );
+        m_node.remove( GoodsTableValue );
+        m_node.remove( GoodsTableColumn );
+        m_node.remove( GoodsTableRow );
+        m_node.remove( GoodsTableLink );
+    }
+
+    // если знаем индекс, то удаляем всю ветку
+    if( -1 != m_node_index )
+    {
+        m_node_parent.remove( m_node_index );
+    }
+}
 
 void  TTable::TableDelete()
 {
@@ -223,12 +293,32 @@ void  TTable::TableDelete()
                 //qDebug() << m_pAncestor->m_apTableList.at(i)->getTableName() << "obsolete";
 
                 m_pAncestor->m_apTableList.removeAt(i);
+
+                break;
+            }
+        }
+
+        int  index;
+
+        // делаем переиндексацию оставшихся детей
+        for( int i = 0; i < m_pAncestor->m_apTableList.count(); i++ )
+        {
+            index = m_pAncestor->m_apTableList.at(i)->getNodeIndex();
+
+            if( index > m_node_index )
+            {
+                index -= 1;
+
+                m_pAncestor->m_apTableList.at(i)->setNodeIndex( index );
             }
         }
 
         // удаляемся из родительского layout-а
         m_pAncestor->m_vlayout->removeWidget(this);
     }
+
+    // очищаем ветку
+    clearNodeSequence();
 }
 
 //------------------------------------------------------------------------------

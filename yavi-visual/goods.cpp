@@ -190,6 +190,8 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             std::string  id_name = __yaml_GetString( config[ GoodsTableSection ][j], GoodsTableName );
             pTable->setTableName( id_name );
 
+            qDebug() << j << pTable->getTableId();
+
             //if( ( 0 != id.length() ) && ( 0 != id_name.length() ) )
             //{
             //    table_fill = true;

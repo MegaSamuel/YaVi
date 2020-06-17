@@ -68,6 +68,7 @@ Q_SIGNALS:
 private Q_SLOTS:
     void           onBtnId();
     void           onBtnName();
+    void           onBtnDec();
     void           onBtnInc();
     void           onSendCancel();
     void           onSendValue( QString& );
@@ -76,9 +77,13 @@ private Q_SLOTS:
 private:
     void           clear();
 
+    void           clearNodeSequence();
+
     YAML::Node     m_node;        // текущий уровнь дерева ямла
     YAML::Node     m_node_parent; // родительский уровнь дерева ямла
     int            m_node_index;  // номер перечисления у родителя
+
+    YAML::Node     m_temporary_node;  // временный ямл для правки основного
 
     QGridLayout   *m_grid;
 
