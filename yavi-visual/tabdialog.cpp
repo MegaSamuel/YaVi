@@ -75,9 +75,9 @@ TTabDialog::TTabDialog( bool fullsize, QString name, QWidget *parent, QString va
         QLabel *lblType = new QLabel( QString( "%1%2" ).arg("Type").arg(":"), this );
         priv__->m_grid->addWidget( lblType, row, 0, 1, 1 );
         QComboBox *ptComboType = new QComboBox( this );
-        ptComboType->addItem( "link" );
-        ptComboType->addItem( "row" );
-        ptComboType->addItem( "col" );
+        ptComboType->addItem( "Ссылка" );
+        ptComboType->addItem( "Столбцы" );
+        ptComboType->addItem( "Строки" );
         priv__->m_ptComboType = ptComboType;
         priv__->m_grid->addWidget( ptComboType, row, 1, 1, 1 );
         row++;
@@ -154,6 +154,7 @@ void  TTabDialog::setDlgEmpty()
     {
         priv__->m_ptLineId->setText( name );
         priv__->m_ptLineName->setText( name );
+        priv__->m_ptComboType->setCurrentIndex(0);
     }
     else
     {
@@ -174,7 +175,7 @@ void  TTabDialog::onBtnAction( QAbstractButton*  btn )
         {
             priv__->m_tValues.m_zId = priv__->m_ptLineId->text();
             priv__->m_tValues.m_zName = priv__->m_ptLineName->text();
-            priv__->m_tValues.m_uType = static_cast<unsigned>(priv__->m_ptComboType->currentIndex());
+            priv__->m_tValues.m_uType = static_cast<unsigned>(priv__->m_ptComboType->currentIndex()) + 1;
 
             // шлем сигнал с данными
             Q_EMIT sendValues( priv__->m_tValues );

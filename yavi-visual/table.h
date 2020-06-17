@@ -25,8 +25,8 @@ public:
     {
         keTypeNone   = 0,
         keTypeLink   = 1,
-        keTypeRow    = 2,
-        keTypeColumn = 3,
+        keTypeColumn = 2,
+        keTypeRow    = 3,
     };
 
     void           setTableType( unsigned  type ) noexcept;
@@ -85,6 +85,7 @@ private:
     int            m_node_index;  // номер перечисления у родителя
 
     YAML::Node     m_temporary_node;  // временный ямл для правки основного
+    YAML::Node     m_temporary_inner_node;  // временный ямл для правки основного
 
     QGridLayout   *m_grid;
 

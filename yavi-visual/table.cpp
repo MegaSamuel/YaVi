@@ -42,9 +42,6 @@ TTable::TTable( TGoods  *pAncestor )
     // цепляем местный сигнал к слоту MainWindow
     connect( this, &TTable::sendChanged, MainWindow::getMainWinPtr(), &MainWindow::onYamlChanged );
 
-    resetRow();
-    resetColumn();
-
     m_grid = new QGridLayout;
     m_grid->setAlignment( Qt::AlignLeft | Qt::AlignTop );
     m_grid->setMargin(0);
@@ -91,11 +88,15 @@ TTable::~TTable()
 
 void  TTable::clear()
 {
+    resetRow();
+    resetColumn();
+
     m_node.reset();
     m_node_parent.reset();
     m_node_index = -1;
 
     m_temporary_node = YAML::Node();
+    m_temporary_inner_node = YAML::Node();
 
     m_uTableType = keTypeNone;
 
@@ -190,6 +191,12 @@ void  TTable::onSendValue( QString& a_zValue )
         m_tValues.m_zId = a_zValue;
 
         setTableId( m_tValues.m_zId.toStdString(), true );
+
+        if( 0 == m_tValues.m_zId.length() )
+        {
+            // если имя пустое, то удаляем таблицу
+            onBtnDec();
+        }
     }
 
     if( edit_name )
@@ -245,6 +252,7 @@ void  TTable::onSendValues( TValues& a_tValues )
         // ставим значения параметров
         pTable->setTableId( m_tValues.m_zId.toStdString() );
         pTable->setTableName( m_tValues.m_zName.toStdString() );
+        pTable->setTableType( m_tValues.m_uType );
 
         // очищаем ямл
         m_temporary_node.reset();
@@ -252,6 +260,35 @@ void  TTable::onSendValues( TValues& a_tValues )
         // пишем их в пустой ямл
         __yaml_SetString( m_temporary_node, GoodsTableId, m_tValues.m_zId.toStdString() );
         __yaml_SetString( m_temporary_node, GoodsTableName, m_tValues.m_zName.toStdString() );
+
+        if( keTypeLink == m_tValues.m_uType )
+        {
+            __yaml_SetString( m_temporary_node, GoodsTableLink, "link" );
+        }
+        else if( keTypeColumn == m_tValues.m_uType )
+        {
+            // очищаем ямл
+            m_temporary_inner_node.reset();
+
+            // пустая запись столбца
+            __yaml_SetString( m_temporary_inner_node, GoodsTableName, "name" );
+            __yaml_SetString( m_temporary_inner_node, GoodsTableValue, "value" );
+
+            // добавляем ямл к временному
+            m_temporary_node[ GoodsTableColumn ].push_back( m_temporary_inner_node );
+        }
+        else if( keTypeRow == m_tValues.m_uType )
+        {
+            // очищаем ямл
+            m_temporary_inner_node.reset();
+
+            // пустая запись строки
+            __yaml_SetString( m_temporary_inner_node, GoodsTableName, "name" );
+            __yaml_SetString( m_temporary_inner_node, GoodsTableValue, "value" );
+
+            // добавляем ямл к временному
+            m_temporary_node[ GoodsTableRow ].push_back( m_temporary_inner_node );
+        }
 
         // добавляем ямл к основному
         m_node_parent.push_back( m_temporary_node );
@@ -350,6 +387,8 @@ void  TTable::setTableType( unsigned type ) noexcept
 
     if( keTypeLink == m_uTableType )
     {
+        qDebug() << "table type" << m_uTableType << "link";
+
         // диалог для ссылки
         m_ptTabDialogLink = new TTabDialog( false, "Table", this, "Link" );
 
@@ -364,11 +403,15 @@ void  TTable::setTableType( unsigned type ) noexcept
         m_grid->addWidget( m_ptBtnLink, m_row, 2, Qt::AlignLeft );
 
         widget_stretch( m_grid->minimumSize().width(), m_grid->minimumSize().height() );
-
-        nextRow();
     }
-
-    //qDebug() << "table" << getTableName() << "type" << m_uTableType;
+    else if( keTypeColumn == m_uTableType )
+    {
+        qDebug() << "table type" << m_uTableType << "column";
+    }
+    else if( keTypeRow == m_uTableType )
+    {
+        qDebug() << "table type" << m_uTableType << "row";
+    }
 }
 
 //------------------------------------------------------------------------------

@@ -210,6 +210,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             {
                 pTable->setTableType( TTable::keTypeColumn );
             }
+            else
             {
                 pTable->setTableType( TTable::keTypeNone );
             }
