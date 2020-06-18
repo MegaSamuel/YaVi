@@ -113,7 +113,6 @@ void  TTable::clear_edit()
 {
     edit_id = false;
     edit_name = false;
-    edit_column_name = false;
     edit_link = false;
 }
 
@@ -184,9 +183,9 @@ void  TTable::onBtnRowInc()
     qDebug() << __func__;
 }
 
-void  TTable::onBtnRowName()
+void  TTable::onBtnRowName( QString&  name )
 {
-    qDebug() << __func__;
+    qDebug() << __func__ << name;
 }
 
 void  TTable::onBtnRowValInc()
@@ -204,19 +203,9 @@ void  TTable::onBtnColumnInc()
     qDebug() << __func__;
 }
 
-void  TTable::onBtnColumnName()
+void  TTable::onBtnColumnName( QString&  name )
 {
-    qDebug() << __func__;
-
-    // признак что хотим отредактировать имя
-    edit_column_name = true;
-
-    // диалог с пустыми параметрами
-    m_ptTabDialogName->setDlgEmpty();
-
-    m_ptTabDialogName->setDlgName( "" );
-
-    m_ptTabDialogName->open();
+    qDebug() << __func__ << name;
 }
 
 void  TTable::onBtnColumnValInc()
@@ -269,11 +258,6 @@ void  TTable::onSendValue( QString& a_zValue )
     if( edit_link )
     {
         setTableLink( a_zValue.toStdString(), true );
-    }
-
-    if( edit_column_name )
-    {
-        qDebug() << a_zValue;
     }
 
     clear_edit();
@@ -444,7 +428,7 @@ void  TTable::setTableType( unsigned type ) noexcept
 
     if( keTypeLink == m_uTableType )
     {
-        qDebug() << "table type" << m_uTableType << "link";
+        //qDebug() << "table type" << m_uTableType << "link";
 
         // диалог для ссылки
         m_ptTabDialogLink = new TTabDialog( false, "Table", this, "Link" );
@@ -464,11 +448,11 @@ void  TTable::setTableType( unsigned type ) noexcept
     }
     else if( keTypeColumn == m_uTableType )
     {
-        qDebug() << "table type" << m_uTableType << "column";
+        //qDebug() << "table type" << m_uTableType << "column";
     }
     else if( keTypeRow == m_uTableType )
     {
-        qDebug() << "table type" << m_uTableType << "row";
+        //qDebug() << "table type" << m_uTableType << "row";
     }
 }
 
@@ -615,7 +599,9 @@ void TTable::setTableRow( const std::string&  name, QStringList& list )
     QPushButton *ptBtnRowName = new QPushButton( QString::fromStdString(name) );
     ptBtnRowName->setToolTip( "Строка: " + QString::fromStdString(name) );
     ptBtnRowName->setFixedWidth( 93 );
-    connect( ptBtnRowName, &QPushButton::clicked, this, &TTable::onBtnRowName );
+    connect( ptBtnRowName, &QPushButton::clicked, m_apRowList.last(), &TTabEntry::onBtnName );
+    //connect( m_apRowList.last(), &TTabEntry::sendName, this, &TTable::onBtnRowName );
+    connect( m_apRowList.last(), &TTabEntry::sendName, ptBtnRowName, &QPushButton::setText );
     m_grid->addWidget( ptBtnRowName, m_row, m_column + column, Qt::AlignLeft );
 
     column += 1;
@@ -668,7 +654,9 @@ void TTable::setTableColumn( const std::string&  name, QStringList& list )
     QPushButton *ptBtnColumnName = new QPushButton( QString::fromStdString(name) );
     ptBtnColumnName->setToolTip( "Столбец: " + QString::fromStdString(name) );
     ptBtnColumnName->setFixedWidth( 93 );
-    connect( ptBtnColumnName, &QPushButton::clicked, this, &TTable::onBtnColumnName );
+    connect( ptBtnColumnName, &QPushButton::clicked, m_apColumnList.last(), &TTabEntry::onBtnName );
+    //connect( m_apColumnList.last(), &TTabEntry::sendName, this, &TTable::onBtnColumnName );
+    connect( m_apColumnList.last(), &TTabEntry::sendName, ptBtnColumnName, &QPushButton::setText );
     m_grid->addWidget( ptBtnColumnName, m_row + row, m_column, Qt::AlignLeft );
 
     row += 1;

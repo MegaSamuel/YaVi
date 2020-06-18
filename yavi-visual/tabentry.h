@@ -4,6 +4,7 @@
 #include <QtWidgets>
 
 #include "values.h"
+#include "tabdialog.h"
 
 //------------------------------------------------------------------------------
 
@@ -16,20 +17,36 @@ public:
     ~TTabEntry();
 
     void           setNode( const YAML::Node&  node );
-    void           setNodeParent( const YAML::Node&  node );
     void           setNodeIndex( int  index );
 
     YAML::Node&    getNode();
-    YAML::Node&    getNodeParent();
     int            getNodeIndex();
+
+    void           setEntryName( const std::string&  name, bool  set_to_node = false );
+    void           setEntryValues( const std::string&  name, bool  set_to_node = false );
+
+    QString        getEntryName();
+    QString        getEntryValues();
+
+Q_SIGNALS:
+    void           sendName( QString& name );
+
+public Q_SLOTS:
+    void           onBtnDec();
+    void           onBtnName();
+
+private Q_SLOTS:
+    void           onSendCancel();
+    void           onSendValue( QString& );
 
 private:
     YAML::Node     m_node;        // текущий уровнь дерева ямла
-    YAML::Node     m_node_parent; // родительский уровнь дерева ямла
     int            m_node_index;  // номер перечисления у родителя
 
-    YAML::Node     m_temporary_node;  // временный ямл для правки основного
-    YAML::Node     m_temporary_inner_node;  // временный ямл для правки основного
+    QString        m_zName;
+    QString        m_zValues;
+
+    TTabDialog    *m_ptTabDialogName;
 };
 
 //------------------------------------------------------------------------------

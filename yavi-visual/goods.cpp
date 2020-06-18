@@ -166,6 +166,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
         m_vlayout->addWidget( label, 0, Qt::AlignLeft );
 
         TTable  *pTable;
+        TTabEntry  *pEntry;
 
         // перебираем все таблицы
         for( int j = 0; j < static_cast<int>(config[ GoodsTableSection ].size()); j++ )
@@ -202,25 +203,27 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
                 int  max_row_count = 0;
 
-                for( auto& col : config[ GoodsTableSection ][j][ GoodsTableColumn ] )
+                for( int i = 0; i < static_cast<int>(config[ GoodsTableSection ][j][ GoodsTableColumn ].size()); i++ )
                 {
-                    QStringList  col_list;
-                    col_list.clear();
+                    // новая запись
+                    pEntry = new TTabEntry();
+                    pEntry->setNode( config[ GoodsTableSection ][j][ GoodsTableColumn ][i] );
+                    pEntry->setNodeIndex( i );
+
+                    // добавляем запись в список
+                    pTable->m_apColumnList.append( pEntry );
 
                     // имя
-                    std::string  col_name = __yaml_GetString( col, GoodsTableName );
+                    std::string  col_name = __yaml_GetString( config[ GoodsTableSection ][j][ GoodsTableColumn ][i], GoodsTableName );
+                    pEntry->setEntryName( col_name );
 
                     // значение
-                    QStringList  vValues;
-                    const std::string  col_val = __yaml_GetString( col, GoodsTableValue );
-                    vValues.clear();
-                    vValues = QString::fromStdString(col_val).split( '\n', QString::SkipEmptyParts );
+                    const std::string  col_val = __yaml_GetString( config[ GoodsTableSection ][j][ GoodsTableColumn ][i], GoodsTableValue );
+                    pEntry->setEntryValues( col_val );
 
-                    for( auto& it : vValues )
-                    {
-                        col_list.append( it );
-                    }
-
+                    QStringList  col_list;
+                    col_list.clear();
+                    col_list = QString::fromStdString(col_val).split( '\n', QString::SkipEmptyParts );
                     pTable->setTableColumn( col_name, col_list );
 
                     if( col_list.size() > max_row_count )
@@ -237,25 +240,27 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
                 unsigned  row_count = 0;
 
-                for( auto& row : config[ GoodsTableSection ][j][ GoodsTableRow ] )
+                for( int i = 0; i < static_cast<int>(config[ GoodsTableSection ][j][ GoodsTableRow ].size()); i++ )
                 {
-                    QStringList  row_list;
-                    row_list.clear();
+                    // новая запись
+                    pEntry = new TTabEntry();
+                    pEntry->setNode( config[ GoodsTableSection ][j][ GoodsTableRow ][i] );
+                    pEntry->setNodeIndex( i );
+
+                    // добавляем запись в список
+                    pTable->m_apRowList.append( pEntry );
 
                     // имя
-                    std::string  row_name = __yaml_GetString( row, GoodsTableName );
+                    std::string  row_name = __yaml_GetString( config[ GoodsTableSection ][j][ GoodsTableRow ][i], GoodsTableName );
+                    pEntry->setEntryName( row_name );
 
                     // значение
-                    QStringList  vValues;
-                    const std::string  row_val = __yaml_GetString( row, GoodsTableValue );
-                    vValues.clear();
-                    vValues = QString::fromStdString(row_val).split( '\n', QString::SkipEmptyParts );
+                    const std::string  row_val = __yaml_GetString( config[ GoodsTableSection ][j][ GoodsTableRow ][i], GoodsTableValue );
+                    pEntry->setEntryValues( row_val );
 
-                    for( auto& it : vValues )
-                    {
-                        row_list.append( it );
-                    }
-
+                    QStringList  row_list;
+                    row_list.clear();
+                    row_list = QString::fromStdString(row_val).split( '\n', QString::SkipEmptyParts );
                     pTable->setTableRow( row_name, row_list );
 
                     row_count++;

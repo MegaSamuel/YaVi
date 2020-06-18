@@ -65,6 +65,9 @@ public:
     void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет
     void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
 
+    QList<TTabEntry*>  m_apRowList;
+    QList<TTabEntry*>  m_apColumnList;
+
 Q_SIGNALS:
     void           sendChanged();
 
@@ -75,11 +78,11 @@ private Q_SLOTS:
     void           onBtnDec();
     void           onBtnInc();
     void           onBtnRowInc();
-    void           onBtnRowName();
+    void           onBtnRowName( QString& ); //??
     void           onBtnRowValInc();
     void           onBtnRowValName();
     void           onBtnColumnInc();
-    void           onBtnColumnName();
+    void           onBtnColumnName( QString& ); //??
     void           onBtnColumnValInc();
     void           onBtnColumnValName();
     void           onSendCancel();
@@ -127,9 +130,6 @@ private:
 
     TGoods        *m_pAncestor;
 
-    QList<TTabEntry*>  m_apRowList;
-    QList<TTabEntry*>  m_apColumnList;
-
     int            m_width;     // ширина виджета
     int            m_height;    // высота виджета
 
@@ -142,7 +142,6 @@ private:
 
     bool           edit_id;
     bool           edit_name;
-    bool           edit_column_name;
     bool           edit_link;
 };
 
