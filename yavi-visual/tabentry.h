@@ -1,5 +1,5 @@
-#ifndef TABCOLUMN_H
-#define TABCOLUMN_H
+#ifndef TABENTRY_H
+#define TABENTRY_H
 
 #include <QtWidgets>
 
@@ -7,13 +7,13 @@
 
 //------------------------------------------------------------------------------
 
-class TTabColumn : public QWidget
+class TTabEntry : public QWidget
 {
    Q_OBJECT
 
 public:
-    explicit TTabColumn();
-    ~TTabColumn();
+    explicit TTabEntry();
+    ~TTabEntry();
 
     void           setNode( const YAML::Node&  node );
     void           setNodeParent( const YAML::Node&  node );
@@ -34,4 +34,4 @@ private:
 
 //------------------------------------------------------------------------------
 
-#endif // TABCOLUMN_H
+#endif // TABENTRY_H

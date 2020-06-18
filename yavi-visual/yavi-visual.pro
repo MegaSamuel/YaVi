@@ -39,8 +39,7 @@ SOURCES += \
     param.cpp \
     dialog.cpp \
     tabdialog.cpp \
-    tabrow.cpp \
-    tabcolumn.cpp
+    tabentry.cpp
 
 HEADERS += \
     mainwindow.h \
@@ -52,8 +51,7 @@ HEADERS += \
     dialog.h \
     values.h \
     tabdialog.h \
-    tabrow.h \
-    tabcolumn.h
+    tabentry.h
 
 win32: RC_ICONS = $$PWD/favicon.ico
 

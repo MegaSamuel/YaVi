@@ -1,47 +1,47 @@
-#include "tabrow.h"
+#include "tabentry.h"
 
 //------------------------------------------------------------------------------
 
-TTabRow::TTabRow()
+TTabEntry::TTabEntry()
 {
     m_node.reset();
     m_node_parent.reset();
     m_node_index = -1;
 }
 
-TTabRow::~TTabRow()
+TTabEntry::~TTabEntry()
 {
 
 }
 
 //------------------------------------------------------------------------------
 
-void  TTabRow::setNode( const YAML::Node&  node )
+void  TTabEntry::setNode( const YAML::Node&  node )
 {
     m_node = node;
 }
 
-void  TTabRow::setNodeParent( const YAML::Node&  node )
+void  TTabEntry::setNodeParent( const YAML::Node&  node )
 {
     m_node_parent = node;
 }
 
-void  TTabRow::setNodeIndex( int  index )
+void  TTabEntry::setNodeIndex( int  index )
 {
     m_node_index = index;
 }
 
-YAML::Node&  TTabRow::getNode()
+YAML::Node&  TTabEntry::getNode()
 {
     return m_node;
 }
 
-YAML::Node&  TTabRow::getNodeParent()
+YAML::Node&  TTabEntry::getNodeParent()
 {
     return m_node_parent;
 }
 
-int  TTabRow::getNodeIndex()
+int  TTabEntry::getNodeIndex()
 {
     return m_node_index;
 }

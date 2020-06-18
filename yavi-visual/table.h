@@ -3,8 +3,7 @@
 
 #include <QtWidgets>
 
-#include "tabrow.h"
-#include "tabcolumn.h"
+#include "tabentry.h"
 #include "tabdialog.h"
 #include "values.h"
 
@@ -128,8 +127,8 @@ private:
 
     TGoods        *m_pAncestor;
 
-    QList<TTabRow*>     m_apRowList;
-    QList<TTabColumn*>  m_apColumnList;
+    QList<TTabEntry*>  m_apRowList;
+    QList<TTabEntry*>  m_apColumnList;
 
     int            m_width;     // ширина виджета
     int            m_height;    // высота виджета
