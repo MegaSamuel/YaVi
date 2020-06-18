@@ -106,8 +106,14 @@ void  TTable::clear()
 
     need_to_add = false;
 
+    clear_edit();
+}
+
+void  TTable::clear_edit()
+{
     edit_id = false;
     edit_name = false;
+    edit_column_name = false;
     edit_link = false;
 }
 
@@ -201,6 +207,16 @@ void  TTable::onBtnColumnInc()
 void  TTable::onBtnColumnName()
 {
     qDebug() << __func__;
+
+    // признак что хотим отредактировать имя
+    edit_column_name = true;
+
+    // диалог с пустыми параметрами
+    m_ptTabDialogName->setDlgEmpty();
+
+    m_ptTabDialogName->setDlgName( "" );
+
+    m_ptTabDialogName->open();
 }
 
 void  TTable::onBtnColumnValInc()
@@ -217,9 +233,7 @@ void  TTable::onSendCancel()
 {
     need_to_add = false;
 
-    edit_id = false;
-    edit_name = false;
-    edit_link = false;
+    clear_edit();
 }
 
 void  TTable::onSendValue( QString& a_zValue )
@@ -257,9 +271,12 @@ void  TTable::onSendValue( QString& a_zValue )
         setTableLink( a_zValue.toStdString(), true );
     }
 
-    edit_id = false;
-    edit_name = false;
-    edit_link = false;
+    if( edit_column_name )
+    {
+        qDebug() << a_zValue;
+    }
+
+    clear_edit();
 }
 
 void  TTable::onSendValues( TValues& a_tValues )

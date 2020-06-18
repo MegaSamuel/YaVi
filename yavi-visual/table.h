@@ -3,6 +3,8 @@
 
 #include <QtWidgets>
 
+#include "tabrow.h"
+#include "tabcolumn.h"
 #include "tabdialog.h"
 #include "values.h"
 
@@ -87,6 +89,7 @@ private Q_SLOTS:
 
 private:
     void           clear();
+    void           clear_edit();
 
     void           clearNodeSequence();
 
@@ -125,6 +128,9 @@ private:
 
     TGoods        *m_pAncestor;
 
+    QList<TTabRow*>     m_apRowList;
+    QList<TTabColumn*>  m_apColumnList;
+
     int            m_width;     // ширина виджета
     int            m_height;    // высота виджета
 
@@ -137,6 +143,7 @@ private:
 
     bool           edit_id;
     bool           edit_name;
+    bool           edit_column_name;
     bool           edit_link;
 };
 
