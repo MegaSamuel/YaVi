@@ -9,14 +9,32 @@ TTable::TTable( TGoods  *pAncestor )
 {
     clear();
 
-    // диалог
-    m_ptDialog = new TDialog( true, "Table", this );
+    // диалог для айди
+    m_ptTabDialogId = new TTabDialog( false, "Table", this, "ID" );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptDialog, &TDialog::sendCancel, this, &TTable::onSendCancel );
+    connect( m_ptTabDialogId, &TTabDialog::sendCancel, this, &TTable::onSendCancel );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptDialog, &TDialog::sendValues, this, &TTable::onSendValues );
+    connect( m_ptTabDialogId, &TTabDialog::sendValue, this, &TTable::onSendValue );
+
+    // диалог для имени
+    m_ptTabDialogName = new TTabDialog( false, "Table", this );
+
+    // ловим сигнал от диалога об отмене
+    connect( m_ptTabDialogName, &TTabDialog::sendCancel, this, &TTable::onSendCancel );
+
+    // ловим сигнал от диалога с данными
+    connect( m_ptTabDialogName, &TTabDialog::sendValue, this, &TTable::onSendValue );
+
+    // диалог для новой таблицы
+    m_ptTabDialogAdd = new TTabDialog( true, "Add table", this );
+
+    // ловим сигнал от диалога об отмене
+    connect( m_ptTabDialogAdd, &TTabDialog::sendCancel, this, &TTable::onSendCancel );
+
+    // ловим сигнал от диалога с данными
+    connect( m_ptTabDialogAdd, &TTabDialog::sendValues, this, &TTable::onSendValues );
 
     // указатель на родителя
     m_pAncestor = pAncestor;
@@ -24,25 +42,30 @@ TTable::TTable( TGoods  *pAncestor )
     // цепляем местный сигнал к слоту MainWindow
     connect( this, &TTable::sendChanged, MainWindow::getMainWinPtr(), &MainWindow::onYamlChanged );
 
-    resetRow();
-    resetColumn();
-
     m_grid = new QGridLayout;
     m_grid->setAlignment( Qt::AlignLeft | Qt::AlignTop );
     m_grid->setMargin(0);
 
+    // кнопка с id
+    m_ptBtnId = new QPushButton( "id" );
+    m_ptBtnId->setToolTip( "ID таблицы" );
+    m_ptBtnId->setFixedWidth( 93 );
+    connect( m_ptBtnId, &QPushButton::clicked, this, &TTable::onBtnId );
+    m_grid->addWidget( m_ptBtnId, m_row, 0, Qt::AlignLeft );
+
     // кнопка с именем
-    m_ptBtnName = new QPushButton( "button" );
+    m_ptBtnName = new QPushButton( "name" );
+    m_ptBtnName->setToolTip( "Название таблицы" );
     m_ptBtnName->setFixedWidth( 93 );
     connect( m_ptBtnName, &QPushButton::clicked, this, &TTable::onBtnName );
-    m_grid->addWidget( m_ptBtnName, m_row, 0, Qt::AlignLeft );
+    m_grid->addWidget( m_ptBtnName, m_row, 1, Qt::AlignLeft );
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+" );
-    m_ptBtnInc->setToolTip( "Добавить запись" );
+    m_ptBtnInc->setToolTip( "Добавить таблицу" );
     m_ptBtnInc->setFixedWidth( 93 );
     connect( m_ptBtnInc, &QPushButton::clicked, this, &TTable::onBtnInc );
-    m_grid->addWidget( m_ptBtnInc, m_row, 1, Qt::AlignLeft );
+    m_grid->addWidget( m_ptBtnInc, m_row+1, 0, Qt::AlignLeft );
 
     // перевод строки и колонки в grid для следующих добавлений
     nextRow();
@@ -52,7 +75,10 @@ TTable::TTable( TGoods  *pAncestor )
 
     widget_size_reset();
 
-    widget_stretch( m_grid->minimumSize().width(), m_grid->minimumSize().height() );
+    int  width = 2*m_grid->margin() + m_ptBtnId->minimumSize().width() + m_ptBtnName->minimumSize().width() + m_grid->spacing();
+    int  height = 2*m_grid->margin() + m_ptBtnId->minimumSizeHint().height() + m_ptBtnInc->minimumSizeHint().height() + m_grid->spacing();
+
+    widget_stretch( width, height );
 }
 
 TTable::~TTable()
@@ -62,9 +88,15 @@ TTable::~TTable()
 
 void  TTable::clear()
 {
+    resetRow();
+    resetColumn();
+
     m_node.reset();
     m_node_parent.reset();
     m_node_index = -1;
+
+    m_temporary_node = YAML::Node();
+    m_temporary_inner_node = YAML::Node();
 
     m_uTableType = keTypeNone;
 
@@ -73,42 +105,162 @@ void  TTable::clear()
     m_zLink.clear();
 
     need_to_add = false;
+
+    clear_edit();
+}
+
+void  TTable::clear_edit()
+{
+    edit_id = false;
+    edit_name = false;
+    edit_link = false;
 }
 
 //------------------------------------------------------------------------------
 
-void  TTable::onBtnName()
+void  TTable::onBtnId()
 {
-    //qDebug() << getTableName() << "button";
+    // признак что хотим отредактировать имя
+    edit_id = true;
 
     // диалог с пустыми параметрами
-    m_ptDialog->setDlgEmpty();
+    m_ptTabDialogId->setDlgEmpty();
 
-    m_ptDialog->setDlgEnabled( false );
+    m_ptTabDialogId->setDlgName( getTableId() );
 
-    m_ptDialog->setDlgName( getTableName() );
+    m_ptTabDialogId->open();
+}
 
-    m_ptDialog->open();
+void  TTable::onBtnName()
+{
+    // признак что хотим отредактировать имя
+    edit_name = true;
+
+    // диалог с пустыми параметрами
+    m_ptTabDialogName->setDlgEmpty();
+
+    m_ptTabDialogName->setDlgName( getTableName() );
+
+    m_ptTabDialogName->open();
+}
+
+void  TTable::onBtnLink()
+{
+    // признак что хотим отредактировать ссылку
+    edit_link = true;
+
+    // диалог с пустыми параметрами
+    m_ptTabDialogLink->setDlgEmpty();
+
+    m_ptTabDialogLink->setDlgName( getTableLink() );
+
+    m_ptTabDialogLink->open();
+}
+
+void  TTable::onBtnDec()
+{
+    widget_shrink( getTableWidth(), getTableHeight() + m_grid->spacing() );
+
+    TableDelete();
 }
 
 void  TTable::onBtnInc()
 {
-    //qDebug() << "Inc button" << getTableId() << getTableName();
-
     // признак что хотим создать новый набор параметров
     need_to_add = true;
 
     // диалог с пустыми параметрами
-    m_ptDialog->setDlgEmpty();
+    m_ptTabDialogAdd->setDlgEmpty();
 
-    m_ptDialog->setDlgName( "NewRecord" );
+    m_ptTabDialogAdd->setDlgId( "Id" );
+    m_ptTabDialogAdd->setDlgName( "Table" );
 
-    m_ptDialog->open();
+    m_ptTabDialogAdd->open();
+}
+
+void  TTable::onBtnRowInc()
+{
+    qDebug() << __func__;
+}
+
+void  TTable::onBtnRowName( QString&  name )
+{
+    qDebug() << __func__ << name;
+}
+
+void  TTable::onBtnRowValInc()
+{
+    qDebug() << __func__;
+}
+
+void  TTable::onBtnRowValName()
+{
+    qDebug() << __func__;
+}
+
+void  TTable::onBtnColumnInc()
+{
+    qDebug() << __func__;
+}
+
+void  TTable::onBtnColumnName( QString&  name )
+{
+    qDebug() << __func__ << name;
+}
+
+void  TTable::onBtnColumnValInc()
+{
+    qDebug() << __func__;
+}
+
+void  TTable::onBtnColumnValName()
+{
+    qDebug() << __func__;
 }
 
 void  TTable::onSendCancel()
 {
     need_to_add = false;
+
+    clear_edit();
+}
+
+void  TTable::onSendValue( QString& a_zValue )
+{
+    // редактируем текущую таблицу
+
+    if( edit_id )
+    {
+        m_tValues.m_zId = a_zValue;
+
+        setTableId( m_tValues.m_zId.toStdString(), true );
+
+        if( 0 == m_tValues.m_zId.length() )
+        {
+            // если имя пустое, то удаляем таблицу
+            onBtnDec();
+        }
+    }
+
+    if( edit_name )
+    {
+        m_tValues.m_zName = a_zValue;
+
+        setTableName( m_tValues.m_zName.toStdString(), true );
+
+        if( 0 == m_tValues.m_zName.length() )
+        {
+            // если имя пустое, то удаляем таблицу
+            onBtnDec();
+        }
+    }
+
+    if( edit_link )
+    {
+        setTableLink( a_zValue.toStdString(), true );
+    }
+
+    clear_edit();
 }
 
 void  TTable::onSendValues( TValues& a_tValues )
@@ -117,23 +269,104 @@ void  TTable::onSendValues( TValues& a_tValues )
 
     if( false == need_to_add )
     {
-        // редактируем текущий набор параметров
-
-        setTableName( m_tValues.m_zName.toStdString(), true );
-
-        //qDebug() << getCategoriesName() << "fix categories";
+        qDebug() << "it has gone wrong!";
     }
 
     if( true == need_to_add )
     {
-        // создаем новый набор параметров
+        // создаем новую таблицу
 
+        if( 0 == m_tValues.m_zName.length() )
+        {
+            // если имя пустое, то ставим дефолтное имя
+            m_tValues.m_zName = "noname";
+        }
+
+        // добавляем таблицу
+        TTable  *pTable;
+        pTable = new TTable( m_pAncestor );
+
+        // добавляемся к родителю
+        m_pAncestor->m_vlayout->addWidget( pTable );
+        m_pAncestor->m_apTableList.append(pTable);
+
+        // ставим значения параметров
+        pTable->setTableId( m_tValues.m_zId.toStdString() );
+        pTable->setTableName( m_tValues.m_zName.toStdString() );
+        pTable->setTableType( m_tValues.m_uType );
+
+        // очищаем ямл
+        m_temporary_node.reset();
+
+        // пишем их в пустой ямл
+        __yaml_SetString( m_temporary_node, GoodsTableId, m_tValues.m_zId.toStdString() );
+        __yaml_SetString( m_temporary_node, GoodsTableName, m_tValues.m_zName.toStdString() );
+
+        if( keTypeLink == m_tValues.m_uType )
+        {
+            __yaml_SetString( m_temporary_node, GoodsTableLink, "link" );
+        }
+        else if( keTypeColumn == m_tValues.m_uType )
+        {
+            // очищаем ямл
+            m_temporary_inner_node.reset();
+
+            // пустая запись столбца
+            __yaml_SetString( m_temporary_inner_node, GoodsTableName, "name" );
+            __yaml_SetString( m_temporary_inner_node, GoodsTableValue, "value" );
+
+            // добавляем ямл к временному
+            m_temporary_node[ GoodsTableColumn ].push_back( m_temporary_inner_node );
+        }
+        else if( keTypeRow == m_tValues.m_uType )
+        {
+            // очищаем ямл
+            m_temporary_inner_node.reset();
+
+            // пустая запись строки
+            __yaml_SetString( m_temporary_inner_node, GoodsTableName, "name" );
+            __yaml_SetString( m_temporary_inner_node, GoodsTableValue, "value" );
+
+            // добавляем ямл к временному
+            m_temporary_node[ GoodsTableRow ].push_back( m_temporary_inner_node );
+        }
+
+        // добавляем ямл к основному
+        m_node_parent.push_back( m_temporary_node );
+
+        int index = static_cast<int>(m_node_parent.size()) - 1;
+
+        pTable->setNode( m_node_parent[index] );
+        pTable->setNodeParent( m_node_parent );
+        pTable->setNodeIndex( index );
+
+        qDebug() << pTable->getTableName() << "index" << index;
     }
 
     need_to_add = false;
 }
 
 //------------------------------------------------------------------------------
+
+void  TTable::clearNodeSequence()
+{
+    // если не знаем индекс, то удаляем поля
+    if( -1 == m_node_index )
+    {
+        m_node.remove( GoodsTableId );
+        m_node.remove( GoodsTableName );
+        m_node.remove( GoodsTableValue );
+        m_node.remove( GoodsTableColumn );
+        m_node.remove( GoodsTableRow );
+        m_node.remove( GoodsTableLink );
+    }
+
+    // если знаем индекс, то удаляем всю ветку
+    if( -1 != m_node_index )
+    {
+        m_node_parent.remove( m_node_index );
+    }
+}
 
 void  TTable::TableDelete()
 {
@@ -159,12 +392,32 @@ void  TTable::TableDelete()
                 //qDebug() << m_pAncestor->m_apTableList.at(i)->getTableName() << "obsolete";
 
                 m_pAncestor->m_apTableList.removeAt(i);
+
+                break;
+            }
+        }
+
+        int  index;
+
+        // делаем переиндексацию оставшихся детей
+        for( int i = 0; i < m_pAncestor->m_apTableList.count(); i++ )
+        {
+            index = m_pAncestor->m_apTableList.at(i)->getNodeIndex();
+
+            if( index > m_node_index )
+            {
+                index -= 1;
+
+                m_pAncestor->m_apTableList.at(i)->setNodeIndex( index );
             }
         }
 
         // удаляемся из родительского layout-а
         m_pAncestor->m_vlayout->removeWidget(this);
     }
+
+    // очищаем ветку
+    clearNodeSequence();
 }
 
 //------------------------------------------------------------------------------
@@ -173,7 +426,34 @@ void  TTable::setTableType( unsigned type ) noexcept
 {
     m_uTableType = type;
 
-    //qDebug() << "table" << getTableName() << "type" << m_uTableType;
+    if( keTypeLink == m_uTableType )
+    {
+        //qDebug() << "table type" << m_uTableType << "link";
+
+        // диалог для ссылки
+        m_ptTabDialogLink = new TTabDialog( false, "Table", this, "Link" );
+
+        // ловим сигнал от диалога об отмене
+        connect( m_ptTabDialogLink, &TTabDialog::sendCancel, this, &TTable::onSendCancel );
+
+        // ловим сигнал от диалога с данными
+        connect( m_ptTabDialogLink, &TTabDialog::sendValue, this, &TTable::onSendValue );
+
+        m_ptBtnLink = new QPushButton( "link" );
+        connect( m_ptBtnLink, &QPushButton::clicked, this, &TTable::onBtnLink );
+        m_grid->addWidget( m_ptBtnLink, m_row, 2, Qt::AlignLeft );
+
+        // эта кнопка на второй строке, высоту этой строки учли в конструкторе класса
+        //widget_stretch( m_grid->minimumSize().width(), m_ptBtnLink->minimumSizeHint().height() );
+    }
+    else if( keTypeColumn == m_uTableType )
+    {
+        //qDebug() << "table type" << m_uTableType << "column";
+    }
+    else if( keTypeRow == m_uTableType )
+    {
+        //qDebug() << "table type" << m_uTableType << "row";
+    }
 }
 
 //------------------------------------------------------------------------------
@@ -212,7 +492,28 @@ int  TTable::getNodeIndex()
 
 void  TTable::setTableId( const std::string&  name, bool  set_to_node )
 {
+    int  height;
+
     m_zId = QString::fromStdString(name);
+
+    height = m_ptBtnId->minimumSizeHint().height();
+
+    m_zBtnId = QString::fromStdString(name);
+    m_zBtnId.replace( QRegExp("[ ]{2,}"), " " );     // убираем подряд идущие пробелы на один
+    m_zBtnId.replace( " ", "\n" );                   // заменяем пробелы на перевод строки
+    m_ptBtnId->setText( m_zBtnId );                  // правленное имя кнопки
+    m_ptBtnId->setToolTip( "Таблица: " + m_zId );    // подсказка с оригинальным именем
+
+    height = m_ptBtnId->minimumSizeHint().height() - height;
+
+    if( 0 < height )
+    {
+        widget_stretch( 0, height, false );
+    }
+    else
+    {
+        widget_shrink( 0, -1 * height );
+    }
 
     if( set_to_node )
     {
@@ -227,13 +528,28 @@ const QString TTable::getTableId()
 
 void  TTable::setTableName( const std::string&  name, bool  set_to_node )
 {
+    int  height;
+
     m_zName = QString::fromStdString(name);
+
+    height = m_ptBtnName->minimumSizeHint().height();
 
     m_zBtnName = QString::fromStdString(name);
     m_zBtnName.replace( QRegExp("[ ]{2,}"), " " );       // убираем подряд идущие пробелы на один
     m_zBtnName.replace( " ", "\n" );                     // заменяем пробелы на перевод строки
     m_ptBtnName->setText( m_zBtnName );                  // правленное имя кнопки
     m_ptBtnName->setToolTip( "Таблица: " + m_zName );    // подсказка с оригинальным именем
+
+    height = m_ptBtnName->minimumSizeHint().height() - height;
+
+    if( 0 < height )
+    {
+        widget_stretch( 0, height, false );
+    }
+    else
+    {
+        widget_shrink( 0, -1 * height );
+    }
 
     if( set_to_node )
     {
@@ -250,15 +566,8 @@ void  TTable::setTableLink( const std::string&  name, bool  set_to_node )
 {
     m_zLink = QString::fromStdString(name);
 
-    m_ptLblLink = new QLabel( this, Q_NULLPTR );
-    m_ptLblLink->setText( m_zLink );
-//    m_ptLblLink->setMinimumSize(95,25);
-    m_ptLblLink->setFrameStyle( QFrame::Panel | QFrame::Raised );
-    m_grid->addWidget( m_ptLblLink, m_row, 1, 1, -1, Qt::AlignLeft );
-
-    widget_stretch( m_grid->minimumSize().width(), m_grid->minimumSize().height() );
-
-    nextRow();
+    m_ptBtnLink->setText( m_zLink );
+    m_ptBtnLink->setToolTip( "Внешняя ссылка" );
 
     if( set_to_node )
     {
@@ -271,47 +580,123 @@ const QString TTable::getTableLink()
     return m_zLink;
 }
 
-void TTable::setTableRow( QStringList& list )
+//------------------------------------------------------------------------------
+
+void TTable::setTableRow( const std::string&  name, QStringList& list )
 {
     int column = 0;
 
+    // кнопка плюс для добавления значения
+    QPushButton *ptBtnRowValInc = new QPushButton( "+" );
+    ptBtnRowValInc->setToolTip( "Добавить значение" );
+    ptBtnRowValInc->setFixedWidth( 93 );
+    connect( ptBtnRowValInc, &QPushButton::clicked, this, &TTable::onBtnRowValInc );
+    m_grid->addWidget( ptBtnRowValInc, m_row, m_column + column, Qt::AlignLeft );
+
+    column += 1;
+
+    // кнопка с именем строки
+    QPushButton *ptBtnRowName = new QPushButton( QString::fromStdString(name) );
+    ptBtnRowName->setToolTip( "Строка: " + QString::fromStdString(name) );
+    ptBtnRowName->setFixedWidth( 93 );
+    connect( ptBtnRowName, &QPushButton::clicked, m_apRowList.last(), &TTabEntry::onBtnName );
+    //connect( m_apRowList.last(), &TTabEntry::sendName, this, &TTable::onBtnRowName );
+    connect( m_apRowList.last(), &TTabEntry::sendName, ptBtnRowName, &QPushButton::setText );
+    m_grid->addWidget( ptBtnRowName, m_row, m_column + column, Qt::AlignLeft );
+
+    column += 1;
+
+    int  i = 0;
+
     for( auto& it : list )
     {
-        QLabel  *label = new QLabel();
-        label->setText( it );
-        label->setFixedWidth( 93 );
-        label->setAlignment( Qt::AlignCenter );
-        label->setFrameStyle( QFrame::Panel | QFrame::Raised );
-        m_grid->addWidget( label, m_row, m_column + column, Qt::AlignLeft );
+        i++;
 
-        widget_stretch( m_grid->minimumSize().width(), label->minimumSize().height() + m_grid->spacing() );
+        // кнопки со значениями
+        QPushButton  *button = new QPushButton( it );
+        button->setToolTip( "Значение: " + it );
+        button->setFixedWidth( 93 );
+        connect( button, &QPushButton::clicked, this, &TTable::onBtnRowValName );
+        m_grid->addWidget( button, m_row, m_column + column, Qt::AlignLeft );
 
         column += 1;
     }
 
+    // кнопка плюс для добавления строки
+    QPushButton *ptBtnRowInc = new QPushButton( "+" );
+    ptBtnRowInc->setToolTip( "Добавить строку" );
+    ptBtnRowInc->setFixedWidth( 93 );
+    connect( ptBtnRowInc, &QPushButton::clicked, this, &TTable::onBtnRowInc );
+    m_grid->addWidget( ptBtnRowInc, m_row, m_column + column, Qt::AlignLeft );
+
+    column += 1;
+
+    // подгоняем ширину
+    widget_stretch( m_grid->minimumSize().width() + i * m_grid->spacing(), 0 );
+
     nextRow();
 }
 
-void TTable::setTableColumn( QStringList& list )
+void TTable::setTableColumn( const std::string&  name, QStringList& list )
 {
     int row = 0;
 
+    // кнопка плюс для добавления значения
+    QPushButton *ptBtnColumnValInc = new QPushButton( "+" );
+    ptBtnColumnValInc->setToolTip( "Добавить значение" );
+    ptBtnColumnValInc->setFixedWidth( 93 );
+    connect( ptBtnColumnValInc, &QPushButton::clicked, this, &TTable::onBtnColumnValInc );
+    m_grid->addWidget( ptBtnColumnValInc, m_row + row, m_column, Qt::AlignLeft );
+
+    row += 1;
+
+    // кнопка с именем столбца
+    QPushButton *ptBtnColumnName = new QPushButton( QString::fromStdString(name) );
+    ptBtnColumnName->setToolTip( "Столбец: " + QString::fromStdString(name) );
+    ptBtnColumnName->setFixedWidth( 93 );
+    connect( ptBtnColumnName, &QPushButton::clicked, m_apColumnList.last(), &TTabEntry::onBtnName );
+    //connect( m_apColumnList.last(), &TTabEntry::sendName, this, &TTable::onBtnColumnName );
+    connect( m_apColumnList.last(), &TTabEntry::sendName, ptBtnColumnName, &QPushButton::setText );
+    m_grid->addWidget( ptBtnColumnName, m_row + row, m_column, Qt::AlignLeft );
+
+    row += 1;
+
+    int  i = 0;
+
     for( auto& it : list )
     {
-        QLabel  *label = new QLabel();
-        label->setText( it );
-        label->setFixedWidth( 93 );
-        label->setAlignment( Qt::AlignCenter );
-        label->setFrameStyle( QFrame::Panel | QFrame::Raised );
-        m_grid->addWidget( label, m_row + row, m_column, Qt::AlignLeft );
+        i++;
 
-        widget_stretch( m_grid->minimumSize().width(), label->minimumSize().height() + m_grid->spacing() );
+        // кнопки со значениями
+        QPushButton  *button = new QPushButton( it );
+        button->setToolTip( "Значение: " + it );
+        button->setFixedWidth( 93 );
+        connect( button, &QPushButton::clicked, this, &TTable::onBtnColumnValName );
+        m_grid->addWidget( button, m_row + row, m_column, Qt::AlignLeft );
 
         row += 1;
     }
 
+    // кнопка плюс для добавления строки
+    QPushButton *ptBtnColumnInc = new QPushButton( "+" );
+    ptBtnColumnInc->setToolTip( "Добавить столбец" );
+    ptBtnColumnInc->setFixedWidth( 93 );
+    connect( ptBtnColumnInc, &QPushButton::clicked, this, &TTable::onBtnColumnInc );
+    m_grid->addWidget( ptBtnColumnInc, m_row + row, m_column, Qt::AlignLeft );
+
+    //widget_stretch( m_grid->minimumSize().width(), label->minimumSize().height() + m_grid->spacing() );
+
     nextColumn();
 }
+
+//------------------------------------------------------------------------------
+
+void TTable::fixTableHeight( unsigned  row_count )
+{
+    widget_stretch( 0, static_cast<int>(row_count) * ( m_ptBtnInc->minimumSizeHint().height() + m_grid->spacing() ) );
+}
+
+//------------------------------------------------------------------------------
 
 void TTable::resetRow() noexcept
 {
@@ -348,10 +733,10 @@ void  TTable::widget_stretch( int width, int height, bool add_height ) noexcept
     if( width > m_width )
         m_width = width;
 
+    //qDebug() << "stretch" << width << height;
+
     // высоту увеличиваем на каждый элемент
     m_height += height;
-
-    //qDebug() << "table" << getTableName() << m_width << m_height;
 
     // ставим размер самого себя
     setMinimumWidth( m_width );
@@ -378,6 +763,8 @@ void  TTable::widget_parent_stretch( int width, int height, bool add_height ) no
 void  TTable::widget_shrink( int width, int height ) noexcept
 {
     Q_UNUSED( width );
+
+    //qDebug() << "shrink" << width << height;
 
     m_height -= height;
 
