@@ -23,12 +23,14 @@ public Q_SLOTS:
 
 private Q_SLOTS:
     void         onTimerWork();
+    void         onBtnNew();
     void         onBtnOpen();
     void         onBtnSave();
 
 private:
     static MainWindow *pMainWindow;
 
+    QPushButton  *m_ptBtnNew;
     QPushButton  *m_ptBtnOpen;
     QPushButton  *m_ptBtnSave;
     QLabel       *m_ptLblNotice;
@@ -69,15 +71,19 @@ private:
 
     unsigned      m_cfg_autoload;        // автоматическая загрузка последнего файла (0 - no / 1 - yes)
 
+    bool          askSaveIfChanged();
     void          actionAfterStart();
 
+    void          writeSettings();
+    void          readSettings();
+#if 0
     void          cfgReset() noexcept;
 
     void          cfgRefresh() noexcept;
 
     bool          cfgRead( const QString&  filename );   // прочитать конфиг
     bool          cfgWrite( const QString&  filename );  // сохранить конфиг
-
+#endif
     void          cfgSetAutoload( unsigned  load ) noexcept;
     unsigned      cfgGetAutoload() noexcept;
 

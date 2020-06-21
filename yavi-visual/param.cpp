@@ -2,6 +2,7 @@
 #include "param.h"
 #include "category.h"
 
+#include "mainwindow.h"
 //------------------------------------------------------------------------------
 
 TCategories::TCategories( TParam  *pMentor, int  depth )
@@ -110,6 +111,8 @@ void  TCategories::onBtnDec()
     widget_shrink( getCategoriesWidth(), getCategoriesHeight() + m_vlayout->spacing() );
 
     CategoriesDelete();
+
+    MainWindow::getMainWinPtr()->onYamlChanged();
 }
 
 void  TCategories::onBtnInc()
@@ -718,11 +721,15 @@ void  TParam::onBtnDec()
     widget_shrink( getParamWidth(), getParamHeight() + m_vlayout->spacing() );
 
     ParamDelete();
+
+    MainWindow::getMainWinPtr()->onYamlChanged();
 }
 
 void  TParam::onBtnValDec()
 {
     setParamType( 0, true );
+
+    MainWindow::getMainWinPtr()->onYamlChanged();
 }
 
 void  TParam::onBtnInc()

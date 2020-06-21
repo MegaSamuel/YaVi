@@ -1,6 +1,10 @@
+#include <QSettings>
 #include "mainwindow.h"
 #include "func.h"
 #include "dialog.h"
+
+#define AppVendor   "Cobu"
+#define AppName     "yavi"
 
 //------------------------------------------------------------------------------
 
@@ -39,6 +43,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     QHBoxLayout  *hlayout = new QHBoxLayout;
     hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+
+    m_ptBtnNew = new QPushButton( "New" );
+    connect( m_ptBtnNew, &QPushButton::clicked, this, &MainWindow::onBtnNew );
+    hlayout->addWidget( m_ptBtnNew, 0, Qt::AlignLeft );
 
     // кнопка "загрузить yaml из файла"
     m_ptBtnOpen = new QPushButton( "Open" );
@@ -97,6 +105,33 @@ MainWindow *MainWindow::getMainWinPtr()
 
 //------------------------------------------------------------------------------
 
+void  MainWindow::onBtnNew()
+{
+    if( ! askSaveIfChanged() )
+    {
+        return;
+    }
+
+    bool ok;
+    QString text = QInputDialog::getText( this, tr( "New category" ), tr( "Category name:"), QLineEdit::Normal, "", &ok);
+    if( ok && !text.isEmpty() )
+    {
+        // clear all and make new value
+        // похоже что уже есть открытый ямл
+        if( !m_config.IsNull() )
+        {
+            m_pGoods->GoodsDelete();
+
+            m_config.reset();
+        }
+
+        m_config = YAML::Load( QString( "category: \n  - name: " +  text ).toStdString() );
+        m_pGoods->parse_yaml( m_config );
+
+        setPrgTitleText();
+    }
+}
+
 void  MainWindow::onBtnOpen()
 {
     // очищаем лэйбл с описанием ошибки
@@ -104,7 +139,7 @@ void  MainWindow::onBtnOpen()
 //    m_ptLblNotice->setStyleSheet( "QLabel {background-color: transparent;}" );
 
     // каталог где мы находимся
-    QDir *pDir = new QDir( cfgGetLastOpenPath() );
+    QDir *pDir = new QDir( cfgGetLastOpenFile() );
 
     // строка с именем каталога где мы находимся
     QString dir( pDir->path() );
@@ -142,7 +177,8 @@ void  MainWindow::onBtnOpen()
             cfgSetLastOpenFile( filename );
 
             // обновляем ini
-            cfgRefresh();
+            writeSettings();
+            //cfgRefresh();
         }
     }
     else
@@ -158,10 +194,10 @@ void  MainWindow::onBtnOpen()
 void  MainWindow::onBtnSave()
 {
     // формируем имя файла по умолчанию
-    QString deffilename = QString( "/test.yml" );
+    //QString deffilename = QString( "/test.yml" );
 
     // каталог где мы сохранялись крайний раз
-    QDir *pDir = new QDir( cfgGetLastSavePath() + deffilename );
+    QDir *pDir = new QDir( cfgGetLastOpenFile() );
 
     // строка с именем каталога где мы сохранялись крайний раз
     QString dir( pDir->path() );
@@ -188,9 +224,12 @@ void  MainWindow::onBtnSave()
 
             // запоминаем каталог
             cfgSetLastSavePath( filename.section( QDir::separator(), 0, -2 ) );
+            // запоминаем файл
+            cfgSetLastOpenFile( filename );
 
             // обновляем ini
-            cfgRefresh();
+            writeSettings();
+            //cfgRefresh();
         }
     }
     else
@@ -355,7 +394,7 @@ void  MainWindow::onYamlChanged()
 
 void  MainWindow::actionAfterStart()
 {
-    cfgReset();
+    //cfgReset();
 
     // каталог где мы находимся
     QDir *pDir = new QDir( QDir::currentPath() );
@@ -365,6 +404,8 @@ void  MainWindow::actionAfterStart()
 
     cfgSetCurrentPath( dir );
 
+    readSettings();
+#if 0
     // формиреум путь с именем файла
     QString cfgfilename = QDir::toNativeSeparators( dir + "/yavi.yml" );
 
@@ -384,7 +425,7 @@ void  MainWindow::actionAfterStart()
         // сразу сохраняем
         cfgWrite( cfgfilename );
     }
-
+#endif
     if( cfgGetAutoload() )
     {
         // полное имя ранее открытого файла
@@ -405,6 +446,29 @@ void  MainWindow::actionAfterStart()
 
 //------------------------------------------------------------------------------
 
+void  MainWindow::readSettings()
+{
+     //QSettings  settings( QSettings::IniFormat, QSettings::UserScope, AppVendor, AppName );
+     QSettings  settings( AppVendor, AppName );
+
+     cfgSetAutoload( static_cast<unsigned>(settings.value( "autoload", 1 ).toInt()) );
+     cfgSetLastOpenPath( settings.value( "last open path", "./" ).toString() );
+     cfgSetLastSavePath( settings.value( "last save path", "./" ).toString() );
+     cfgSetLastOpenFile( settings.value( "last open file", "./" ).toString() );
+}
+
+void  MainWindow::writeSettings()
+{
+     //QSettings  settings( QSettings::IniFormat, QSettings::UserScope, AppVendor, AppName );
+     QSettings  settings( AppVendor, AppName );
+
+     settings.setValue( "autoload", cfgGetAutoload() );
+     settings.setValue( "last open path", cfgGetLastOpenPath() );
+     settings.setValue( "last save path", cfgGetLastSavePath() );
+     settings.setValue( "last open file", cfgGetLastOpenFile() );
+}
+
+#if 0
 void  MainWindow::cfgReset() noexcept
 {
     m_cfg.reset();
@@ -520,7 +584,7 @@ bool  MainWindow::cfgWrite( const QString&  filename )
 
     return true;
 }
-
+#endif
 //------------------------------------------------------------------------------
 
 void  MainWindow::cfgSetAutoload( unsigned  load ) noexcept
@@ -584,13 +648,53 @@ QString  MainWindow::cfgGetLastOpenFile() noexcept
 
 //------------------------------------------------------------------------------
 
+bool  MainWindow::askSaveIfChanged()
+{
+    if( m_bPrgTitleChanged )
+    {
+        QMessageBox     msgBox;
+
+        msgBox.setText( "The document has been modified" );
+        msgBox.setInformativeText( "Do you want to save your changes?" );
+        msgBox.setStandardButtons( QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel );
+        msgBox.setDefaultButton( QMessageBox::Save );
+
+        int ret = msgBox.exec();
+
+        switch (ret) 
+        {
+            case QMessageBox::Save:
+                onBtnSave();
+                break;
+
+            case QMessageBox::Discard:
+                break;
+
+            case QMessageBox::Cancel:
+                return false;
+
+            default:
+                return false;
+        }
+    }
+
+    return true;
+}
+
 void  MainWindow::closeEvent( QCloseEvent  *event )
 {
-    m_pGoods->GoodsDelete();
+    if( ! askSaveIfChanged() )
+    {
+        event->ignore();
+    }
+    else
+    {
+        m_pGoods->GoodsDelete();
 
-    m_config.reset();
+        m_config.reset();
 
-    event->accept();
+        event->accept();
+    }
 }
 
 //------------------------------------------------------------------------------
