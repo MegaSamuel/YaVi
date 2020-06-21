@@ -154,10 +154,18 @@ void  TCategories::onSendValues( TValues& a_tValues )
         setCategoriesUlink( m_tValues.m_zUlink.toStdString(), true );
         setCategoriesUname( m_tValues.m_zUname.toStdString(), true );
 
-        if( Q_NULLPTR != m_pMentor )
+        if( 0 == m_tValues.m_zName.length() )
         {
-            // переименовываем запись в values родителя
-            m_pMentor->renameParamList( m_tValues.m_zName, getNodeIndex(), true );
+            // если имя пустое, то удаляем категорию
+            onBtnDec();
+        }
+        else
+        {
+            if( Q_NULLPTR != m_pMentor )
+            {
+                // переименовываем запись в values родителя
+                m_pMentor->renameParamList( m_tValues.m_zName, getNodeIndex(), true );
+            }
         }
 
         //qDebug() << getCategoriesName() << "fix categories";
@@ -169,6 +177,12 @@ void  TCategories::onSendValues( TValues& a_tValues )
 
         TParam  *pParam;
         pParam = new TParam( Q_NULLPTR, this, m_depth+1 );
+
+        if( 0 == m_tValues.m_zName.length() )
+        {
+            // если имя пустое, то ставим дефолтное имя
+            m_tValues.m_zName = "noname";
+        }
 
         // добавляемся к родителю
         //m_vlayout->insertWidget( 1, pParam, 0, Qt::AlignLeft | Qt::AlignTop );
@@ -801,14 +815,26 @@ void  TParam::onSendValues( TValues& a_tValues )
         // после рекактирования проверяем раскраску
         setParamNameColor( getParamName() );
 
+        if( 0 == m_tValues.m_zName.length() )
+        {
+            // если имя пустое, то удаляем параметр
+            onBtnDec();
+        }
+
         //qDebug() << getParamName() << "fix parameter";
     }
 
     if( true == need_to_add )
     {
-        // создаем новый набор параметров
+        // создаем новую запись в values
 
         // тут мы должны добавить поле field в values и создать categories
+
+        if( 0 == m_tValues.m_zName.length() )
+        {
+            // если имя пустое, то ставим дефолтное имя
+            m_tValues.m_zName = "noname";
+        }
 
         // добавляем новое поле в values
         addParamList( m_tValues.m_zName, true );
@@ -1313,6 +1339,11 @@ bool  TParam::setParamNameColor( const QString&  name, bool  force )
     QList<TParam*> list;
 
     list.clear();
+
+    if( 0 == name.length() )
+    {
+        return false;
+    }
 
     // красим имя текущего параметра в серый
     //colorBtnName( false );

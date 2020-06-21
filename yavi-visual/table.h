@@ -3,7 +3,8 @@
 
 #include <QtWidgets>
 
-#include "dialog.h"
+#include "tabentry.h"
+#include "tabdialog.h"
 #include "values.h"
 
 //------------------------------------------------------------------------------
@@ -42,8 +43,10 @@ public:
     void           setTableId( const std::string&  name, bool  set_to_node = false );
     void           setTableName( const std::string&  name, bool  set_to_node = false );
     void           setTableLink( const std::string&  name, bool  set_to_node = false );
-    void           setTableRow( QStringList& list );
-    void           setTableColumn( QStringList& list );
+    void           setTableRow( const std::string&  name, QStringList& list );
+    void           setTableColumn( const std::string&  name, QStringList& list );
+
+    void           fixTableHeight( unsigned  row_count );
 
     void           resetRow() noexcept;
     void           resetColumn() noexcept;
@@ -62,37 +65,63 @@ public:
     void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет
     void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
 
+    QList<TTabEntry*>  m_apRowList;
+    QList<TTabEntry*>  m_apColumnList;
+
 Q_SIGNALS:
     void           sendChanged();
 
 private Q_SLOTS:
+    void           onBtnId();
     void           onBtnName();
+    void           onBtnLink();
+    void           onBtnDec();
     void           onBtnInc();
+    void           onBtnRowInc();
+    void           onBtnRowName( QString& ); //??
+    void           onBtnRowValInc();
+    void           onBtnRowValName();
+    void           onBtnColumnInc();
+    void           onBtnColumnName( QString& ); //??
+    void           onBtnColumnValInc();
+    void           onBtnColumnValName();
     void           onSendCancel();
+    void           onSendValue( QString& );
     void           onSendValues( TValues& );
 
 private:
     void           clear();
+    void           clear_edit();
+
+    void           clearNodeSequence();
 
     YAML::Node     m_node;        // текущий уровнь дерева ямла
     YAML::Node     m_node_parent; // родительский уровнь дерева ямла
     int            m_node_index;  // номер перечисления у родителя
 
+    YAML::Node     m_temporary_node;  // временный ямл для правки основного
+    YAML::Node     m_temporary_inner_node;  // временный ямл для правки основного
+
     QGridLayout   *m_grid;
 
     QPushButton   *m_ptBtnInc;
+    QPushButton   *m_ptBtnId;
     QPushButton   *m_ptBtnName;
-
-    QLabel        *m_ptLblLink;
+    QPushButton   *m_ptBtnLink;
 
     unsigned       m_uTableType;
 
     QString        m_zId;      // table Id
+    QString        m_zBtnId;   // текст на кнопке
     QString        m_zName;    // table Name
     QString        m_zBtnName; // текст на кнопке
     QString        m_zLink;    // table Link
+    QString        m_zBtnLink; // текст на кнопке
 
-    TDialog       *m_ptDialog;
+    TTabDialog    *m_ptTabDialogId;
+    TTabDialog    *m_ptTabDialogName;
+    TTabDialog    *m_ptTabDialogLink;
+    TTabDialog    *m_ptTabDialogAdd;
 
     TValues        m_tValues;
 
@@ -110,6 +139,10 @@ private:
     void           widget_size_reset() noexcept;  // сброс размера виджета
 
     bool           need_to_add; // необходимость создать новый набор параметров в ямле
+
+    bool           edit_id;
+    bool           edit_name;
+    bool           edit_link;
 };
 
 //------------------------------------------------------------------------------
