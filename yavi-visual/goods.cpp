@@ -208,6 +208,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     // новая запись
                     pEntry = new TTabEntry( pTable );
                     pEntry->setNode( config[ GoodsTableSection ][j][ GoodsTableColumn ][i] );
+                    pEntry->setNodeParent( config[ GoodsTableSection ][j][ GoodsTableColumn ] );
                     pEntry->setNodeIndex( i );
 
                     // добавляем запись в список
@@ -245,6 +246,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     // новая запись
                     pEntry = new TTabEntry( pTable );
                     pEntry->setNode( config[ GoodsTableSection ][j][ GoodsTableRow ][i] );
+                    pEntry->setNodeParent( config[ GoodsTableSection ][j][ GoodsTableRow ] );
                     pEntry->setNodeIndex( i );
 
                     // добавляем запись в список

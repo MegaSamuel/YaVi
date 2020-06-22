@@ -26,9 +26,14 @@ public:
     YAML::Node&    getNode();
     int            getNodeIndex();
 
+    void           setValueIndex( int  index );
+    int            getValueIndex();
+
     void           setEntryValue( QString&  value );
 
     QString        getEntryValue();
+
+    void           EntryValueDelete();
 
 Q_SIGNALS:
     void           sendValue( QString&  value );
@@ -44,6 +49,8 @@ private Q_SLOTS:
 private:
     YAML::Node     m_node;        // текущий уровнь дерева ямла
     int            m_node_index;  // номер перечисления у родителя
+
+    int            m_value_index;  // номер записи в values
 
     TTabEntry     *m_pAncestor;
 

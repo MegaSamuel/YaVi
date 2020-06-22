@@ -46,7 +46,7 @@ public:
     void           setTableRow( const std::string&  name, QStringList& list );
     void           setTableColumn( const std::string&  name, QStringList& list );
 
-    void           setTableEntryValue( TTabEntry  *pEntry, QString&  value );
+    void           setTableEntryValue( TTabEntry  *pEntry, QString&  value, int  index );
 
     void           fixTableHeight( unsigned  row_count );
 

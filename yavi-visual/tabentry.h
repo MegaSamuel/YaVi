@@ -22,9 +22,11 @@ public:
     ~TTabEntry();
 
     void           setNode( const YAML::Node&  node );
+    void           setNodeParent( const YAML::Node&  node );
     void           setNodeIndex( int  index );
 
     YAML::Node&    getNode();
+    YAML::Node&    getNodeParent();
     int            getNodeIndex();
 
     void           setEntryName( const std::string&  name, bool  set_to_node = false );
@@ -32,6 +34,8 @@ public:
 
     QString        getEntryName();
     QString        getEntryValues();
+
+    void           EntryDelete();
 
     QList<TTabEntryValue*>  m_apValueList;
 
@@ -47,7 +51,10 @@ private Q_SLOTS:
     void           onSendValue( QString& );
 
 private:
+    void           clearNodeSequence();
+
     YAML::Node     m_node;        // текущий уровнь дерева ямла
+    YAML::Node     m_node_parent; // родительский уровнь дерева ямла
     int            m_node_index;  // номер перечисления у родителя
 
     TTable        *m_pAncestor;

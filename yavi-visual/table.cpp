@@ -186,6 +186,11 @@ void  TTable::onBtnRowInc()
 void  TTable::onBtnRowName( QString&  name )
 {
     qDebug() << __func__ << name;
+
+    if( 0 == name.length() )
+    {
+        qDebug() << "need to delete";
+    }
 }
 
 void  TTable::onBtnRowValInc()
@@ -206,6 +211,11 @@ void  TTable::onBtnColumnInc()
 void  TTable::onBtnColumnName( QString&  name )
 {
     qDebug() << __func__ << name;
+
+    if( 0 == name.length() )
+    {
+        qDebug() << "need to delete";
+    }
 }
 
 void  TTable::onBtnColumnValInc()
@@ -582,7 +592,7 @@ const QString TTable::getTableLink()
 
 //------------------------------------------------------------------------------
 
-void TTable::setTableEntryValue( TTabEntry  *pEntry, QString&  value )
+void TTable::setTableEntryValue( TTabEntry  *pEntry, QString&  value, int  index )
 {
     TTabEntryValue  *pEntryValue;
 
@@ -591,6 +601,7 @@ void TTable::setTableEntryValue( TTabEntry  *pEntry, QString&  value )
     pEntryValue->setNode( getNode() );
     pEntryValue->setNodeIndex( getNodeIndex() );
     pEntryValue->setEntryValue( value );
+    pEntryValue->setValueIndex( index );
 
     // добавляем запись в список
     pEntry->m_apValueList.append( pEntryValue );
@@ -614,23 +625,21 @@ void TTable::setTableRow( const std::string&  name, QStringList& list )
     ptBtnRowName->setToolTip( "Строка: " + QString::fromStdString(name) );
     ptBtnRowName->setFixedWidth( 93 );
     connect( ptBtnRowName, &QPushButton::clicked, m_apRowList.last(), &TTabEntry::onBtnName );
-    //connect( m_apRowList.last(), &TTabEntry::sendName, this, &TTable::onBtnRowName );
+    connect( m_apRowList.last(), &TTabEntry::sendName, this, &TTable::onBtnRowName );
     connect( m_apRowList.last(), &TTabEntry::sendName, ptBtnRowName, &QPushButton::setText );
     m_grid->addWidget( ptBtnRowName, m_row, m_column + column, Qt::AlignLeft );
 
     column += 1;
 
-    int  i = 0;
+    int i = 0;
 
-    for( auto& it : list )
+    for( i = 0; i < static_cast<int>(list.size()); i++ )
     {
-        i++;
-
         // кнопки со значениями
-        QPushButton  *button = new QPushButton( it );
-        button->setToolTip( "Значение: " + it );
+        QPushButton  *button = new QPushButton( list[i] );
+        button->setToolTip( "Значение: " + list[i] );
         button->setFixedWidth( 93 );
-        setTableEntryValue( m_apRowList.last(), it );
+        setTableEntryValue( m_apRowList.last(), list[i], i );
         connect( button, &QPushButton::clicked, m_apRowList.last()->m_apValueList.last(), &TTabEntryValue::onBtnValue );
         //connect( button, &QPushButton::clicked, this, &TTable::onBtnRowValName );
         connect( m_apRowList.last()->m_apValueList.last(), &TTabEntryValue::sendValue, button, &QPushButton::setText );
@@ -672,23 +681,19 @@ void TTable::setTableColumn( const std::string&  name, QStringList& list )
     ptBtnColumnName->setToolTip( "Столбец: " + QString::fromStdString(name) );
     ptBtnColumnName->setFixedWidth( 93 );
     connect( ptBtnColumnName, &QPushButton::clicked, m_apColumnList.last(), &TTabEntry::onBtnName );
-    //connect( m_apColumnList.last(), &TTabEntry::sendName, this, &TTable::onBtnColumnName );
+    connect( m_apColumnList.last(), &TTabEntry::sendName, this, &TTable::onBtnColumnName );
     connect( m_apColumnList.last(), &TTabEntry::sendName, ptBtnColumnName, &QPushButton::setText );
     m_grid->addWidget( ptBtnColumnName, m_row + row, m_column, Qt::AlignLeft );
 
     row += 1;
 
-    int  i = 0;
-
-    for( auto& it : list )
+    for( int i = 0; i < static_cast<int>(list.size()); i++ )
     {
-        i++;
-
         // кнопки со значениями
-        QPushButton  *button = new QPushButton( it );
-        button->setToolTip( "Значение: " + it );
+        QPushButton  *button = new QPushButton( list[i] );
+        button->setToolTip( "Значение: " + list[i] );
         button->setFixedWidth( 93 );
-        setTableEntryValue( m_apColumnList.last(), it );
+        setTableEntryValue( m_apColumnList.last(), list[i], i );
         connect( button, &QPushButton::clicked, m_apColumnList.last()->m_apValueList.last(), &TTabEntryValue::onBtnValue );
         //connect( button, &QPushButton::clicked, this, &TTable::onBtnColumnValName );
         connect( m_apColumnList.last()->m_apValueList.last(), &TTabEntryValue::sendValue, button, &QPushButton::setText );

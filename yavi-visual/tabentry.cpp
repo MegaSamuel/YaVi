@@ -6,6 +6,7 @@
 TTabEntry::TTabEntry( TTable  *pAncestor )
 {
     m_node.reset();
+    m_node_parent.reset();
     m_node_index = -1;
 
     m_pAncestor = pAncestor;
@@ -33,6 +34,8 @@ TTabEntry::~TTabEntry()
 void  TTabEntry::onBtnDec()
 {
     //qDebug() << "TTabEntry" << __func__ << getEntryName();
+
+    clearNodeSequence();
 }
 
 void  TTabEntry::onBtnName()
@@ -72,9 +75,37 @@ void  TTabEntry::onSendValue( QString& a_zValue )
 
 //------------------------------------------------------------------------------
 
+void  TTabEntry::clearNodeSequence()
+{
+    // если не знаем индекс, то удаляем поля
+    if( -1 == m_node_index )
+    {
+        m_node.remove( GoodsTableName );
+        m_node.remove( GoodsTableValue );
+    }
+
+    // если знаем индекс, то удаляем всю ветку
+    if( -1 != m_node_index )
+    {
+        m_node_parent.remove( m_node_index );
+    }
+}
+
+void  TTabEntry::EntryDelete()
+{
+
+}
+
+//------------------------------------------------------------------------------
+
 void  TTabEntry::setNode( const YAML::Node&  node )
 {
     m_node = node;
+}
+
+void  TTabEntry::setNodeParent( const YAML::Node&  node )
+{
+    m_node_parent = node;
 }
 
 void  TTabEntry::setNodeIndex( int  index )
@@ -85,6 +116,11 @@ void  TTabEntry::setNodeIndex( int  index )
 YAML::Node&  TTabEntry::getNode()
 {
     return m_node;
+}
+
+YAML::Node&  TTabEntry::getNodeParent()
+{
+    return m_node_parent;
 }
 
 int  TTabEntry::getNodeIndex()
