@@ -3,10 +3,12 @@
 
 //------------------------------------------------------------------------------
 
-TTabEntry::TTabEntry()
+TTabEntry::TTabEntry( TTable  *pAncestor )
 {
     m_node.reset();
     m_node_index = -1;
+
+    m_pAncestor = pAncestor;
 
     m_zName.clear();
     m_zValues.clear();

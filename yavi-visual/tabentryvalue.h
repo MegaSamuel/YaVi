@@ -1,25 +1,24 @@
-#ifndef TABENTRY_H
-#define TABENTRY_H
+#ifndef TABENTRYVALUE_H
+#define TABENTRYVALUE_H
 
 #include <QtWidgets>
 
 #include "values.h"
 #include "tabdialog.h"
-#include "tabentryvalue.h"
 
 //------------------------------------------------------------------------------
 
-class TTable;
+class TTabEntry;
 
 //------------------------------------------------------------------------------
 
-class TTabEntry : public QWidget
+class TTabEntryValue : public QWidget
 {
    Q_OBJECT
 
 public:
-    explicit TTabEntry( TTable  *pAncestor );
-    ~TTabEntry();
+    explicit TTabEntryValue( TTabEntry  *pAncestor );
+    ~TTabEntryValue();
 
     void           setNode( const YAML::Node&  node );
     void           setNodeIndex( int  index );
@@ -27,20 +26,16 @@ public:
     YAML::Node&    getNode();
     int            getNodeIndex();
 
-    void           setEntryName( const std::string&  name, bool  set_to_node = false );
-    void           setEntryValues( const std::string&  name, bool  set_to_node = false );
+    void           setEntryValue( QString&  value );
 
-    QString        getEntryName();
-    QString        getEntryValues();
-
-    QList<TTabEntryValue*>  m_apValueList;
+    QString        getEntryValue();
 
 Q_SIGNALS:
-    void           sendName( QString& name );
+    void           sendValue( QString&  value );
 
 public Q_SLOTS:
     void           onBtnDec();
-    void           onBtnName();
+    void           onBtnValue();
 
 private Q_SLOTS:
     void           onSendCancel();
@@ -50,14 +45,13 @@ private:
     YAML::Node     m_node;        // текущий уровнь дерева ямла
     int            m_node_index;  // номер перечисления у родителя
 
-    TTable        *m_pAncestor;
+    TTabEntry     *m_pAncestor;
 
-    QString        m_zName;
-    QString        m_zValues;
+    QString        m_zValue;
 
-    TTabDialog    *m_ptTabDialogName;
+    TTabDialog    *m_ptTabDialogValue;
 };
 
 //------------------------------------------------------------------------------
 
-#endif // TABENTRY_H
+#endif // TABENTRYVALUE_H

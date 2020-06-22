@@ -3,6 +3,7 @@
 #include "category.h"
 
 #include "mainwindow.h"
+
 //------------------------------------------------------------------------------
 
 TCategories::TCategories( TParam  *pMentor, int  depth )

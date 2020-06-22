@@ -206,7 +206,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                 for( int i = 0; i < static_cast<int>(config[ GoodsTableSection ][j][ GoodsTableColumn ].size()); i++ )
                 {
                     // новая запись
-                    pEntry = new TTabEntry();
+                    pEntry = new TTabEntry( pTable );
                     pEntry->setNode( config[ GoodsTableSection ][j][ GoodsTableColumn ][i] );
                     pEntry->setNodeIndex( i );
 
@@ -243,7 +243,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                 for( int i = 0; i < static_cast<int>(config[ GoodsTableSection ][j][ GoodsTableRow ].size()); i++ )
                 {
                     // новая запись
-                    pEntry = new TTabEntry();
+                    pEntry = new TTabEntry( pTable );
                     pEntry->setNode( config[ GoodsTableSection ][j][ GoodsTableRow ][i] );
                     pEntry->setNodeIndex( i );
 

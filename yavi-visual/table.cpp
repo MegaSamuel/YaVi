@@ -582,6 +582,20 @@ const QString TTable::getTableLink()
 
 //------------------------------------------------------------------------------
 
+void TTable::setTableEntryValue( TTabEntry  *pEntry, QString&  value )
+{
+    TTabEntryValue  *pEntryValue;
+
+    // новая запись
+    pEntryValue = new TTabEntryValue( pEntry );
+    pEntryValue->setNode( getNode() );
+    pEntryValue->setNodeIndex( getNodeIndex() );
+    pEntryValue->setEntryValue( value );
+
+    // добавляем запись в список
+    pEntry->m_apValueList.append( pEntryValue );
+}
+
 void TTable::setTableRow( const std::string&  name, QStringList& list )
 {
     int column = 0;
@@ -616,7 +630,10 @@ void TTable::setTableRow( const std::string&  name, QStringList& list )
         QPushButton  *button = new QPushButton( it );
         button->setToolTip( "Значение: " + it );
         button->setFixedWidth( 93 );
-        connect( button, &QPushButton::clicked, this, &TTable::onBtnRowValName );
+        setTableEntryValue( m_apRowList.last(), it );
+        connect( button, &QPushButton::clicked, m_apRowList.last()->m_apValueList.last(), &TTabEntryValue::onBtnValue );
+        //connect( button, &QPushButton::clicked, this, &TTable::onBtnRowValName );
+        connect( m_apRowList.last()->m_apValueList.last(), &TTabEntryValue::sendValue, button, &QPushButton::setText );
         m_grid->addWidget( button, m_row, m_column + column, Qt::AlignLeft );
 
         column += 1;
@@ -671,7 +688,10 @@ void TTable::setTableColumn( const std::string&  name, QStringList& list )
         QPushButton  *button = new QPushButton( it );
         button->setToolTip( "Значение: " + it );
         button->setFixedWidth( 93 );
-        connect( button, &QPushButton::clicked, this, &TTable::onBtnColumnValName );
+        setTableEntryValue( m_apColumnList.last(), it );
+        connect( button, &QPushButton::clicked, m_apColumnList.last()->m_apValueList.last(), &TTabEntryValue::onBtnValue );
+        //connect( button, &QPushButton::clicked, this, &TTable::onBtnColumnValName );
+        connect( m_apColumnList.last()->m_apValueList.last(), &TTabEntryValue::sendValue, button, &QPushButton::setText );
         m_grid->addWidget( button, m_row + row, m_column, Qt::AlignLeft );
 
         row += 1;
