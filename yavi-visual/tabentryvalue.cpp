@@ -61,7 +61,7 @@ void  TTabEntryValue::onSendValue( QString&  a_zValue )
     setEntryValue( a_zValue );
 
     // шлем сигнал с именем
-    Q_EMIT sendValue( a_zValue );
+    Q_EMIT sendEntryValue( a_zValue, getValueIndex() );
 
     if( 0 == a_zValue.length() )
     {

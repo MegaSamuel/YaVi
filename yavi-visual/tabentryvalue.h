@@ -36,7 +36,7 @@ public:
     void           EntryValueDelete();
 
 Q_SIGNALS:
-    void           sendValue( QString&  value );
+    void           sendEntryValue( QString&  value, int  index = 0 );
 
 public Q_SLOTS:
     void           onBtnDec();

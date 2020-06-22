@@ -220,11 +220,12 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
                     // значение
                     const std::string  col_val = __yaml_GetString( config[ GoodsTableSection ][j][ GoodsTableColumn ][i], GoodsTableValue );
-                    pEntry->setEntryValues( col_val );
+                    //pEntry->setEntryValues( col_val );
 
                     QStringList  col_list;
                     col_list.clear();
                     col_list = QString::fromStdString(col_val).split( '\n', QString::SkipEmptyParts );
+                    pEntry->setParamList( col_list, col_val );
                     pTable->setTableColumn( col_name, col_list );
 
                     if( col_list.size() > max_row_count )
@@ -258,11 +259,12 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
                     // значение
                     const std::string  row_val = __yaml_GetString( config[ GoodsTableSection ][j][ GoodsTableRow ][i], GoodsTableValue );
-                    pEntry->setEntryValues( row_val );
+                    //pEntry->setEntryValues( row_val );
 
                     QStringList  row_list;
                     row_list.clear();
                     row_list = QString::fromStdString(row_val).split( '\n', QString::SkipEmptyParts );
+                    pEntry->setParamList( row_list, row_val );
                     pTable->setTableRow( row_name, row_list );
 
                     row_count++;

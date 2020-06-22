@@ -603,6 +603,9 @@ void TTable::setTableEntryValue( TTabEntry  *pEntry, QString&  value, int  index
     pEntryValue->setEntryValue( value );
     pEntryValue->setValueIndex( index );
 
+    // ловим сигнал с данными значения
+    connect( pEntryValue, &TTabEntryValue::sendEntryValue, pEntry, &TTabEntry::onSendEntryValue );
+
     // добавляем запись в список
     pEntry->m_apValueList.append( pEntryValue );
 }
@@ -642,7 +645,7 @@ void TTable::setTableRow( const std::string&  name, QStringList& list )
         setTableEntryValue( m_apRowList.last(), list[i], i );
         connect( button, &QPushButton::clicked, m_apRowList.last()->m_apValueList.last(), &TTabEntryValue::onBtnValue );
         //connect( button, &QPushButton::clicked, this, &TTable::onBtnRowValName );
-        connect( m_apRowList.last()->m_apValueList.last(), &TTabEntryValue::sendValue, button, &QPushButton::setText );
+        connect( m_apRowList.last()->m_apValueList.last(), &TTabEntryValue::sendEntryValue, button, &QPushButton::setText );
         m_grid->addWidget( button, m_row, m_column + column, Qt::AlignLeft );
 
         column += 1;
@@ -696,7 +699,7 @@ void TTable::setTableColumn( const std::string&  name, QStringList& list )
         setTableEntryValue( m_apColumnList.last(), list[i], i );
         connect( button, &QPushButton::clicked, m_apColumnList.last()->m_apValueList.last(), &TTabEntryValue::onBtnValue );
         //connect( button, &QPushButton::clicked, this, &TTable::onBtnColumnValName );
-        connect( m_apColumnList.last()->m_apValueList.last(), &TTabEntryValue::sendValue, button, &QPushButton::setText );
+        connect( m_apColumnList.last()->m_apValueList.last(), &TTabEntryValue::sendEntryValue, button, &QPushButton::setText );
         m_grid->addWidget( button, m_row + row, m_column, Qt::AlignLeft );
 
         row += 1;
