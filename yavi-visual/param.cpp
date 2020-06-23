@@ -10,7 +10,7 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     clear();
 
     // диалог для себя
-    m_ptDialogSelf = new TDialog( false, "Value",  this );
+    m_ptDialogSelf = new TDialog( false, tr( "Value" ),  this );
 
     // ловим сигнал от диалога об отмене
     connect( m_ptDialogSelf, &TDialog::sendCancel, this, &TCategories::onSendCancel );
@@ -19,7 +19,7 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
     connect( m_ptDialogSelf, &TDialog::sendValues, this, &TCategories::onSendValues );
 
     // диалог для добавления параметра
-    m_ptDialogAdd = new TDialog( true, "Add parameter",  this );
+    m_ptDialogAdd = new TDialog( true, tr( "Add parameter" ),  this );
 
     // ловим сигнал от диалога об отмене
     connect( m_ptDialogAdd, &TDialog::sendCancel, this, &TCategories::onSendCancel );
@@ -55,7 +55,7 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 
     // кнопка минус
     m_ptBtnDec = new QPushButton( "-" );
-    m_ptBtnDec->setToolTip( "Удалить значение" );
+    m_ptBtnDec->setToolTip( tr( "Delete value" ) );
     m_ptBtnDec->setFixedWidth( 93 );
     connect( m_ptBtnDec, &QPushButton::clicked, this, &TCategories::onBtnDec );
     m_hlayout->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
@@ -68,7 +68,7 @@ TCategories::TCategories( TParam  *pMentor, int  depth )
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+" );
-    m_ptBtnInc->setToolTip( "Добавить параметр" );
+    m_ptBtnInc->setToolTip( tr( "Add parameter" ) );
     m_ptBtnInc->setFixedWidth( 93 );
     //setIncBtnVisible( false );
     connect( m_ptBtnInc, &QPushButton::clicked, this, &TCategories::onBtnInc );
@@ -108,6 +108,17 @@ void TCategories::clear()
 
 void  TCategories::onBtnDec()
 {
+    QMessageBox     msgBox;
+
+    msgBox.setText( tr( "Are you sure you want to delete it?" ) );
+    msgBox.setStandardButtons( QMessageBox::Ok | QMessageBox::Cancel );
+    msgBox.setDefaultButton( QMessageBox::Ok );
+    msgBox.button( QMessageBox::Ok )->setText( tr( "Ok" ) );
+    msgBox.button( QMessageBox::Cancel )->setText( tr( "Cancel" ) );
+
+    int ret = msgBox.exec();
+    if( ret != QMessageBox::Ok )
+        return;
     widget_shrink( getCategoriesWidth(), getCategoriesHeight() + m_vlayout->spacing() );
 
     CategoriesDelete();
@@ -125,6 +136,9 @@ void  TCategories::onBtnInc()
 
     m_ptDialogAdd->setDlgName( "NewParameter" );
 
+    if( MainWindow::getMainWinPtr()->goods() )
+        m_ptDialogAdd->setDlgUlink( MainWindow::getMainWinPtr()->goods()->collectULinks() );
+
     m_ptDialogAdd->open();
 }
 
@@ -134,6 +148,8 @@ void  TCategories::onBtnName()
     m_ptDialogSelf->setDlgEmpty();
 
     m_ptDialogSelf->setDlgName( getCategoriesName() );
+    if( MainWindow::getMainWinPtr()->goods() )
+        m_ptDialogSelf->setDlgUlink( MainWindow::getMainWinPtr()->goods()->collectULinks() );
     m_ptDialogSelf->setDlgUlink( getCategoriesUlink() );
     m_ptDialogSelf->setDlgUname( getCategoriesUname() );
 
@@ -194,6 +210,29 @@ void  TCategories::onSendValues( TValues& a_tValues )
 
         // ставим значения параметров
         pParam->setParamName( m_tValues.m_zName.toStdString() );
+
+        TParam  copy;
+        if( pParam->setParamNameColor( pParam->getParamName(), &copy ) )
+        {
+            if( ! m_tValues.m_uType )
+            {
+                m_tValues.m_uType =  copy.getParamType();
+                m_tValues.m_zPlaceholder = copy.getParamPlaceholder();
+                m_tValues.m_zNew = copy.getParamNew();
+                m_tValues.m_zAfter = copy.getParamAfter();
+                m_tValues.m_zBefore = copy.getParamBefore();
+                m_tValues.m_zUlink = copy.getParamUlink();
+                m_tValues.m_zUname = copy.getParamUname();
+                m_tValues.m_nMin = copy.getParamMin();
+                m_tValues.m_nMax = copy.getParamMax();
+                m_tValues.m_fMin = copy.getParamDMin();
+                m_tValues.m_fMax = copy.getParamDMax();
+                m_tValues.m_zMulti =copy.getParamMulti();
+                m_tValues.m_zLoadLink =copy.getParamLoadFrom();
+                m_tValues.m_vList = copy.getParamList();
+            }
+        }
+
         pParam->setParamType( m_tValues.m_uType );
 
         if( 0 != m_tValues.m_uType )
@@ -220,6 +259,11 @@ void  TCategories::onSendValues( TValues& a_tValues )
         if( 5 == m_tValues.m_uType )
         {
             pParam->setParamMulti( m_tValues.m_zMulti.toStdString() );
+        }
+
+        if( ( 4 == m_tValues.m_uType ) || ( 5 == m_tValues.m_uType ) )
+        {
+            pParam->setParamLoadFrom( m_tValues.m_zLoadLink.toStdString() );
         }
 
         // очищаем ямл
@@ -254,6 +298,11 @@ void  TCategories::onSendValues( TValues& a_tValues )
         {
             __yaml_SetString( m_temporary_node, GoodsMultiSection, m_tValues.m_zMulti.toStdString() );
         }
+        if( ( 4 == m_tValues.m_uType ) || ( 5 == m_tValues.m_uType ) )
+        {
+            if( ! m_tValues.m_zLoadLink.isEmpty() )
+                __yaml_SetString( m_temporary_node, GoodsLoadFromSection, m_tValues.m_zLoadLink.toStdString() );
+        }
 
         // добавляем ямл к основному
         m_node[ GoodsParametersSection ].push_back( m_temporary_node );
@@ -264,7 +313,7 @@ void  TCategories::onSendValues( TValues& a_tValues )
         pParam->setNodeParent( m_node[ GoodsParametersSection ] );
         pParam->setNodeIndex( index );
 
-        pParam->setParamNameColor( pParam->getParamName() );
+        pParam->setParamNameColor( pParam->getParamName(), Q_NULLPTR );
 
         //qDebug() << pParam->getParamName() << "index" << index;
     }
@@ -383,19 +432,19 @@ void  TCategories::CategoriesDelete()
 
 //------------------------------------------------------------------------------
 
-bool  TCategories::isParamNameRedefined( const QString&  name )
+bool  TCategories::isParamNameRedefined( const QString&  name, TParam  *copy )
 {
     bool  result = false;
 
     if( Q_NULLPTR != m_pMentor )
     {
-        result = m_pMentor->setParamNameColorByRelative( name );
+        result = m_pMentor->setParamNameColorByRelative( name, copy );
 
         //qDebug() << "call setParamNameColorByRelative by isParamNameRedefined for" << name << result;
 
         if( false == result )
         {
-            result = m_pMentor->setParamNameColor( name, true );
+            result = m_pMentor->setParamNameColor( name, copy, true );
 
             //qDebug() << "call setParamNameColor by isParamNameRedefined for" << name << result;
         }
@@ -601,7 +650,7 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     clear();
 
     // диалог для себя
-    m_ptDialogSelf = new TDialog( true, "Parameter",  this );
+    m_ptDialogSelf = new TDialog( true, tr( "Parameter" ),  this );
 
     // ловим сигнал от диалога об отмене
     connect( m_ptDialogSelf, &TDialog::sendCancel, this, &TParam::onSendCancel );
@@ -610,7 +659,7 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
     connect( m_ptDialogSelf, &TDialog::sendValues, this, &TParam::onSendValues );
 
     // диалог для добавления values
-    m_ptDialogAdd = new TDialog( false, "Add value",  this );
+    m_ptDialogAdd = new TDialog( false, tr( "Add value" ),  this );
 
     // ловим сигнал от диалога об отмене
     connect( m_ptDialogAdd, &TDialog::sendCancel, this, &TParam::onSendCancel );
@@ -651,7 +700,7 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
 
     // кнопка минус
     m_ptBtnDec = new QPushButton( "-" );
-    m_ptBtnDec->setToolTip( "Удалить параметр" );
+    m_ptBtnDec->setToolTip( tr( "Delete parameter" ) );
     m_ptBtnDec->setFixedWidth( 93 );
     connect( m_ptBtnDec, &QPushButton::clicked, this, &TParam::onBtnDec );
     m_hlayout1->addWidget( m_ptBtnDec, 0, Qt::AlignLeft );
@@ -664,7 +713,7 @@ TParam::TParam( TCategory  *pAncestor, TCategories  *pMentor, int  depth )
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+" );
-    m_ptBtnInc->setToolTip( "Добавить значение" );
+    m_ptBtnInc->setToolTip( tr( "Add value" ) );
     m_ptBtnInc->setFixedWidth( 93 );
     setIncBtnVisible( false );  // по умолчанию кнопка невидимая
     connect( m_ptBtnInc, &QPushButton::clicked, this, &TParam::onBtnInc );
@@ -697,6 +746,7 @@ void  TParam::clear()
     m_zUlink.clear();
     m_zUname.clear();
     m_zMulti.clear();
+    m_zLoadLink.clear();
 
     m_uType = 0;
     m_nMin = 0;
@@ -718,6 +768,18 @@ void  TParam::clear()
 
 void  TParam::onBtnDec()
 {
+    QMessageBox     msgBox;
+
+    msgBox.setText( tr( "Are you sure you want to delete it?" ) );
+    msgBox.setStandardButtons( QMessageBox::Ok | QMessageBox::Cancel );
+    msgBox.setDefaultButton( QMessageBox::Ok );
+    msgBox.button( QMessageBox::Ok )->setText( tr( "Ok" ) );
+    msgBox.button( QMessageBox::Cancel )->setText( tr( "Cancel" ) );
+
+    int ret = msgBox.exec();
+    if( ret != QMessageBox::Ok )
+        return;
+
     widget_shrink( getParamWidth(), getParamHeight() + m_vlayout->spacing() );
 
     ParamDelete();
@@ -727,6 +789,18 @@ void  TParam::onBtnDec()
 
 void  TParam::onBtnValDec()
 {
+    QMessageBox     msgBox;
+
+    msgBox.setText( tr( "Are you sure you want to delete it?" ) );
+    msgBox.setStandardButtons( QMessageBox::Ok | QMessageBox::Cancel );
+    msgBox.setDefaultButton( QMessageBox::Ok );
+    msgBox.button( QMessageBox::Ok )->setText( tr( "Ok" ) );
+    msgBox.button( QMessageBox::Cancel )->setText( tr( "Cancel" ) );
+
+    int ret = msgBox.exec();
+    if( ret != QMessageBox::Ok )
+        return;
+
     setParamType( 0, true );
 
     MainWindow::getMainWinPtr()->onYamlChanged();
@@ -742,6 +816,9 @@ void  TParam::onBtnInc()
 
     m_ptDialogAdd->setDlgName( "NewValue" );
 
+    if( MainWindow::getMainWinPtr()->goods() )
+        m_ptDialogAdd->setDlgUlink( MainWindow::getMainWinPtr()->goods()->collectULinks() );
+
     m_ptDialogAdd->open();
 }
 
@@ -755,9 +832,12 @@ void  TParam::onBtnName()
     m_ptDialogSelf->setDlgNew( getParamNew() );
     m_ptDialogSelf->setDlgAfter( getParamAfter() );
     m_ptDialogSelf->setDlgBefore( getParamBefore() );
+    if( MainWindow::getMainWinPtr()->goods() )
+        m_ptDialogSelf->setDlgUlink( MainWindow::getMainWinPtr()->goods()->collectULinks() );
     m_ptDialogSelf->setDlgUlink( getParamUlink() );
     m_ptDialogSelf->setDlgUname( getParamUname() );
     m_ptDialogSelf->setDlgMulti( getParamMulti() );
+    m_ptDialogSelf->setDlgLoadFrom( getParamLoadFrom() );
 
     m_ptDialogSelf->setDlgType( getParamType() );
 
@@ -815,12 +895,14 @@ void  TParam::onSendValues( TValues& a_tValues )
         {
             setParamMulti( m_tValues.m_zMulti.toStdString(), true );
         }
+        if( ( 4 == m_tValues.m_uType ) || ( 5 == m_tValues.m_uType ) )
+            setParamLoadFrom( m_tValues.m_zLoadLink.toStdString(), true );
 
         // сброс цвета текста кнопки
         colorBtnName( false );
 
         // после рекактирования проверяем раскраску
-        setParamNameColor( getParamName() );
+        if( setParamNameColor( getParamName() ) ) {};
 
         if( 0 == m_tValues.m_zName.length() )
         {
@@ -902,6 +984,7 @@ void  TParam::clearNodeSequence()
         m_node.remove( GoodsMinSection );
         m_node.remove( GoodsMaxSection );
         m_node.remove( GoodsMultiSection );
+        m_node.remove( GoodsLoadFromSection );
         m_node.remove( GoodsValuesSection );
     }
 
@@ -1177,6 +1260,16 @@ void  TParam::setParamMulti( const std::string&  name, bool  set_to_node )
     }
 }
 
+void  TParam::setParamLoadFrom( const std::string&  name, bool  set_to_node )
+{
+    m_zLoadLink = QString::fromStdString(name);
+
+    if( set_to_node && ! m_zLoadLink.isEmpty() )
+    {
+        __yaml_SetString( m_node, GoodsLoadFromSection, name );
+    }
+}
+
 
 void  TParam::setParamType( unsigned  val, bool  set_to_node )
 {
@@ -1293,7 +1386,29 @@ void  TParam::colorBtnName( bool  color )
     }
 }
 
-bool  TParam::setParamNameColorByRelative( const QString&  name )
+void            TParam::copyData( TParam  *param )
+{
+    m_zName = param->m_zName;
+    m_zPlaceholder = param->m_zPlaceholder;
+    m_zNew = param->m_zNew;
+    m_zAfter = param->m_zAfter;
+    m_zBefore = param->m_zBefore;
+    m_zUlink = param->m_zUlink;
+    m_zUname = param->m_zUname;
+    m_zMulti = param->m_zMulti;
+    m_zLoadLink = param->m_zLoadLink;
+
+    m_uType = param->m_uType;
+    m_nMin = param->m_nMin;
+    m_nMax = param->m_nMax;
+    m_fMin = param->m_fMin;
+    m_fMax = param->m_fMax;
+
+    m_zList = param->m_zList;
+    m_vList = param->m_vList;
+}
+
+bool  TParam::setParamNameColorByRelative( const QString&  name, TParam  *copy )
 {
     bool result = false;
     QList<TParam*> list;
@@ -1315,7 +1430,7 @@ bool  TParam::setParamNameColorByRelative( const QString&  name )
         // нашли совпадение -> красим
         if( Q_NULLPTR != m_pMentor )
         {
-            if( m_pMentor->isParamNameRedefined( name ) )
+            if( m_pMentor->isParamNameRedefined( name, copy ) )
             {
                 //qDebug() << "color item" << name << "by parameter" << it->getParamName() << "yyy" << getParamName();
 
@@ -1331,6 +1446,8 @@ bool  TParam::setParamNameColorByRelative( const QString&  name )
         {
             //qDebug() << "color item" << name << "by parameter" << it->getParamName() << "zzz" << getParamName();
 
+            if( copy )  
+                copy->copyData( it );
             result = true;
 
             break;
@@ -1340,7 +1457,7 @@ bool  TParam::setParamNameColorByRelative( const QString&  name )
     return result;
 }
 
-bool  TParam::setParamNameColor( const QString&  name, bool  force )
+bool  TParam::setParamNameColor( const QString&  name, TParam *copy, bool  force )
 {
     bool result = false;
     QList<TParam*> list;
@@ -1392,6 +1509,9 @@ bool  TParam::setParamNameColor( const QString&  name, bool  force )
                     if( !force )
                         colorBtnName( true );
 
+                    if( copy )  
+                        copy->copyData( it );
+
                     result = true;
 
                     break;
@@ -1403,7 +1523,7 @@ bool  TParam::setParamNameColor( const QString&  name, bool  force )
         {
             // проверяем у прародителя
             // нашли совпадение -> красим
-            if( m_pMentor->isParamNameRedefined( name ) )
+            if( m_pMentor->isParamNameRedefined( name, copy ) )
             {
                 //qDebug() << "color item" << name << "by parameter" << it->getParamName() << force << "xxx" << getParamName();
 
@@ -1428,6 +1548,8 @@ bool  TParam::setParamNameColor( const QString&  name, bool  force )
                     //it->colorBtnName( true );
                     colorBtnName( true );
 
+                    if( copy )  
+                        copy->copyData( it );
                     result = true;
 
                     break;
@@ -1565,6 +1687,10 @@ QString  TParam::getParamMulti() noexcept
     return m_zMulti;
 }
 
+QString  TParam::getParamLoadFrom() noexcept
+{
+    return m_zLoadLink;
+}
 
 unsigned  TParam::getParamType() noexcept
 {
@@ -1640,7 +1766,7 @@ void  TParam::setParamValueAdd( unsigned  type )
 
     // кнопка минус
     m_ptBtnValDec = new QPushButton( "-" );
-    m_ptBtnValDec->setToolTip( "Удалить значение" );
+    m_ptBtnValDec->setToolTip( tr( "Delete value" ) );
     m_ptBtnValDec->setFixedWidth( 93 );
     connect( m_ptBtnValDec, &QPushButton::clicked, this, &TParam::onBtnValDec );
     m_hlayout2->addWidget( m_ptBtnValDec, 0, Qt::AlignLeft );

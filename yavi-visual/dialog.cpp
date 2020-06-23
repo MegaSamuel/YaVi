@@ -10,18 +10,20 @@ public:
 
     QLineEdit        *m_ptLineName;
     QSpinBox         *m_ptSpinType;
+    QComboBox        *m_ptBoxType;
     QLineEdit        *m_ptLinePlaceholder;
     QLineEdit        *m_ptLineNew;
     QLineEdit        *m_ptLineAfter;
     QLineEdit        *m_ptLineBefore;
-    QLineEdit        *m_ptLineUlink;
+    QComboBox        *m_ptBoxUlink;
     QLineEdit        *m_ptLineUname;
     QSpinBox         *m_ptSpinMin;
     QSpinBox         *m_ptSpinMax;
     QDoubleSpinBox   *m_ptDSpinMin;
     QDoubleSpinBox   *m_ptDSpinMax;
-    QLineEdit        *m_ptLineMulti;
+    QComboBox        *m_ptLineMulti;
     QComboBox        *m_ptComboList;
+    QLineEdit        *m_ptLineLoadLink;
 
     QDialogButtonBox *m_ptBtnBox;
 
@@ -32,12 +34,19 @@ public:
     inline TPrivDialog()
     {
         m_grid = new QGridLayout;
+        m_ptSpinType = NULL;
+        m_ptBoxType = NULL;
     }
     ~TPrivDialog()
     {
         m_grid->deleteLater();
     }
 
+};
+
+static QStringList  s_azMultiValues = 
+{ 
+    "both", "seller", "buyer" 
 };
 
 //------------------------------------------------------------------------------
@@ -68,7 +77,7 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
     priv__->m_grid->addWidget( title, row, 0, 1, 1 );
     row++;
 
-    QLabel *lblName = new QLabel( QString( "%1%2" ).arg("Name").arg(":"), this );
+    QLabel *lblName = new QLabel( QString( "%1%2" ).arg( tr( "Name" )).arg(":"), this );
     priv__->m_grid->addWidget( lblName, row, 0, 1, 1 );
     QLineEdit *ptLineName = new QLineEdit( this );
     priv__->m_ptLineName = ptLineName;
@@ -77,38 +86,51 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
 
     if( m_bFullSize )
     {
-        QLabel *lblType = new QLabel( QString( "%1%2" ).arg("Type").arg(":"), this );
+        QLabel *lblType = new QLabel( QString( "%1%2" ).arg( tr( "Type" ) ).arg(":"), this );
         priv__->m_grid->addWidget( lblType, row, 0, 1, 1 );
+#if 0
         QSpinBox *ptSpinType = new QSpinBox( this );
         ptSpinType->setMinimum( 0 );
         ptSpinType->setMaximum( 5 );
         priv__->m_ptSpinType = ptSpinType;
         priv__->m_grid->addWidget( ptSpinType, row, 1, 1, 1 );
         connect( ptSpinType, QOverload<int>::of(&QSpinBox::valueChanged), this, &TDialog::onTypeChanged );
+#else
+        QComboBox   *ptBoxType = new QComboBox( this );
+        ptBoxType->addItems( QStringList() << "0 -- пустое поле" 
+                << "1 -- строка" 
+                << "2 -- целое" 
+                << "3 -- дробное" 
+                << "4 -- список"
+                << "5 -- выбор" );
+        priv__->m_ptBoxType = ptBoxType;
+        priv__->m_grid->addWidget( ptBoxType, row, 1, 1, 1 );
+        connect( ptBoxType, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &TDialog::onTypeChanged );
+#endif
         row++;
 
-        QLabel *lblPlaceholder = new QLabel( QString( "%1%2" ).arg("Placeholder").arg(":"), this );
+        QLabel *lblPlaceholder = new QLabel( QString( "%1%2" ).arg( tr( "Placeholder" ) ).arg(":"), this );
         priv__->m_grid->addWidget( lblPlaceholder, row, 0, 1, 1 );
         QLineEdit *ptLinePlaceholder = new QLineEdit( this );
         priv__->m_ptLinePlaceholder = ptLinePlaceholder;
         priv__->m_grid->addWidget( ptLinePlaceholder, row, 1, 1, 1 );
         row++;
 
-        QLabel *lblNew = new QLabel( QString( "%1%2" ).arg("New").arg(":"), this );
+        QLabel *lblNew = new QLabel( QString( "%1%2" ).arg( tr( "New" ) ).arg(":"), this );
         priv__->m_grid->addWidget( lblNew, row, 0, 1, 1 );
         QLineEdit *ptLineNew = new QLineEdit( this );
         priv__->m_ptLineNew = ptLineNew;
         priv__->m_grid->addWidget( ptLineNew, row, 1, 1, 1 );
         row++;
 
-        QLabel *lblAfter = new QLabel( QString( "%1%2" ).arg("After").arg(":"), this );
+        QLabel *lblAfter = new QLabel( QString( "%1%2" ).arg( tr( "After" ) ).arg(":"), this );
         priv__->m_grid->addWidget( lblAfter, row, 0, 1, 1 );
         QLineEdit *ptLineAfter = new QLineEdit( this );
         priv__->m_ptLineAfter = ptLineAfter;
         priv__->m_grid->addWidget( ptLineAfter, row, 1, 1, 1 );
         row++;
 
-        QLabel *lblBefore = new QLabel( QString( "%1%2" ).arg("Before").arg(":"), this );
+        QLabel *lblBefore = new QLabel( QString( "%1%2" ).arg( tr( "Before" ) ).arg(":"), this );
         priv__->m_grid->addWidget( lblBefore, row, 0, 1, 1 );
         QLineEdit *ptLineBefore = new QLineEdit( this );
         priv__->m_ptLineBefore = ptLineBefore;
@@ -116,14 +138,14 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
         row++;
     }
 
-    QLabel *lblUlink = new QLabel( QString( "%1%2" ).arg("Ulink").arg(":"), this );
+    QLabel *lblUlink = new QLabel( QString( "%1%2" ).arg( tr( "Ulink" ) ).arg(":"), this );
     priv__->m_grid->addWidget( lblUlink, row, 0, 1, 1 );
-    QLineEdit *ptLineUlink = new QLineEdit( this );
-    priv__->m_ptLineUlink = ptLineUlink;
-    priv__->m_grid->addWidget( ptLineUlink, row, 1, 1, 1 );
+    QComboBox *ptBoxUlink = new QComboBox( this );
+    priv__->m_ptBoxUlink = ptBoxUlink;
+    priv__->m_grid->addWidget( ptBoxUlink, row, 1, 1, 1 );
     row++;
 
-    QLabel *lblUname = new QLabel( QString( "%1%2" ).arg("Uname").arg(":"), this );
+    QLabel *lblUname = new QLabel( QString( "%1%2" ).arg( tr( "Uname" ) ).arg(":"), this );
     priv__->m_grid->addWidget( lblUname, row, 0, 1, 1 );
     QLineEdit *ptLineUname = new QLineEdit( this );
     priv__->m_ptLineUname = ptLineUname;
@@ -132,7 +154,7 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
 
     if( m_bFullSize )
     {
-        QLabel *lblMin = new QLabel( QString( "%1%2" ).arg("Min").arg(":"), this );
+        QLabel *lblMin = new QLabel( QString( "%1%2" ).arg( tr( "Min" ) ).arg(":"), this );
         priv__->m_grid->addWidget( lblMin, row, 0, 1, 1 );
         QSpinBox *ptSpinMin = new QSpinBox( this );
         ptSpinMin->setMinimum( -999 );
@@ -148,7 +170,7 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
         priv__->m_ptDSpinMin = ptDSpinMin;
         priv__->m_ptDSpinMin->hide();
 
-        QLabel *lblMax = new QLabel( QString( "%1%2" ).arg("Max").arg(":"), this );
+        QLabel *lblMax = new QLabel( QString( "%1%2" ).arg( tr( "Max" ) ).arg(":"), this );
         priv__->m_grid->addWidget( lblMax, row, 0, 1, 1 );
         QSpinBox *ptSpinMax = new QSpinBox( this );
         ptSpinMax->setMinimum( -999 );
@@ -164,19 +186,29 @@ TDialog::TDialog( bool fullsize, QString name, QWidget *parent )
         priv__->m_ptDSpinMax = ptDSpinMax;
         priv__->m_ptDSpinMax->hide();
 
-        QLabel *lblMulti = new QLabel( QString( "%1%2" ).arg("Multi").arg(":"), this );
+        QLabel *lblMulti = new QLabel( QString( "%1%2" ).arg( tr( "Multi" ) ).arg(":"), this );
         priv__->m_grid->addWidget( lblMulti, row, 0, 1, 1 );
-        QLineEdit *ptLineMulti = new QLineEdit( this );
+        QComboBox *ptLineMulti = new QComboBox( this );
+        ptLineMulti->addItems( QStringList() << tr( "both" ) << tr( "seller" ) << tr( "buyer" ) );
         priv__->m_ptLineMulti = ptLineMulti;
         priv__->m_grid->addWidget( ptLineMulti, row, 1, 1, 1 );
         row++;
 
-        QLabel *lblList = new QLabel( QString( "%1%2" ).arg("Values").arg(":"), this );
+        QLabel *lblList = new QLabel( QString( "%1%2" ).arg( tr( "Values" ) ).arg(":"), this );
         priv__->m_grid->addWidget( lblList, row, 0, 1, 1 );
         QComboBox *ptComboList = new QComboBox( this );
         priv__->m_ptComboList = ptComboList;
         priv__->m_grid->addWidget( ptComboList, row, 1, 1, 1 );
         row++;
+
+        QPushButton *btnLoadFrom = new QPushButton( QString( "%1%2" ).arg( tr( "Load From" ) ).arg(":"), this );
+        connect( btnLoadFrom, &QPushButton::clicked, this, &TDialog::onLoadFrom );
+        priv__->m_grid->addWidget( btnLoadFrom, row, 0, 1, 1 );
+        QLineEdit *ptLineLoadLink = new QLineEdit( this );
+        priv__->m_ptLineLoadLink = ptLineLoadLink;
+        priv__->m_grid->addWidget( ptLineLoadLink, row, 1, 1, 1 );
+        row++;
+
     }
 
     QLabel *empty = new QLabel( this );
@@ -250,7 +282,18 @@ void  TDialog::setDlgBefore( const QString&  name )
 
 void  TDialog::setDlgUlink( const QString&  name )
 {
-    priv__->m_ptLineUlink->setText( name );
+    int     index = priv__->m_ptBoxUlink->findText( name );
+
+    if( index > 0 )
+        priv__->m_ptBoxUlink->setCurrentIndex( index );
+    else
+        priv__->m_ptBoxUlink->setItemText( priv__->m_ptBoxUlink->currentIndex(), name );
+}
+
+void  TDialog::setDlgUlink( const QStringList&  list )
+{
+    priv__->m_ptBoxUlink->clear();
+    priv__->m_ptBoxUlink->addItems( list );
 }
 
 void  TDialog::setDlgUname( const QString&  name )
@@ -263,7 +306,17 @@ void  TDialog::setDlgMulti( const QString&  name )
     if( !m_bFullSize )
         return;
 
-    priv__->m_ptLineMulti->setText( name );
+    int     index = s_azMultiValues.indexOf( name );
+    if( index >= 0 )
+        priv__->m_ptLineMulti->setCurrentIndex( index );
+}
+
+void  TDialog::setDlgLoadFrom( const QString&  name )
+{
+    if( !m_bFullSize )
+        return;
+
+    priv__->m_ptLineLoadLink->setText( name );
 }
 
 void  TDialog::setDlgCombo( QStringList  list )
@@ -284,7 +337,8 @@ void  TDialog::setDlgType( unsigned  val )
     if( !m_bFullSize )
         return;
 
-    priv__->m_ptSpinType->setValue( static_cast<int>(val) );
+    //priv__->m_ptSpinType->setValue( static_cast<int>(val) );
+    priv__->m_ptBoxType->setCurrentIndex( static_cast<int>(val) );
 
     setDlgEnabledByType( val );
 
@@ -335,7 +389,7 @@ void  TDialog::setDlgEmpty()
 
     priv__->m_ptLineName->setText( name );
 
-    priv__->m_ptLineUlink->setText( name );
+    priv__->m_ptBoxUlink->setCurrentIndex( 0 );
     priv__->m_ptLineUname->setText( name );
 
     if( m_bFullSize )
@@ -344,9 +398,11 @@ void  TDialog::setDlgEmpty()
         priv__->m_ptLineNew->setText( name );
         priv__->m_ptLineAfter->setText( name );
         priv__->m_ptLineBefore->setText( name );
-        priv__->m_ptLineMulti->setText( name );
+        priv__->m_ptLineMulti->setCurrentIndex( 0 );
+        priv__->m_ptLineLoadLink->setText( name );
 
-        priv__->m_ptSpinType->setValue( val );
+        //priv__->m_ptSpinType->setValue( val );
+        priv__->m_ptBoxType->setCurrentIndex( val );
 
         priv__->m_ptSpinMin->setValue( val );
         priv__->m_ptSpinMax->setValue( val );
@@ -368,6 +424,7 @@ void  TDialog::setDlgEnabled( bool enabled ) noexcept
     setDlgUlinkEnabled( enabled );
     setDlgUnameEnabled( enabled );
     setDlgMultiEnabled( enabled );
+    setDlgLoadFromEnabled( enabled );
     setDlgMinEnabled( enabled );
     setDlgMaxEnabled( enabled );
     setDlgComboEnabled( enabled );
@@ -378,7 +435,8 @@ void  TDialog::setDlgTypeEnabled( bool enabled ) noexcept
     if( !m_bFullSize )
         return;
 
-    priv__->m_ptSpinType->setEnabled( enabled );
+    //priv__->m_ptSpinType->setEnabled( enabled );
+    priv__->m_ptBoxType->setEnabled( enabled );
 }
 
 void  TDialog::setDlgPlaceholderEnabled( bool  enabled ) noexcept
@@ -415,7 +473,7 @@ void  TDialog::setDlgBeforeEnabled( bool  enabled ) noexcept
 
 void  TDialog::setDlgUlinkEnabled( bool  enabled ) noexcept
 {
-    priv__->m_ptLineUlink->setEnabled( enabled );
+    priv__->m_ptBoxUlink->setEnabled( enabled );
 }
 
 void  TDialog::setDlgUnameEnabled( bool  enabled ) noexcept
@@ -429,6 +487,14 @@ void  TDialog::setDlgMultiEnabled( bool  enabled ) noexcept
         return;
 
     priv__->m_ptLineMulti->setEnabled( enabled );
+}
+
+void  TDialog::setDlgLoadFromEnabled( bool  enabled ) noexcept
+{
+    if( !m_bFullSize )
+        return;
+
+    priv__->m_ptLineLoadLink->setEnabled( enabled );
 }
 
 void  TDialog::setDlgMinEnabled( bool  enabled ) noexcept
@@ -468,6 +534,7 @@ void  TDialog::setDlgEnabledByType( unsigned  type ) noexcept
     setDlgUlinkEnabled( 0 != type );
     setDlgUnameEnabled( 0 != type );
     setDlgMultiEnabled( 5 == type );
+    setDlgLoadFromEnabled( ( 4 == type ) || ( 5 == type ) );
     setDlgMinEnabled( ( 2 == type ) || ( 3 == type ) );
     setDlgMaxEnabled( ( 2 == type ) || ( 3 == type ) );
     setDlgComboEnabled( ( 4 == type ) || ( 5 == type ) );
@@ -526,7 +593,7 @@ void  TDialog::onBtnAction( QAbstractButton*  btn )
 
         priv__->m_tValues.m_zName = priv__->m_ptLineName->text();
 
-        priv__->m_tValues.m_zUlink = priv__->m_ptLineUlink->text();
+        priv__->m_tValues.m_zUlink = priv__->m_ptBoxUlink->currentText();
         priv__->m_tValues.m_zUname = priv__->m_ptLineUname->text();
 
         if( m_bFullSize )
@@ -535,9 +602,11 @@ void  TDialog::onBtnAction( QAbstractButton*  btn )
             priv__->m_tValues.m_zNew = priv__->m_ptLineNew->text();
             priv__->m_tValues.m_zAfter = priv__->m_ptLineAfter->text();
             priv__->m_tValues.m_zBefore = priv__->m_ptLineBefore->text();
-            priv__->m_tValues.m_zMulti = priv__->m_ptLineMulti->text();
+            priv__->m_tValues.m_zMulti = s_azMultiValues[ priv__->m_ptLineMulti->currentIndex() ];
+            priv__->m_tValues.m_zLoadLink = priv__->m_ptLineLoadLink->text();
 
-            priv__->m_tValues.m_uType = static_cast<unsigned>(priv__->m_ptSpinType->value());
+            //priv__->m_tValues.m_uType = static_cast<unsigned>(priv__->m_ptSpinType->value());
+            priv__->m_tValues.m_uType = static_cast<unsigned>(priv__->m_ptBoxType->currentIndex());
 
             priv__->m_tValues.m_nMin = priv__->m_ptSpinMin->value();
             priv__->m_tValues.m_nMax = priv__->m_ptSpinMax->value();
@@ -552,6 +621,7 @@ void  TDialog::onBtnAction( QAbstractButton*  btn )
             priv__->m_tValues.m_zAfter.clear();
             priv__->m_tValues.m_zBefore.clear();
             priv__->m_tValues.m_zMulti.clear();
+            priv__->m_tValues.m_zLoadLink.clear();
 
             priv__->m_tValues.m_uType = 0;
 
@@ -583,6 +653,13 @@ void  TDialog::onBtnAction( QAbstractButton*  btn )
         // шлем сигнал об отмене
         Q_EMIT sendCancel();
     }
+}
+
+void    TDialog::onLoadFrom()
+{
+    QString     url = priv__->m_ptLineLoadLink->text();
+    if( ! url.isEmpty() )
+        QDesktopServices::openUrl( QUrl::fromUserInput( url ) );
 }
 
 //------------------------------------------------------------------------------

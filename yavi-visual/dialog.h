@@ -27,8 +27,10 @@ public :
     void    setDlgAfter( const QString&  name );
     void    setDlgBefore( const QString&  name );
     void    setDlgUlink( const QString&  name );
+    void    setDlgUlink( const QStringList&  list );
     void    setDlgUname( const QString&  name );
     void    setDlgMulti( const QString&  name );
+    void    setDlgLoadFrom( const QString&  name );
 
     void    setDlgType( unsigned  val );
 
@@ -52,6 +54,7 @@ public :
     void    setDlgUlinkEnabled( bool  enabled ) noexcept;
     void    setDlgUnameEnabled( bool  enabled ) noexcept;
     void    setDlgMultiEnabled( bool  enabled ) noexcept;
+    void    setDlgLoadFromEnabled( bool  enabled ) noexcept;
     void    setDlgMinEnabled( bool  enabled ) noexcept;
     void    setDlgMaxEnabled( bool  enabled ) noexcept;
     void    setDlgComboEnabled( bool  enabled ) noexcept;
@@ -64,6 +67,7 @@ Q_SIGNALS:
 protected Q_SLOTS:
     void    onTypeChanged( int );
     void 	onBtnAction( QAbstractButton *btn );
+    void    onLoadFrom();
 
 private:
     std::unique_ptr<TPrivDialog> priv__;

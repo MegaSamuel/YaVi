@@ -10,7 +10,7 @@ TCategory::TCategory( TGoods  *pAncestor )
     clear();
 
     // диалог для себя
-    m_ptDialogSelf = new TDialog( false, "Category", this );
+    m_ptDialogSelf = new TDialog( false, tr( "Category" ), this );
 
     // ловим сигнал от диалога об отмене
     connect( m_ptDialogSelf, &TDialog::sendCancel, this, &TCategory::onSendCancel );
@@ -19,7 +19,7 @@ TCategory::TCategory( TGoods  *pAncestor )
     connect( m_ptDialogSelf, &TDialog::sendValues, this, &TCategory::onSendValues );
 
     // диалог для добавления параметра
-    m_ptDialogAdd = new TDialog( true, "Add parameter", this );
+    m_ptDialogAdd = new TDialog( true, tr( "Add parameter" ), this );
 
     // ловим сигнал от диалога об отмене
     connect( m_ptDialogAdd, &TDialog::sendCancel, this, &TCategory::onSendCancel );
@@ -58,7 +58,7 @@ TCategory::TCategory( TGoods  *pAncestor )
 
     // кнопка плюс
     m_ptBtnInc = new QPushButton( "+" );
-    m_ptBtnInc->setToolTip( "Добавить параметр" );
+    m_ptBtnInc->setToolTip( tr( "Add parameter" ) );
     m_ptBtnInc->setFixedWidth( 93 );
     connect( m_ptBtnInc, &QPushButton::clicked, this, &TCategory::onBtnInc );
     m_hlayout->addWidget( m_ptBtnInc, 0, Qt::AlignLeft );
@@ -101,8 +101,10 @@ void  TCategory::onBtnName()
     m_ptDialogSelf->setDlgEmpty();
 
     m_ptDialogSelf->setDlgName( getCategoryName() );
-    m_ptDialogSelf->setDlgUlink( getCategoryUlink() );
     m_ptDialogSelf->setDlgUname( getCategoryUname() );
+    if( MainWindow::getMainWinPtr()->goods() )
+        m_ptDialogSelf->setDlgUlink( MainWindow::getMainWinPtr()->goods()->collectULinks() );
+    m_ptDialogSelf->setDlgUlink( getCategoryUlink() );
 
     m_ptDialogSelf->open();
 }
@@ -116,6 +118,8 @@ void  TCategory::onBtnInc()
     m_ptDialogAdd->setDlgEmpty();
 
     m_ptDialogAdd->setDlgName( "NewParam" );
+    if( MainWindow::getMainWinPtr()->goods() )
+        m_ptDialogAdd->setDlgUlink( MainWindow::getMainWinPtr()->goods()->collectULinks() );
 
     m_ptDialogAdd->open();
 }
@@ -161,6 +165,7 @@ void  TCategory::onSendValues( TValues& a_tValues )
         pParam->setParamUlink( m_tValues.m_zUlink.toStdString() );
         pParam->setParamUname( m_tValues.m_zUname.toStdString() );
         pParam->setParamMulti( m_tValues.m_zMulti.toStdString() );
+        pParam->setParamLoadFrom( m_tValues.m_zLoadLink.toStdString() );
         pParam->setParamMin( m_tValues.m_nMin );
         pParam->setParamMax( m_tValues.m_nMax );
         pParam->setParamDMin( m_tValues.m_fMin );
@@ -199,6 +204,11 @@ void  TCategory::onSendValues( TValues& a_tValues )
             __yaml_SetString( m_temporary_node, GoodsMultiSection, m_tValues.m_zMulti.toStdString() );
         }
 
+        if( ( 4 == m_tValues.m_uType ) || ( 5 == m_tValues.m_uType ) )
+        {
+            if( ! m_tValues.m_zLoadLink.isEmpty() )
+                __yaml_SetString( m_temporary_node, GoodsLoadFromSection, m_tValues.m_zLoadLink.toStdString() );
+        }
         // добавляем ямл к основному
         m_node[ GoodsParametersSection ].push_back( m_temporary_node );
 
@@ -470,6 +480,9 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
     str = __yaml_GetString( node, GoodsMultiSection );
     a_pParam->setParamMulti( str );
 
+    str = __yaml_GetString( node, GoodsLoadFromSection );
+    a_pParam->setParamLoadFrom( str );
+
     // значение
     str = __yaml_GetString( node, GoodsValuesSection );
     QStringList list = QString::fromStdString(str).split( '\n', QString::SkipEmptyParts );
@@ -495,7 +508,7 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
                 if( list_size > cat_size )
                 {
                     //qDebug() << "there is value bigger than categories for" << a_pParam->getParamName();
-
+#if 1
                     // дописываем недостающие categories
                     for( int i = cat_size; i < list_size; i++ )
                     {
@@ -503,6 +516,7 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
                     }
 
                     Q_EMIT  sendChanged();
+#endif
                 }
                 else if( list_size < cat_size )
                 {
@@ -521,6 +535,7 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
             }
             else
             {
+#if 1
                 // есть записи в values, но нет секции categories
                 // создаем секцию categories и пишем в нее значения из values
 
@@ -532,6 +547,7 @@ void  TCategory::getParameters( YAML::Node&  node, TParam *a_pParam, int  depth 
                 }
 
                 Q_EMIT  sendChanged();
+#endif
             }
         }
         else

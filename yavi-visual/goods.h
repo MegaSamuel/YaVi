@@ -11,6 +11,7 @@
 //! класс - протокол взаимодействия, считанный с файла
 class TGoods : public QWidget
 {
+    Q_OBJECT
 public :
     explicit TGoods();
     ~TGoods();
@@ -23,11 +24,14 @@ public :
 
     void          GoodsDelete();
 
+    QStringList     collectULinks();
+
     void          widget_stretch( int width, int height ) noexcept;  // растягиваем виджет
     void          widget_shrink( int width, int height ) noexcept;   // сжимаем виджет
 
     QList<TTable*>     m_apTableList;
     QList<TCategory*>  m_apCategoryList;
+    QLabel              *m_ptSeparator;
 
 private :
     void          clear() noexcept;

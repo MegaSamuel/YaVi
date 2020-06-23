@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QtWidgets>
 
+#include <vector>
+
 #include "goods.h"
 
 //------------------------------------------------------------------------------
@@ -18,6 +20,8 @@ public:
 
     static MainWindow *getMainWinPtr();
 
+    TGoods*     goods() const { return m_pGoods; }
+
 public Q_SLOTS:
     void         onYamlChanged();
 
@@ -26,6 +30,10 @@ private Q_SLOTS:
     void         onBtnNew();
     void         onBtnOpen();
     void         onBtnSave();
+    void         onBtnUndo();
+
+protected:
+    void         keyPressEvent( QKeyEvent *event );
 
 private:
     static MainWindow *pMainWindow;
@@ -34,6 +42,7 @@ private:
     QPushButton  *m_ptBtnOpen;
     QPushButton  *m_ptBtnSave;
     QLabel       *m_ptLblNotice;
+    QPushButton  *m_ptBtnUndo;
 
     QString       m_zFailReason;  // причина ошибки загрузки/выгрузки ямла
 
@@ -47,8 +56,6 @@ private:
     void          setPrgTitleText( const QString&  text = "" );
 
     void          setPrgTitleChanged( bool  changed );
-
-    YAML::Node    m_config; // считанный ямл
 
     double        cpu_time() const;
     double        current_time() const;
@@ -76,14 +83,7 @@ private:
 
     void          writeSettings();
     void          readSettings();
-#if 0
-    void          cfgReset() noexcept;
 
-    void          cfgRefresh() noexcept;
-
-    bool          cfgRead( const QString&  filename );   // прочитать конфиг
-    bool          cfgWrite( const QString&  filename );  // сохранить конфиг
-#endif
     void          cfgSetAutoload( unsigned  load ) noexcept;
     unsigned      cfgGetAutoload() noexcept;
 
@@ -99,6 +99,13 @@ private:
     QString       cfgGetLastOpenFile() noexcept;
 
     void          closeEvent( QCloseEvent * );
+
+    YAML::Node    m_config; // считанный ямл
+    std::vector<std::string>    m_history;
+
+    bool          addHistory( const YAML::Node&  node );
+    bool          undoHistory();
+    void          showHistory();
 };
 
 //------------------------------------------------------------------------------

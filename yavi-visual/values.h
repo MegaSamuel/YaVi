@@ -32,6 +32,7 @@ public:
         m_fVal = 0.0;
 
         m_vList.clear();
+        m_zLoadLink.clear();
     }
     ~TValues()
     {
@@ -67,6 +68,7 @@ public:
     #define  GoodsMaxSection         "max"
     #define  GoodsMultiSection       "multi"
     #define  GoodsValuesSection      "values"
+    #define  GoodsLoadFromSection    "loadfrom"
 
     // набор параметров
     QString      m_zId;
@@ -91,6 +93,7 @@ public:
 
     // список для combobox (для type 4,5)
     QStringList  m_vList;
+    QString      m_zLoadLink;
 };
 
 Q_DECLARE_METATYPE( TValues )

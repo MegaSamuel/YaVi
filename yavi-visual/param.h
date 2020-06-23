@@ -44,7 +44,7 @@ public:
     int            getCategoriesWidth() noexcept;
     int            getCategoriesHeight() noexcept;
 
-    bool           isParamNameRedefined( const QString&  name );
+    bool           isParamNameRedefined( const QString&  name, TParam  *copy = Q_NULLPTR );
 
     void           CategoriesDelete();
 
@@ -118,6 +118,8 @@ public:
     explicit TParam( TCategory  *pAncestor = Q_NULLPTR, TCategories  *pMentor = Q_NULLPTR, int  depth = 0 );
     ~TParam();
 
+    void            copyData( TParam  *param );
+
     void           setNode( const YAML::Node&  node );
     void           setNodeParent( const YAML::Node&  node );
     void           setNodeIndex( int  index );
@@ -134,6 +136,7 @@ public:
     void           setParamUlink( const std::string&  name, bool  set_to_node = false );
     void           setParamUname( const std::string&  name, bool  set_to_node = false );
     void           setParamMulti( const std::string&  name, bool  set_to_node = false );
+    void           setParamLoadFrom( const std::string&  name, bool  set_to_node = false );
 
     void           setParamType( unsigned  val, bool  set_to_node = false );
 
@@ -143,8 +146,8 @@ public:
     void           setParamDMin( double  val, bool  set_to_node = false );
     void           setParamDMax( double  val, bool  set_to_node = false );
 
-    bool           setParamNameColor( const QString&  name, bool  force = false );
-    bool           setParamNameColorByRelative( const QString&  name );
+    bool           setParamNameColor( const QString&  name, TParam   *copy = Q_NULLPTR, bool  force = false );
+    bool           setParamNameColorByRelative( const QString&  name, TParam  *copy = Q_NULLPTR );
 
 //    bool           isStrEqual( QString  str1, QString  str2 );
     void           colorBtnName( bool  color = false );
@@ -166,6 +169,7 @@ public:
     QString        getParamUlink() noexcept;
     QString        getParamUname() noexcept;
     QString        getParamMulti() noexcept;
+    QString        getParamLoadFrom() noexcept;
 
     unsigned       getParamType() noexcept;
 
@@ -241,6 +245,7 @@ private:
 
     std::string    m_zList;
     QStringList    m_vList;
+    QString        m_zLoadLink;
 
     //QVBoxLayout   *m_vlayout;   // главный layout класса
     QHBoxLayout   *m_hlayout1;  // вложенный layout
