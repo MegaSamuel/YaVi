@@ -52,7 +52,7 @@ public:
     QList<TTableEntryValue*>  m_apValueList;
 
 Q_SIGNALS:
-    void           sendName( QString& name );
+    void           sendName( QString&, int );
 
 public Q_SLOTS:
     void           onBtnDec();

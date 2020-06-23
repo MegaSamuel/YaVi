@@ -81,11 +81,11 @@ private Q_SLOTS:
     void           onBtnDec();
     void           onBtnInc();
     void           onBtnRowInc();
-    void           onBtnRowName( QString& ); //??
+    void           onBtnRowName( QString&, int );
     void           onBtnRowValInc();
     void           onBtnRowValName();
     void           onBtnColumnInc();
-    void           onBtnColumnName( QString& ); //??
+    void           onBtnColumnName( QString&, int );
     void           onBtnColumnValInc();
     void           onBtnColumnValName();
     void           onSendCancel();

@@ -191,13 +191,34 @@ void  TTable::onBtnRowInc()
     qDebug() << __func__;
 }
 
-void  TTable::onBtnRowName( QString&  name )
+void  TTable::onBtnRowName( QString&  name, int  entry_index )
 {
     qDebug() << __func__ << name;
 
     if( 0 == name.length() )
     {
         qDebug() << "need to delete";
+
+        // удаляемся из layout-а
+        m_vlayout->removeWidget( m_apTabEntryList.at(entry_index) );
+
+        // удаляем себя из списка
+        m_apTabEntryList.removeAt(entry_index);
+
+        int  index;
+
+        // делаем переиндексацию оставшихся детей
+        for( int i = 0; i < m_apTabEntryList.count(); i++ )
+        {
+            index = m_apTabEntryList.at(i)->getNodeIndex();
+
+            if( index > entry_index )
+            {
+                index -= 1;
+
+                m_apTabEntryList.at(i)->setNodeIndex( index );
+            }
+        }
     }
 }
 
@@ -216,13 +237,34 @@ void  TTable::onBtnColumnInc()
     qDebug() << __func__;
 }
 
-void  TTable::onBtnColumnName( QString&  name )
+void  TTable::onBtnColumnName( QString&  name, int  entry_index )
 {
     qDebug() << __func__ << name;
 
     if( 0 == name.length() )
     {
         qDebug() << "need to delete";
+
+        // удаляемся из layout-а
+        m_vlayout->removeWidget( m_apTabEntryList.at(entry_index) );
+
+        // удаляем себя из списка
+        m_apTabEntryList.removeAt(entry_index);
+
+        int  index;
+
+        // делаем переиндексацию оставшихся детей
+        for( int i = 0; i < m_apTabEntryList.count(); i++ )
+        {
+            index = m_apTabEntryList.at(i)->getNodeIndex();
+
+            if( index > entry_index )
+            {
+                index -= 1;
+
+                m_apTabEntryList.at(i)->setNodeIndex( index );
+            }
+        }
     }
 }
 

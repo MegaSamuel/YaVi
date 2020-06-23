@@ -76,7 +76,7 @@ void  TTableEntry::onSendValue( QString& a_zValue )
     setEntryName( a_zValue.toStdString(), true );
 
     // шлем сигнал с именем
-    Q_EMIT sendName( a_zValue );
+    Q_EMIT sendName( a_zValue, getNodeIndex() );
 
     if( 0 == a_zValue.length() )
     {
@@ -243,42 +243,6 @@ void  TTableEntry::EntryDelete()
     m_vlayout->deleteLater();
     m_hlayout->deleteLater();
 
-    // удаляем себя из списка родителя
-    /*
-    // удаляем себя из списка родителя
-    if( Q_NULLPTR != m_pAncestor )
-    {
-        for( int i = 0; i < m_pAncestor->m_apTabEntryList.count(); i++ )
-        {
-            if( this == m_pAncestor->m_apTableList.at(i) )
-            {
-                //qDebug() << m_pAncestor->m_apTableList.at(i)->getTableName() << "obsolete";
-
-                m_pAncestor->m_apTableList.removeAt(i);
-
-                break;
-            }
-        }
-
-        int  index;
-
-        // делаем переиндексацию оставшихся детей
-        for( int i = 0; i < m_pAncestor->m_apTableList.count(); i++ )
-        {
-            index = m_pAncestor->m_apTableList.at(i)->getNodeIndex();
-
-            if( index > m_node_index )
-            {
-                index -= 1;
-
-                m_pAncestor->m_apTableList.at(i)->setNodeIndex( index );
-            }
-        }
-
-        // удаляемся из родительского layout-а
-        m_pAncestor->m_vlayout->removeWidget(this);
-    }
-*/
     // очищаем ветку
     clearNodeSequence();
 }
