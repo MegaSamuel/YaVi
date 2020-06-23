@@ -4,22 +4,22 @@
 #include <QtWidgets>
 
 #include "values.h"
-#include "tabdialog.h"
-#include "tabentryvalue.h"
+#include "table_dialog.h"
+#include "table_entryvalue.h"
 
 //------------------------------------------------------------------------------
 
-class TTable;
+class  TTable;
 
 //------------------------------------------------------------------------------
 
-class TTabEntry : public QWidget
+class TTableEntry : public QWidget
 {
    Q_OBJECT
 
 public:
-    explicit TTabEntry( TTable  *pAncestor );
-    ~TTabEntry();
+    explicit TTableEntry( TTable  *pAncestor = Q_NULLPTR );
+    ~TTableEntry();
 
     void           setNode( const YAML::Node&  node );
     void           setNodeParent( const YAML::Node&  node );
@@ -46,7 +46,10 @@ public:
 
     void           EntryDelete();
 
-    QList<TTabEntryValue*>  m_apValueList;
+    QVBoxLayout   *m_vlayout;
+    QHBoxLayout   *m_hlayout;
+
+    QList<TTableEntryValue*>  m_apValueList;
 
 Q_SIGNALS:
     void           sendName( QString& name );

@@ -1,4 +1,4 @@
-#include "tabdialog.h"
+#include "table_dialog.h"
 
 #include "mainwindow.h"
 

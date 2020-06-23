@@ -1,9 +1,9 @@
 #include "func.h"
-#include "tabentry.h"
+#include "table_entry.h"
 
 //------------------------------------------------------------------------------
 
-TTabEntry::TTabEntry( TTable  *pAncestor )
+TTableEntry::TTableEntry( TTable  *pAncestor )
 {
     m_node.reset();
     m_node_parent.reset();
@@ -16,33 +16,43 @@ TTabEntry::TTabEntry( TTable  *pAncestor )
 
     m_vList.clear();
 
+    m_vlayout = new QVBoxLayout;
+    m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    m_vlayout->setMargin( 0 );
+
+    m_hlayout = new QHBoxLayout;
+    m_hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    m_hlayout->setMargin( 0 );
+
     // диалог для имени
     m_ptTabDialogName = new TTabDialog( false, "Table", this );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptTabDialogName, &TTabDialog::sendCancel, this, &TTabEntry::onSendCancel );
+    connect( m_ptTabDialogName, &TTabDialog::sendCancel, this, &TTableEntry::onSendCancel );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptTabDialogName, &TTabDialog::sendValue, this, &TTabEntry::onSendValue );
+    connect( m_ptTabDialogName, &TTabDialog::sendValue, this, &TTableEntry::onSendValue );
 }
 
-TTabEntry::~TTabEntry()
+TTableEntry::~TTableEntry()
 {
 
 }
 
 //------------------------------------------------------------------------------
 
-void  TTabEntry::onBtnDec()
+void  TTableEntry::onBtnDec()
 {
-    //qDebug() << "TTabEntry" << __func__ << getEntryName();
+    //qDebug() << "TTableEntry" << __func__ << getEntryName();
 
-    clearNodeSequence();
+    //widget_shrink( getTableWidth(), getTableHeight() + m_grid->spacing() );
+
+    EntryDelete();
 }
 
-void  TTabEntry::onBtnName()
+void  TTableEntry::onBtnName()
 {
-    //qDebug() << "TTabEntry" << __func__ << getEntryName();
+    //qDebug() << "TTableEntry" << __func__ << getEntryName();
 
     // диалог с пустыми параметрами
     m_ptTabDialogName->setDlgEmpty();
@@ -54,14 +64,14 @@ void  TTabEntry::onBtnName()
 
 //------------------------------------------------------------------------------
 
-void  TTabEntry::onSendCancel()
+void  TTableEntry::onSendCancel()
 {
-    //qDebug() << "TTabEntry" << __func__ << getEntryName();
+    //qDebug() << "TTableEntry" << __func__ << getEntryName();
 }
 
-void  TTabEntry::onSendValue( QString& a_zValue )
+void  TTableEntry::onSendValue( QString& a_zValue )
 {
-    //qDebug() << "TTabEntry" << __func__ << getEntryName();
+    //qDebug() << "TTableEntry" << __func__ << getEntryName();
 
     setEntryName( a_zValue.toStdString(), true );
 
@@ -75,7 +85,7 @@ void  TTabEntry::onSendValue( QString& a_zValue )
     }
 }
 
-void  TTabEntry::onSendEntryValue( QString& a_zValue, int  a_nIndex )
+void  TTableEntry::onSendEntryValue( QString& a_zValue, int  a_nIndex )
 {
     qDebug() << __func__ << getEntryName() << a_zValue << a_nIndex;
 
@@ -114,7 +124,7 @@ void  TTabEntry::onSendEntryValue( QString& a_zValue, int  a_nIndex )
 
 //------------------------------------------------------------------------------
 
-void  TTabEntry::makeStrByList() noexcept
+void  TTableEntry::makeStrByList() noexcept
 {
     int  ind = 0;
     m_zList.clear();
@@ -131,7 +141,7 @@ void  TTabEntry::makeStrByList() noexcept
     }
 }
 
-void  TTabEntry::renameParamList( QString&  item, int  index, bool  set_to_node )
+void  TTableEntry::renameParamList( QString&  item, int  index, bool  set_to_node )
 {
     m_vList[ index ] = item;
 
@@ -143,7 +153,7 @@ void  TTabEntry::renameParamList( QString&  item, int  index, bool  set_to_node 
     }
 }
 
-void  TTabEntry::removeParamList( QString&  item, int  index, bool  set_to_node )
+void  TTableEntry::removeParamList( QString&  item, int  index, bool  set_to_node )
 {
     Q_UNUSED( item );
 
@@ -157,7 +167,7 @@ void  TTabEntry::removeParamList( QString&  item, int  index, bool  set_to_node 
     }
 }
 
-void  TTabEntry::addParamList( QString&  item, bool  set_to_node )
+void  TTableEntry::addParamList( QString&  item, bool  set_to_node )
 {
     // добавляем запись в строку
     if( 0 == m_zList.length() )
@@ -181,7 +191,7 @@ void  TTabEntry::addParamList( QString&  item, bool  set_to_node )
     }
 }
 
-void  TTabEntry::setParamList( QStringList  vlist, const std::string&  zlist, bool  set_to_node )
+void  TTableEntry::setParamList( QStringList  vlist, const std::string&  zlist, bool  set_to_node )
 {
     m_vList = vlist;
 
@@ -195,7 +205,7 @@ void  TTabEntry::setParamList( QStringList  vlist, const std::string&  zlist, bo
 
 //------------------------------------------------------------------------------
 
-void  TTabEntry::clearNodeSequence()
+void  TTableEntry::clearNodeSequence()
 {
     // если не знаем индекс, то удаляем поля
     if( -1 == m_node_index )
@@ -211,46 +221,103 @@ void  TTabEntry::clearNodeSequence()
     }
 }
 
-void  TTabEntry::EntryDelete()
+void  TTableEntry::EntryDelete()
 {
+    QLayoutItem *child;
 
+    // уничтожаем виджеты
+    while( ( child = m_vlayout->takeAt(0) ) != Q_NULLPTR )
+    {
+        delete child->widget();
+        delete child;
+    }
+
+    // уничтожаем виджеты
+    while( ( child = m_hlayout->takeAt(0) ) != Q_NULLPTR )
+    {
+        delete child->widget();
+        delete child;
+    }
+
+    // уничтожаем layout-ы
+    m_vlayout->deleteLater();
+    m_hlayout->deleteLater();
+
+    // удаляем себя из списка родителя
+    /*
+    // удаляем себя из списка родителя
+    if( Q_NULLPTR != m_pAncestor )
+    {
+        for( int i = 0; i < m_pAncestor->m_apTabEntryList.count(); i++ )
+        {
+            if( this == m_pAncestor->m_apTableList.at(i) )
+            {
+                //qDebug() << m_pAncestor->m_apTableList.at(i)->getTableName() << "obsolete";
+
+                m_pAncestor->m_apTableList.removeAt(i);
+
+                break;
+            }
+        }
+
+        int  index;
+
+        // делаем переиндексацию оставшихся детей
+        for( int i = 0; i < m_pAncestor->m_apTableList.count(); i++ )
+        {
+            index = m_pAncestor->m_apTableList.at(i)->getNodeIndex();
+
+            if( index > m_node_index )
+            {
+                index -= 1;
+
+                m_pAncestor->m_apTableList.at(i)->setNodeIndex( index );
+            }
+        }
+
+        // удаляемся из родительского layout-а
+        m_pAncestor->m_vlayout->removeWidget(this);
+    }
+*/
+    // очищаем ветку
+    clearNodeSequence();
 }
 
 //------------------------------------------------------------------------------
 
-void  TTabEntry::setNode( const YAML::Node&  node )
+void  TTableEntry::setNode( const YAML::Node&  node )
 {
     m_node = node;
 }
 
-void  TTabEntry::setNodeParent( const YAML::Node&  node )
+void  TTableEntry::setNodeParent( const YAML::Node&  node )
 {
     m_node_parent = node;
 }
 
-void  TTabEntry::setNodeIndex( int  index )
+void  TTableEntry::setNodeIndex( int  index )
 {
     m_node_index = index;
 }
 
-YAML::Node&  TTabEntry::getNode()
+YAML::Node&  TTableEntry::getNode()
 {
     return m_node;
 }
 
-YAML::Node&  TTabEntry::getNodeParent()
+YAML::Node&  TTableEntry::getNodeParent()
 {
     return m_node_parent;
 }
 
-int  TTabEntry::getNodeIndex()
+int  TTableEntry::getNodeIndex()
 {
     return m_node_index;
 }
 
 //------------------------------------------------------------------------------
 
-void  TTabEntry::setEntryName( const std::string&  name, bool  set_to_node )
+void  TTableEntry::setEntryName( const std::string&  name, bool  set_to_node )
 {
     m_zName = QString::fromStdString(name);
 
@@ -261,7 +328,7 @@ void  TTabEntry::setEntryName( const std::string&  name, bool  set_to_node )
 }
 
 /*
-void  TTabEntry::setEntryValues( const std::string&  name, bool  set_to_node )
+void  TTableEntry::setEntryValues( const std::string&  name, bool  set_to_node )
 {
     m_zValues = QString::fromStdString(name);
 
@@ -272,13 +339,13 @@ void  TTabEntry::setEntryValues( const std::string&  name, bool  set_to_node )
 }
 */
 
-QString  TTabEntry::getEntryName()
+QString  TTableEntry::getEntryName()
 {
     return m_zName;
 }
 
 /*
-QString  TTabEntry::getEntryValues()
+QString  TTableEntry::getEntryValues()
 {
     return m_zValues;
 }

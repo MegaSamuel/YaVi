@@ -4,21 +4,21 @@
 #include <QtWidgets>
 
 #include "values.h"
-#include "tabdialog.h"
+#include "table_dialog.h"
 
 //------------------------------------------------------------------------------
 
-class TTabEntry;
+class  TTableEntry;
 
 //------------------------------------------------------------------------------
 
-class TTabEntryValue : public QWidget
+class TTableEntryValue : public QWidget
 {
    Q_OBJECT
 
 public:
-    explicit TTabEntryValue( TTabEntry  *pAncestor );
-    ~TTabEntryValue();
+    explicit TTableEntryValue( TTableEntry  *pAncestor = Q_NULLPTR );
+    ~TTableEntryValue();
 
     void           setNode( const YAML::Node&  node );
     void           setNodeIndex( int  index );
@@ -52,7 +52,7 @@ private:
 
     int            m_value_index;  // номер записи в values
 
-    TTabEntry     *m_pAncestor;
+    TTableEntry   *m_pAncestor;
 
     QString        m_zValue;
 

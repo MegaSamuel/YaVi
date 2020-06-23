@@ -3,8 +3,8 @@
 
 #include <QtWidgets>
 
-#include "tabentry.h"
-#include "tabdialog.h"
+#include "table_entry.h"
+#include "table_dialog.h"
 #include "values.h"
 
 //------------------------------------------------------------------------------
@@ -46,7 +46,7 @@ public:
     void           setTableRow( const std::string&  name, QStringList& list );
     void           setTableColumn( const std::string&  name, QStringList& list );
 
-    void           setTableEntryValue( TTabEntry  *pEntry, QString&  value, int  index );
+    void           setTableEntryValue( TTableEntry  *pEntry, QString&  value, int  index );
 
     void           fixTableHeight( unsigned  row_count );
 
@@ -67,8 +67,9 @@ public:
     void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет
     void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
 
-    QList<TTabEntry*>  m_apRowList;
-    QList<TTabEntry*>  m_apColumnList;
+//    QList<TTabEntry*>  m_apRowList;
+//    QList<TTabEntry*>  m_apColumnList;
+    QList<TTableEntry*>  m_apTabEntryList;
 
 Q_SIGNALS:
     void           sendChanged();
@@ -104,7 +105,10 @@ private:
     YAML::Node     m_temporary_node;  // временный ямл для правки основного
     YAML::Node     m_temporary_inner_node;  // временный ямл для правки основного
 
-    QGridLayout   *m_grid;
+    QGridLayout   *m_grid;      // основная таблица
+
+    QVBoxLayout   *m_vlayout;   // вертикальный layout для строк
+    QHBoxLayout   *m_hlayout;   // горизонтальный layout для столбцов
 
     QPushButton   *m_ptBtnInc;
     QPushButton   *m_ptBtnId;

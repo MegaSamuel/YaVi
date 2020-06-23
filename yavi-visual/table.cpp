@@ -46,6 +46,14 @@ TTable::TTable( TGoods  *pAncestor )
     m_grid->setAlignment( Qt::AlignLeft | Qt::AlignTop );
     m_grid->setMargin(0);
 
+    m_vlayout = new QVBoxLayout;
+    m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    m_vlayout->setMargin( 0 );
+
+    m_hlayout = new QHBoxLayout;
+    m_hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    m_hlayout->setMargin( 0 );
+
     // кнопка с id
     m_ptBtnId = new QPushButton( "id" );
     m_ptBtnId->setToolTip( "ID таблицы" );
@@ -65,7 +73,7 @@ TTable::TTable( TGoods  *pAncestor )
     m_ptBtnInc->setToolTip( "Добавить таблицу" );
     m_ptBtnInc->setFixedWidth( 93 );
     connect( m_ptBtnInc, &QPushButton::clicked, this, &TTable::onBtnInc );
-    m_grid->addWidget( m_ptBtnInc, m_row+1, 0, Qt::AlignLeft );
+    m_grid->addWidget( m_ptBtnInc, m_row+1, 0, Qt::AlignLeft | Qt::AlignTop );
 
     // перевод строки и колонки в grid для следующих добавлений
     nextRow();
@@ -459,10 +467,14 @@ void  TTable::setTableType( unsigned type ) noexcept
     else if( keTypeColumn == m_uTableType )
     {
         //qDebug() << "table type" << m_uTableType << "column";
+
+        m_grid->addLayout( m_hlayout, 1, 1, Qt::AlignLeft );
     }
     else if( keTypeRow == m_uTableType )
     {
         //qDebug() << "table type" << m_uTableType << "row";
+
+        m_grid->addLayout( m_vlayout, 1, 1, Qt::AlignLeft );
     }
 }
 
@@ -592,19 +604,19 @@ const QString TTable::getTableLink()
 
 //------------------------------------------------------------------------------
 
-void TTable::setTableEntryValue( TTabEntry  *pEntry, QString&  value, int  index )
+void TTable::setTableEntryValue( TTableEntry  *pEntry, QString&  value, int  index )
 {
-    TTabEntryValue  *pEntryValue;
+    TTableEntryValue  *pEntryValue;
 
     // новая запись
-    pEntryValue = new TTabEntryValue( pEntry );
+    pEntryValue = new TTableEntryValue( pEntry );
     pEntryValue->setNode( getNode() );
     pEntryValue->setNodeIndex( getNodeIndex() );
     pEntryValue->setEntryValue( value );
     pEntryValue->setValueIndex( index );
 
     // ловим сигнал с данными значения
-    connect( pEntryValue, &TTabEntryValue::sendEntryValue, pEntry, &TTabEntry::onSendEntryValue );
+    connect( pEntryValue, &TTableEntryValue::sendEntryValue, pEntry, &TTableEntry::onSendEntryValue );
 
     // добавляем запись в список
     pEntry->m_apValueList.append( pEntryValue );
@@ -612,6 +624,7 @@ void TTable::setTableEntryValue( TTabEntry  *pEntry, QString&  value, int  index
 
 void TTable::setTableRow( const std::string&  name, QStringList& list )
 {
+    TTableEntry  *pEntry = m_apTabEntryList.last();
     int column = 0;
 
     // кнопка плюс для добавления значения
@@ -619,7 +632,8 @@ void TTable::setTableRow( const std::string&  name, QStringList& list )
     ptBtnRowValInc->setToolTip( "Добавить значение" );
     ptBtnRowValInc->setFixedWidth( 93 );
     connect( ptBtnRowValInc, &QPushButton::clicked, this, &TTable::onBtnRowValInc );
-    m_grid->addWidget( ptBtnRowValInc, m_row, m_column + column, Qt::AlignLeft );
+    //m_grid->addWidget( ptBtnRowValInc, m_row, m_column + column, Qt::AlignLeft );
+    pEntry->m_hlayout->addWidget( ptBtnRowValInc, 0, Qt::AlignLeft );
 
     column += 1;
 
@@ -627,10 +641,11 @@ void TTable::setTableRow( const std::string&  name, QStringList& list )
     QPushButton *ptBtnRowName = new QPushButton( QString::fromStdString(name) );
     ptBtnRowName->setToolTip( "Строка: " + QString::fromStdString(name) );
     ptBtnRowName->setFixedWidth( 93 );
-    connect( ptBtnRowName, &QPushButton::clicked, m_apRowList.last(), &TTabEntry::onBtnName );
-    connect( m_apRowList.last(), &TTabEntry::sendName, this, &TTable::onBtnRowName );
-    connect( m_apRowList.last(), &TTabEntry::sendName, ptBtnRowName, &QPushButton::setText );
-    m_grid->addWidget( ptBtnRowName, m_row, m_column + column, Qt::AlignLeft );
+    connect( ptBtnRowName, &QPushButton::clicked, pEntry, &TTableEntry::onBtnName );
+    connect( pEntry, &TTableEntry::sendName, this, &TTable::onBtnRowName );
+    connect( pEntry, &TTableEntry::sendName, ptBtnRowName, &QPushButton::setText );
+    //m_grid->addWidget( ptBtnRowName, m_row, m_column + column, Qt::AlignLeft );
+    pEntry->m_hlayout->addWidget( ptBtnRowName, 0, Qt::AlignLeft );
 
     column += 1;
 
@@ -642,11 +657,12 @@ void TTable::setTableRow( const std::string&  name, QStringList& list )
         QPushButton  *button = new QPushButton( list[i] );
         button->setToolTip( "Значение: " + list[i] );
         button->setFixedWidth( 93 );
-        setTableEntryValue( m_apRowList.last(), list[i], i );
-        connect( button, &QPushButton::clicked, m_apRowList.last()->m_apValueList.last(), &TTabEntryValue::onBtnValue );
+        setTableEntryValue( pEntry, list[i], i );
+        connect( button, &QPushButton::clicked, pEntry->m_apValueList.last(), &TTableEntryValue::onBtnValue );
         //connect( button, &QPushButton::clicked, this, &TTable::onBtnRowValName );
-        connect( m_apRowList.last()->m_apValueList.last(), &TTabEntryValue::sendEntryValue, button, &QPushButton::setText );
-        m_grid->addWidget( button, m_row, m_column + column, Qt::AlignLeft );
+        connect( pEntry->m_apValueList.last(), &TTableEntryValue::sendEntryValue, button, &QPushButton::setText );
+        //m_grid->addWidget( button, m_row, m_column + column, Qt::AlignLeft );
+        pEntry->m_hlayout->addWidget( button, 0, Qt::AlignLeft );
 
         column += 1;
     }
@@ -656,9 +672,12 @@ void TTable::setTableRow( const std::string&  name, QStringList& list )
     ptBtnRowInc->setToolTip( "Добавить строку" );
     ptBtnRowInc->setFixedWidth( 93 );
     connect( ptBtnRowInc, &QPushButton::clicked, this, &TTable::onBtnRowInc );
-    m_grid->addWidget( ptBtnRowInc, m_row, m_column + column, Qt::AlignLeft );
+    //m_grid->addWidget( ptBtnRowInc, m_row, m_column + column, Qt::AlignLeft );
+    pEntry->m_hlayout->addWidget( ptBtnRowInc, 0, Qt::AlignLeft );
 
     column += 1;
+
+    m_vlayout->addLayout( pEntry->m_hlayout );
 
     // подгоняем ширину
     widget_stretch( m_grid->minimumSize().width() + i * m_grid->spacing(), 0 );
@@ -668,6 +687,7 @@ void TTable::setTableRow( const std::string&  name, QStringList& list )
 
 void TTable::setTableColumn( const std::string&  name, QStringList& list )
 {
+    TTableEntry  *pEntry = m_apTabEntryList.last();
     int row = 0;
 
     // кнопка плюс для добавления значения
@@ -675,7 +695,8 @@ void TTable::setTableColumn( const std::string&  name, QStringList& list )
     ptBtnColumnValInc->setToolTip( "Добавить значение" );
     ptBtnColumnValInc->setFixedWidth( 93 );
     connect( ptBtnColumnValInc, &QPushButton::clicked, this, &TTable::onBtnColumnValInc );
-    m_grid->addWidget( ptBtnColumnValInc, m_row + row, m_column, Qt::AlignLeft );
+    //m_grid->addWidget( ptBtnColumnValInc, m_row + row, m_column, Qt::AlignLeft );
+    pEntry->m_vlayout->addWidget( ptBtnColumnValInc, 0, Qt::AlignLeft );
 
     row += 1;
 
@@ -683,10 +704,11 @@ void TTable::setTableColumn( const std::string&  name, QStringList& list )
     QPushButton *ptBtnColumnName = new QPushButton( QString::fromStdString(name) );
     ptBtnColumnName->setToolTip( "Столбец: " + QString::fromStdString(name) );
     ptBtnColumnName->setFixedWidth( 93 );
-    connect( ptBtnColumnName, &QPushButton::clicked, m_apColumnList.last(), &TTabEntry::onBtnName );
-    connect( m_apColumnList.last(), &TTabEntry::sendName, this, &TTable::onBtnColumnName );
-    connect( m_apColumnList.last(), &TTabEntry::sendName, ptBtnColumnName, &QPushButton::setText );
-    m_grid->addWidget( ptBtnColumnName, m_row + row, m_column, Qt::AlignLeft );
+    connect( ptBtnColumnName, &QPushButton::clicked, pEntry, &TTableEntry::onBtnName );
+    connect( pEntry, &TTableEntry::sendName, this, &TTable::onBtnColumnName );
+    connect( pEntry, &TTableEntry::sendName, ptBtnColumnName, &QPushButton::setText );
+    //m_grid->addWidget( ptBtnColumnName, m_row + row, m_column, Qt::AlignLeft );
+    pEntry->m_vlayout->addWidget( ptBtnColumnName, 0, Qt::AlignLeft );
 
     row += 1;
 
@@ -696,11 +718,12 @@ void TTable::setTableColumn( const std::string&  name, QStringList& list )
         QPushButton  *button = new QPushButton( list[i] );
         button->setToolTip( "Значение: " + list[i] );
         button->setFixedWidth( 93 );
-        setTableEntryValue( m_apColumnList.last(), list[i], i );
-        connect( button, &QPushButton::clicked, m_apColumnList.last()->m_apValueList.last(), &TTabEntryValue::onBtnValue );
+        setTableEntryValue( pEntry, list[i], i );
+        connect( button, &QPushButton::clicked, pEntry->m_apValueList.last(), &TTableEntryValue::onBtnValue );
         //connect( button, &QPushButton::clicked, this, &TTable::onBtnColumnValName );
-        connect( m_apColumnList.last()->m_apValueList.last(), &TTabEntryValue::sendEntryValue, button, &QPushButton::setText );
-        m_grid->addWidget( button, m_row + row, m_column, Qt::AlignLeft );
+        connect( pEntry->m_apValueList.last(), &TTableEntryValue::sendEntryValue, button, &QPushButton::setText );
+        //m_grid->addWidget( button, m_row + row, m_column, Qt::AlignLeft );
+        pEntry->m_vlayout->addWidget( button, 0, Qt::AlignLeft );
 
         row += 1;
     }
@@ -710,7 +733,10 @@ void TTable::setTableColumn( const std::string&  name, QStringList& list )
     ptBtnColumnInc->setToolTip( "Добавить столбец" );
     ptBtnColumnInc->setFixedWidth( 93 );
     connect( ptBtnColumnInc, &QPushButton::clicked, this, &TTable::onBtnColumnInc );
-    m_grid->addWidget( ptBtnColumnInc, m_row + row, m_column, Qt::AlignLeft );
+    //m_grid->addWidget( ptBtnColumnInc, m_row + row, m_column, Qt::AlignLeft );
+    pEntry->m_vlayout->addWidget( ptBtnColumnInc, 0, Qt::AlignLeft );
+
+    m_hlayout->addLayout( pEntry->m_vlayout );
 
     //widget_stretch( m_grid->minimumSize().width(), label->minimumSize().height() + m_grid->spacing() );
 

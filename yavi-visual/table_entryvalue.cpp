@@ -1,9 +1,9 @@
 #include "func.h"
-#include "tabentryvalue.h"
+#include "table_entryvalue.h"
 
 //------------------------------------------------------------------------------
 
-TTabEntryValue::TTabEntryValue( TTabEntry  *pAncestor )
+TTableEntryValue::TTableEntryValue( TTableEntry  *pAncestor )
 {
     m_node.reset();
     m_node_index = -1;
@@ -17,27 +17,27 @@ TTabEntryValue::TTabEntryValue( TTabEntry  *pAncestor )
     m_ptTabDialogValue = new TTabDialog( false, "Table", this, "Value" );
 
     // ловим сигнал от диалога об отмене
-    connect( m_ptTabDialogValue, &TTabDialog::sendCancel, this, &TTabEntryValue::onSendCancel );
+    connect( m_ptTabDialogValue, &TTabDialog::sendCancel, this, &TTableEntryValue::onSendCancel );
 
     // ловим сигнал от диалога с данными
-    connect( m_ptTabDialogValue, &TTabDialog::sendValue, this, &TTabEntryValue::onSendValue );
+    connect( m_ptTabDialogValue, &TTabDialog::sendValue, this, &TTableEntryValue::onSendValue );
 }
 
-TTabEntryValue::~TTabEntryValue()
+TTableEntryValue::~TTableEntryValue()
 {
 
 }
 
 //------------------------------------------------------------------------------
 
-void  TTabEntryValue::onBtnDec()
+void  TTableEntryValue::onBtnDec()
 {
-    qDebug() << "TTabEntryValue" << __func__ << getEntryValue();
+    qDebug() << "TTableEntryValue" << __func__ << getEntryValue();
 }
 
-void  TTabEntryValue::onBtnValue()
+void  TTableEntryValue::onBtnValue()
 {
-    qDebug() << "TTabEntryValue" << __func__ << getEntryValue();
+    qDebug() << "TTableEntryValue" << __func__ << getEntryValue();
 
     // диалог с пустыми параметрами
     m_ptTabDialogValue->setDlgEmpty();
@@ -49,14 +49,14 @@ void  TTabEntryValue::onBtnValue()
 
 //------------------------------------------------------------------------------
 
-void  TTabEntryValue::onSendCancel()
+void  TTableEntryValue::onSendCancel()
 {
-    qDebug() << "TTabEntryValue" << __func__ << getEntryValue();
+    qDebug() << "TTableEntryValue" << __func__ << getEntryValue();
 }
 
-void  TTabEntryValue::onSendValue( QString&  a_zValue )
+void  TTableEntryValue::onSendValue( QString&  a_zValue )
 {
-    qDebug() << "TTabEntryValue" << __func__ << getEntryValue();
+    qDebug() << "TTableEntryValue" << __func__ << getEntryValue();
 
     setEntryValue( a_zValue );
 
@@ -72,51 +72,51 @@ void  TTabEntryValue::onSendValue( QString&  a_zValue )
 
 //------------------------------------------------------------------------------
 
-void  TTabEntryValue::EntryValueDelete()
+void  TTableEntryValue::EntryValueDelete()
 {
 
 }
 
 //------------------------------------------------------------------------------
 
-void  TTabEntryValue::setNode( const YAML::Node&  node )
+void  TTableEntryValue::setNode( const YAML::Node&  node )
 {
     m_node = node;
 }
 
-void  TTabEntryValue::setNodeIndex( int  index )
+void  TTableEntryValue::setNodeIndex( int  index )
 {
     m_node_index = index;
 }
 
-YAML::Node&  TTabEntryValue::getNode()
+YAML::Node&  TTableEntryValue::getNode()
 {
     return m_node;
 }
 
-int  TTabEntryValue::getNodeIndex()
+int  TTableEntryValue::getNodeIndex()
 {
     return m_node_index;
 }
 
-void  TTabEntryValue::setValueIndex( int  index )
+void  TTableEntryValue::setValueIndex( int  index )
 {
     m_value_index = index;
 }
 
-int  TTabEntryValue::getValueIndex()
+int  TTableEntryValue::getValueIndex()
 {
     return m_value_index;
 }
 
 //------------------------------------------------------------------------------
 
-void  TTabEntryValue::setEntryValue( QString&  value )
+void  TTableEntryValue::setEntryValue( QString&  value )
 {
     m_zValue = value;
 }
 
-QString  TTabEntryValue::getEntryValue()
+QString  TTableEntryValue::getEntryValue()
 {
     return m_zValue;
 }

@@ -166,7 +166,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
         m_vlayout->addWidget( label, 0, Qt::AlignLeft );
 
         TTable  *pTable;
-        TTabEntry  *pEntry;
+        TTableEntry  *pEntry;
 
         // перебираем все таблицы
         for( int j = 0; j < static_cast<int>(config[ GoodsTableSection ].size()); j++ )
@@ -206,13 +206,13 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                 for( int i = 0; i < static_cast<int>(config[ GoodsTableSection ][j][ GoodsTableColumn ].size()); i++ )
                 {
                     // новая запись
-                    pEntry = new TTabEntry( pTable );
+                    pEntry = new TTableEntry( pTable );
                     pEntry->setNode( config[ GoodsTableSection ][j][ GoodsTableColumn ][i] );
                     pEntry->setNodeParent( config[ GoodsTableSection ][j][ GoodsTableColumn ] );
                     pEntry->setNodeIndex( i );
 
                     // добавляем запись в список
-                    pTable->m_apColumnList.append( pEntry );
+                    pTable->m_apTabEntryList.append( pEntry );
 
                     // имя
                     std::string  col_name = __yaml_GetString( config[ GoodsTableSection ][j][ GoodsTableColumn ][i], GoodsTableName );
@@ -245,13 +245,13 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                 for( int i = 0; i < static_cast<int>(config[ GoodsTableSection ][j][ GoodsTableRow ].size()); i++ )
                 {
                     // новая запись
-                    pEntry = new TTabEntry( pTable );
+                    pEntry = new TTableEntry( pTable );
                     pEntry->setNode( config[ GoodsTableSection ][j][ GoodsTableRow ][i] );
                     pEntry->setNodeParent( config[ GoodsTableSection ][j][ GoodsTableRow ] );
                     pEntry->setNodeIndex( i );
 
                     // добавляем запись в список
-                    pTable->m_apRowList.append( pEntry );
+                    pTable->m_apTabEntryList.append( pEntry );
 
                     // имя
                     std::string  row_name = __yaml_GetString( config[ GoodsTableSection ][j][ GoodsTableRow ][i], GoodsTableName );
