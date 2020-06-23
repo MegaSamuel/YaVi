@@ -33,6 +33,8 @@ TTableEntryValue::~TTableEntryValue()
 void  TTableEntryValue::onBtnDec()
 {
     qDebug() << "TTableEntryValue" << __func__ << getEntryValue();
+
+    EntryValueDelete();
 }
 
 void  TTableEntryValue::onBtnValue()

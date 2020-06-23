@@ -119,6 +119,23 @@ void  TTableEntry::onSendEntryValue( QString& a_zValue, int  a_nIndex )
                 m_apValueList.at(i)->setValueIndex( index );
             }
         }
+
+        QLayoutItem *child;
+
+        // уничтожаем кнопку
+        // +2 т.к. у нас в начале layout-а кнопка Плюс и кнопка Имя
+        if( ( child = m_vlayout->takeAt(a_nIndex+2) ) != Q_NULLPTR )
+        {
+            delete child->widget();
+            delete child;
+        }
+
+        // уничтожаем кнопку
+        if( ( child = m_hlayout->takeAt(a_nIndex+2) ) != Q_NULLPTR )
+        {
+            delete child->widget();
+            delete child;
+        }
     }
 }
 
@@ -261,6 +278,8 @@ void  TTableEntry::setNodeParent( const YAML::Node&  node )
 
 void  TTableEntry::setNodeIndex( int  index )
 {
+    qDebug() << "TTableEntry" << __func__ << index;
+
     m_node_index = index;
 }
 

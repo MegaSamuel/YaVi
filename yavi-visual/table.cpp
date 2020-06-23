@@ -246,7 +246,7 @@ void  TTable::onBtnColumnName( QString&  name, int  entry_index )
         qDebug() << "need to delete";
 
         // удаляемся из layout-а
-        m_vlayout->removeWidget( m_apTabEntryList.at(entry_index) );
+        m_hlayout->removeWidget( m_apTabEntryList.at(entry_index) );
 
         // удаляем себя из списка
         m_apTabEntryList.removeAt(entry_index);
