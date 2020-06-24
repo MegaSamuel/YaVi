@@ -35,6 +35,9 @@ public:
     QString        getEntryName();
 //    QString        getEntryValues();
 
+    void           setEntryType( int ) noexcept;
+    int            getEntryType() noexcept;
+
     // заменить запись в поле values
     void           renameParamList( QString&  item, int  index, bool  set_to_node = false );
     // убрать запись из поля values
@@ -57,6 +60,7 @@ Q_SIGNALS:
 public Q_SLOTS:
     void           onBtnDec();
     void           onBtnName();
+    void           onBtnInc();
     void           onSendEntryValue( QString&, int );
 
 private Q_SLOTS:
@@ -72,6 +76,8 @@ private:
     YAML::Node     m_node_parent; // родительский уровнь дерева ямла
     int            m_node_index;  // номер перечисления у родителя
 
+    int            m_entry_type;  //
+
     TTable        *m_pAncestor;
 
     QString        m_zName;
@@ -80,7 +86,10 @@ private:
     std::string    m_zList;
     QStringList    m_vList;
 
+    TTabDialog    *m_ptTabDialogAdd;
     TTabDialog    *m_ptTabDialogName;
+
+    bool           need_to_add; // необходимость создать новое значение в ямле
 };
 
 //------------------------------------------------------------------------------

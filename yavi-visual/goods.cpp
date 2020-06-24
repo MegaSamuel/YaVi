@@ -193,13 +193,13 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
             if( 0 != link.length() )
             {
-                pTable->setTableType( TTable::keTypeLink );
+                pTable->setTableType( TValues::keTypeLink );
 
                 pTable->setTableLink( link );
             }
             else if( __yaml_IsSequence( config[ GoodsTableSection ][j][GoodsTableColumn] ) )
             {
-                pTable->setTableType( TTable::keTypeColumn );
+                pTable->setTableType( TValues::keTypeColumn );
 
                 int  max_row_count = 0;
 
@@ -210,6 +210,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     pEntry->setNode( config[ GoodsTableSection ][j][ GoodsTableColumn ][i] );
                     pEntry->setNodeParent( config[ GoodsTableSection ][j][ GoodsTableColumn ] );
                     pEntry->setNodeIndex( i );
+                    pEntry->setEntryType( TValues::keTypeColumn );
 
                     // добавляем запись в список
                     pTable->m_apTabEntryList.append( pEntry );
@@ -238,7 +239,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             }
             else if( __yaml_IsSequence( config[ GoodsTableSection ][j][GoodsTableRow] ) )
             {
-                pTable->setTableType( TTable::keTypeRow );
+                pTable->setTableType( TValues::keTypeRow );
 
                 unsigned  row_count = 0;
 
@@ -249,6 +250,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     pEntry->setNode( config[ GoodsTableSection ][j][ GoodsTableRow ][i] );
                     pEntry->setNodeParent( config[ GoodsTableSection ][j][ GoodsTableRow ] );
                     pEntry->setNodeIndex( i );
+                    pEntry->setEntryType( TValues::keTypeRow );
 
                     // добавляем запись в список
                     pTable->m_apTabEntryList.append( pEntry );
@@ -277,7 +279,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             }
             else
             {
-                pTable->setTableType( TTable::keTypeNone );
+                pTable->setTableType( TValues::keTypeNone );
             }
 
             //widget_stretch( 0, m_vlayout->spacing() );

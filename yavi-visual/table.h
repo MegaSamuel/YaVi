@@ -21,7 +21,7 @@ class TTable : public QWidget
 public:
     explicit TTable( TGoods  *pAncestor = Q_NULLPTR );
     ~TTable();
-
+/*
     enum ETableType
     {
         keTypeNone   = 0,
@@ -29,7 +29,7 @@ public:
         keTypeColumn = 2,
         keTypeRow    = 3,
     };
-
+*/
     void           setTableType( unsigned  type ) noexcept;
 
     void           setNode( const YAML::Node&  node );

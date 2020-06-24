@@ -9,12 +9,16 @@ TTableEntry::TTableEntry( TTable  *pAncestor )
     m_node_parent.reset();
     m_node_index = -1;
 
+    m_entry_type = 0;
+
     m_pAncestor = pAncestor;
 
     m_zName.clear();
     m_zValues.clear();
 
     m_vList.clear();
+
+    need_to_add = false;
 
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
@@ -32,6 +36,15 @@ TTableEntry::TTableEntry( TTable  *pAncestor )
 
     // ловим сигнал от диалога с данными
     connect( m_ptTabDialogName, &TTabDialog::sendValue, this, &TTableEntry::onSendValue );
+
+    // диалог для нового значения
+    m_ptTabDialogAdd = new TTabDialog( false, "Table", this, "Value" );
+
+    // ловим сигнал от диалога об отмене
+    connect( m_ptTabDialogAdd, &TTabDialog::sendCancel, this, &TTableEntry::onSendCancel );
+
+    // ловим сигнал от диалога с данными
+    connect( m_ptTabDialogAdd, &TTabDialog::sendValue, this, &TTableEntry::onSendValue );
 }
 
 TTableEntry::~TTableEntry()
@@ -62,27 +75,82 @@ void  TTableEntry::onBtnName()
     m_ptTabDialogName->open();
 }
 
+void  TTableEntry::onBtnInc()
+{
+    // признак что хотим создать новый набор параметров
+    need_to_add = true;
+
+    // диалог с пустыми параметрами
+    m_ptTabDialogAdd->setDlgEmpty();
+
+    m_ptTabDialogAdd->setDlgName( "NewValue" );
+
+    m_ptTabDialogAdd->open();
+}
+
 //------------------------------------------------------------------------------
 
 void  TTableEntry::onSendCancel()
 {
     //qDebug() << "TTableEntry" << __func__ << getEntryName();
+
+    need_to_add = false;
 }
 
 void  TTableEntry::onSendValue( QString& a_zValue )
 {
     //qDebug() << "TTableEntry" << __func__ << getEntryName();
 
-    setEntryName( a_zValue.toStdString(), true );
+    QString  value = a_zValue;
 
-    // шлем сигнал с именем
-    Q_EMIT sendName( a_zValue, getNodeIndex() );
-
-    if( 0 == a_zValue.length() )
+    if( false == need_to_add )
     {
-        // если имя пустое, то удаляем запись
-        onBtnDec();
+        setEntryName( value.toStdString(), true );
+
+        // шлем сигнал с именем
+        Q_EMIT sendName( value, getNodeIndex() );
+
+        if( 0 == value.length() )
+        {
+            // если имя пустое, то удаляем запись
+            onBtnDec();
+        }
     }
+
+    if( true == need_to_add )
+    {
+        // создаем новое значение
+
+        qDebug() << "new value";
+
+        if( 0 == value.length() )
+        {
+            // если имя пустое, то ставим дефолтное имя
+            value = "noname";
+        }
+
+        // кнопки со значениями
+        QPushButton  *button = new QPushButton( value );
+        button->setToolTip( "Значение: " + value );
+        button->setFixedWidth( 93 );
+        //setTableEntryValue( pEntry, value, i );
+
+        connect( button, &QPushButton::clicked, m_apValueList.last(), &TTableEntryValue::onBtnValue );
+        //connect( button, &QPushButton::clicked, this, &TTable::onBtnRowValName );
+        connect( m_apValueList.last(), &TTableEntryValue::sendEntryValue, button, &QPushButton::setText );
+
+        // в конце кнопка Плюс, надо добавлять на предпоследнюю позицию
+        if( TValues::keTypeColumn == getEntryType() )
+        {
+            m_vlayout->insertWidget( m_vlayout->count()-1, button, 0, Qt::AlignLeft );
+        }
+        else if( TValues::keTypeRow == getEntryType() )
+        {
+            m_hlayout->insertWidget( m_hlayout->count()-1, button, 0, Qt::AlignLeft );
+        }
+    }
+
+    need_to_add = false;
 }
 
 void  TTableEntry::onSendEntryValue( QString& a_zValue, int  a_nIndex )
@@ -333,5 +401,15 @@ QString  TTableEntry::getEntryValues()
     return m_zValues;
 }
 */
+
+void  TTableEntry::setEntryType( int  type ) noexcept
+{
+    m_entry_type = type;
+}
+
+int  TTableEntry::getEntryType() noexcept
+{
+    return m_entry_type;
+}
 
 //------------------------------------------------------------------------------

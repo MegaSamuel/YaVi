@@ -106,7 +106,7 @@ void  TTable::clear()
     m_temporary_node = YAML::Node();
     m_temporary_inner_node = YAML::Node();
 
-    m_uTableType = keTypeNone;
+    m_uTableType = TValues::keTypeNone;
 
     m_zId.clear();
     m_zName.clear();
@@ -362,11 +362,11 @@ void  TTable::onSendValues( TValues& a_tValues )
         __yaml_SetString( m_temporary_node, GoodsTableId, m_tValues.m_zId.toStdString() );
         __yaml_SetString( m_temporary_node, GoodsTableName, m_tValues.m_zName.toStdString() );
 
-        if( keTypeLink == m_tValues.m_uType )
+        if( TValues::keTypeLink == m_tValues.m_uType )
         {
             __yaml_SetString( m_temporary_node, GoodsTableLink, "link" );
         }
-        else if( keTypeColumn == m_tValues.m_uType )
+        else if( TValues::keTypeColumn == m_tValues.m_uType )
         {
             // очищаем ямл
             m_temporary_inner_node.reset();
@@ -378,7 +378,7 @@ void  TTable::onSendValues( TValues& a_tValues )
             // добавляем ямл к временному
             m_temporary_node[ GoodsTableColumn ].push_back( m_temporary_inner_node );
         }
-        else if( keTypeRow == m_tValues.m_uType )
+        else if( TValues::keTypeRow == m_tValues.m_uType )
         {
             // очищаем ямл
             m_temporary_inner_node.reset();
@@ -486,7 +486,7 @@ void  TTable::setTableType( unsigned type ) noexcept
 {
     m_uTableType = type;
 
-    if( keTypeLink == m_uTableType )
+    if( TValues::keTypeLink == m_uTableType )
     {
         //qDebug() << "table type" << m_uTableType << "link";
 
@@ -506,13 +506,13 @@ void  TTable::setTableType( unsigned type ) noexcept
         // эта кнопка на второй строке, высоту этой строки учли в конструкторе класса
         //widget_stretch( m_grid->minimumSize().width(), m_ptBtnLink->minimumSizeHint().height() );
     }
-    else if( keTypeColumn == m_uTableType )
+    else if( TValues::keTypeColumn == m_uTableType )
     {
         //qDebug() << "table type" << m_uTableType << "column";
 
         m_grid->addLayout( m_hlayout, 1, 1, Qt::AlignLeft );
     }
-    else if( keTypeRow == m_uTableType )
+    else if( TValues::keTypeRow == m_uTableType )
     {
         //qDebug() << "table type" << m_uTableType << "row";
 
@@ -674,6 +674,7 @@ void TTable::setTableRow( const std::string&  name, QStringList& list )
     ptBtnRowValInc->setToolTip( "Добавить значение" );
     ptBtnRowValInc->setFixedWidth( 93 );
     connect( ptBtnRowValInc, &QPushButton::clicked, this, &TTable::onBtnRowValInc );
+    connect( ptBtnRowValInc, &QPushButton::clicked, pEntry, &TTableEntry::onBtnInc );
     //m_grid->addWidget( ptBtnRowValInc, m_row, m_column + column, Qt::AlignLeft );
     pEntry->m_hlayout->addWidget( ptBtnRowValInc, 0, Qt::AlignLeft );
 
@@ -737,6 +738,7 @@ void TTable::setTableColumn( const std::string&  name, QStringList& list )
     ptBtnColumnValInc->setToolTip( "Добавить значение" );
     ptBtnColumnValInc->setFixedWidth( 93 );
     connect( ptBtnColumnValInc, &QPushButton::clicked, this, &TTable::onBtnColumnValInc );
+    connect( ptBtnColumnValInc, &QPushButton::clicked, pEntry, &TTableEntry::onBtnInc );
     //m_grid->addWidget( ptBtnColumnValInc, m_row + row, m_column, Qt::AlignLeft );
     pEntry->m_vlayout->addWidget( ptBtnColumnValInc, 0, Qt::AlignLeft );
 
