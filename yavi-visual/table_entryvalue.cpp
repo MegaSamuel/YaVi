@@ -5,13 +5,9 @@
 
 TTableEntryValue::TTableEntryValue( TTableEntry  *pAncestor )
 {
-    m_node.reset();
-    m_node_index = -1;
-    m_value_index = -1;
+    clear();
 
     m_pAncestor = pAncestor;
-
-    m_zValue.clear();
 
     // диалог для имени
     m_ptTabDialogValue = new TTabDialog( false, "Table", this, "Value" );
@@ -28,13 +24,18 @@ TTableEntryValue::~TTableEntryValue()
 
 }
 
+void  TTableEntryValue::clear() noexcept
+{
+    m_value_index = -1;
+
+    m_zValue.clear();
+}
+
 //------------------------------------------------------------------------------
 
 void  TTableEntryValue::onBtnDec()
 {
     qDebug() << "TTableEntryValue" << __func__ << getEntryValue();
-
-    EntryValueDelete();
 }
 
 void  TTableEntryValue::onBtnValue()
@@ -74,51 +75,24 @@ void  TTableEntryValue::onSendValue( QString&  a_zValue )
 
 //------------------------------------------------------------------------------
 
-void  TTableEntryValue::EntryValueDelete()
-{
-
-}
-
-//------------------------------------------------------------------------------
-
-void  TTableEntryValue::setNode( const YAML::Node&  node )
-{
-    m_node = node;
-}
-
-void  TTableEntryValue::setNodeIndex( int  index )
-{
-    m_node_index = index;
-}
-
-YAML::Node&  TTableEntryValue::getNode()
-{
-    return m_node;
-}
-
-int  TTableEntryValue::getNodeIndex()
-{
-    return m_node_index;
-}
-
-void  TTableEntryValue::setValueIndex( int  index )
+void  TTableEntryValue::setValueIndex( int  index ) noexcept
 {
     m_value_index = index;
 }
 
-int  TTableEntryValue::getValueIndex()
+int  TTableEntryValue::getValueIndex() noexcept
 {
     return m_value_index;
 }
 
 //------------------------------------------------------------------------------
 
-void  TTableEntryValue::setEntryValue( QString&  value )
+void  TTableEntryValue::setEntryValue( QString&  value ) noexcept
 {
     m_zValue = value;
 }
 
-QString  TTableEntryValue::getEntryValue()
+QString  TTableEntryValue::getEntryValue() noexcept
 {
     return m_zValue;
 }

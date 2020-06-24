@@ -20,20 +20,11 @@ public:
     explicit TTableEntryValue( TTableEntry  *pAncestor = Q_NULLPTR );
     ~TTableEntryValue();
 
-    void           setNode( const YAML::Node&  node );
-    void           setNodeIndex( int  index );
+    void           setValueIndex( int  index ) noexcept;
+    int            getValueIndex() noexcept;
 
-    YAML::Node&    getNode();
-    int            getNodeIndex();
-
-    void           setValueIndex( int  index );
-    int            getValueIndex();
-
-    void           setEntryValue( QString&  value );
-
-    QString        getEntryValue();
-
-    void           EntryValueDelete();
+    void           setEntryValue( QString&  value ) noexcept;
+    QString        getEntryValue() noexcept;
 
 Q_SIGNALS:
     void           sendEntryValue( QString&  value, int  index = 0 );
@@ -47,8 +38,7 @@ private Q_SLOTS:
     void           onSendValue( QString& );
 
 private:
-    YAML::Node     m_node;        // текущий уровнь дерева ямла
-    int            m_node_index;  // номер перечисления у родителя
+    void           clear() noexcept;
 
     int            m_value_index;  // номер записи в values
 

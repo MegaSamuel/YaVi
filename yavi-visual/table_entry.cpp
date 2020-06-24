@@ -5,20 +5,9 @@
 
 TTableEntry::TTableEntry( TTable  *pAncestor )
 {
-    m_node.reset();
-    m_node_parent.reset();
-    m_node_index = -1;
-
-    m_entry_type = 0;
+    clear();
 
     m_pAncestor = pAncestor;
-
-    m_zName.clear();
-    m_zValues.clear();
-
-    m_vList.clear();
-
-    need_to_add = false;
 
     m_vlayout = new QVBoxLayout;
     m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
@@ -50,6 +39,22 @@ TTableEntry::TTableEntry( TTable  *pAncestor )
 TTableEntry::~TTableEntry()
 {
 
+}
+
+void  TTableEntry::clear() noexcept
+{
+    m_node.reset();
+    m_node_parent.reset();
+    m_node_index = -1;
+
+    m_entry_type = 0;
+
+    m_zName.clear();
+
+    m_zList.clear();
+    m_vList.clear();
+
+    need_to_add = false;
 }
 
 //------------------------------------------------------------------------------
@@ -129,11 +134,26 @@ void  TTableEntry::onSendValue( QString& a_zValue )
             value = "noname";
         }
 
+        addParamList( value, true );
+
         // кнопки со значениями
         QPushButton  *button = new QPushButton( value );
         button->setToolTip( "Значение: " + value );
         button->setFixedWidth( 93 );
         //setTableEntryValue( pEntry, value, i );
+
+        TTableEntryValue  *pEntryValue;
+
+        // новая запись
+        pEntryValue = new TTableEntryValue( this );
+        pEntryValue->setEntryValue( value );
+        pEntryValue->setValueIndex( m_apValueList.size() );
+
+        // ловим сигнал с данными значения
+        connect( pEntryValue, &TTableEntryValue::sendEntryValue, this, &TTableEntry::onSendEntryValue );
+
+        // добавляем запись в список
+        m_apValueList.append( pEntryValue );
 
         connect( button, &QPushButton::clicked, m_apValueList.last(), &TTableEntryValue::onBtnValue );
         //connect( button, &QPushButton::clicked, this, &TTable::onBtnRowValName );
@@ -344,10 +364,8 @@ void  TTableEntry::setNodeParent( const YAML::Node&  node )
     m_node_parent = node;
 }
 
-void  TTableEntry::setNodeIndex( int  index )
+void  TTableEntry::setNodeIndex( int  index ) noexcept
 {
-    qDebug() << "TTableEntry" << __func__ << index;
-
     m_node_index = index;
 }
 
@@ -361,7 +379,7 @@ YAML::Node&  TTableEntry::getNodeParent()
     return m_node_parent;
 }
 
-int  TTableEntry::getNodeIndex()
+int  TTableEntry::getNodeIndex() noexcept
 {
     return m_node_index;
 }
@@ -378,29 +396,10 @@ void  TTableEntry::setEntryName( const std::string&  name, bool  set_to_node )
     }
 }
 
-/*
-void  TTableEntry::setEntryValues( const std::string&  name, bool  set_to_node )
-{
-    m_zValues = QString::fromStdString(name);
-
-    if( set_to_node )
-    {
-        __yaml_SetString( m_node, "values", name );
-    }
-}
-*/
-
-QString  TTableEntry::getEntryName()
+QString  TTableEntry::getEntryName() noexcept
 {
     return m_zName;
 }
-
-/*
-QString  TTableEntry::getEntryValues()
-{
-    return m_zValues;
-}
-*/
 
 void  TTableEntry::setEntryType( int  type ) noexcept
 {
@@ -410,6 +409,83 @@ void  TTableEntry::setEntryType( int  type ) noexcept
 int  TTableEntry::getEntryType() noexcept
 {
     return m_entry_type;
+}
+
+//------------------------------------------------------------------------------
+
+void  TTableEntry::widget_size_reset() noexcept
+{
+    m_width = 0;
+    m_height = 0;
+}
+
+void  TTableEntry::widget_stretch( int width, int height, bool add_height ) noexcept
+{
+    // ширину выбираем максимальную из элементов
+    if( width > m_width )
+        m_width = width;
+
+    //qDebug() << "stretch" << width << height;
+
+    // высоту увеличиваем на каждый элемент
+    m_height += height;
+
+    // ставим размер самого себя
+    setMinimumWidth( m_width );
+    setMinimumHeight( m_height );
+
+    widget_parent_stretch( width, height, add_height );
+}
+
+void  TTableEntry::widget_parent_stretch( int width, int height, bool add_height ) noexcept
+{
+    int  val = 0;
+
+    if( Q_NULLPTR != m_pAncestor )
+    {
+        if( add_height )
+        {
+//            val = m_pAncestor->m_vlayout->spacing();
+        }
+
+//        m_pAncestor->widget_stretch( width, height + val );
+    }
+}
+
+void  TTableEntry::widget_shrink( int width, int height ) noexcept
+{
+    Q_UNUSED( width );
+
+    //qDebug() << "shrink" << width << height;
+
+    m_height -= height;
+
+    if( m_height < 0 )
+        m_height = 0;
+
+    // ставим размер самого себя
+    setMinimumWidth( m_width );
+    setMinimumHeight( m_height );
+
+    widget_parent_shrink( width, height );
+}
+
+void  TTableEntry::widget_parent_shrink( int width, int height ) noexcept
+{
+    if( Q_NULLPTR != m_pAncestor )
+    {
+//        m_pAncestor->widget_shrink( width, height );
+    }
+}
+
+int TTableEntry::getTableEntryWidth() noexcept
+{
+    return minimumSize().width();
+}
+
+int TTableEntry::getTableEntryHeight() noexcept
+{
+    return minimumSize().height();
 }
 
 //------------------------------------------------------------------------------

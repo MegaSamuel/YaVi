@@ -23,17 +23,14 @@ public:
 
     void           setNode( const YAML::Node&  node );
     void           setNodeParent( const YAML::Node&  node );
-    void           setNodeIndex( int  index );
+    void           setNodeIndex( int  index )  noexcept;
 
     YAML::Node&    getNode();
     YAML::Node&    getNodeParent();
-    int            getNodeIndex();
+    int            getNodeIndex()  noexcept;
 
     void           setEntryName( const std::string&  name, bool  set_to_node = false );
-//    void           setEntryValues( const std::string&  name, bool  set_to_node = false );
-
-    QString        getEntryName();
-//    QString        getEntryValues();
+    QString        getEntryName() noexcept;
 
     void           setEntryType( int ) noexcept;
     int            getEntryType() noexcept;
@@ -47,7 +44,13 @@ public:
     // установить поле values
     void           setParamList( QStringList  vlist, const std::string&  list, bool  set_to_node = false );
 
+    int            getTableEntryWidth() noexcept;
+    int            getTableEntryHeight() noexcept;
+
     void           EntryDelete();
+
+    void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет
+    void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
 
     QVBoxLayout   *m_vlayout;
     QHBoxLayout   *m_hlayout;
@@ -68,6 +71,8 @@ private Q_SLOTS:
     void           onSendValue( QString& );
 
 private:
+    void           clear() noexcept;
+
     void           clearNodeSequence();
 
     void           makeStrByList() noexcept;
@@ -78,16 +83,23 @@ private:
 
     int            m_entry_type;  //
 
-    TTable        *m_pAncestor;
-
     QString        m_zName;
-    QString        m_zValues;
 
     std::string    m_zList;
     QStringList    m_vList;
 
     TTabDialog    *m_ptTabDialogAdd;
     TTabDialog    *m_ptTabDialogName;
+
+    TTable        *m_pAncestor;
+
+    int            m_width;     // ширина виджета
+    int            m_height;    // высота виджета
+
+    void           widget_parent_stretch( int width, int height, bool add_height = true ) noexcept;  // растягиваем виджет
+    void           widget_parent_shrink( int width, int height ) noexcept;   // сжимаем виджет
+
+    void           widget_size_reset() noexcept;  // сброс размера виджета
 
     bool           need_to_add; // необходимость создать новое значение в ямле
 };

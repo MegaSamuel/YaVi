@@ -21,15 +21,7 @@ class TTable : public QWidget
 public:
     explicit TTable( TGoods  *pAncestor = Q_NULLPTR );
     ~TTable();
-/*
-    enum ETableType
-    {
-        keTypeNone   = 0,
-        keTypeLink   = 1,
-        keTypeColumn = 2,
-        keTypeRow    = 3,
-    };
-*/
+
     void           setTableType( unsigned  type ) noexcept;
 
     void           setNode( const YAML::Node&  node );
@@ -67,8 +59,6 @@ public:
     void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет
     void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
 
-//    QList<TTabEntry*>  m_apRowList;
-//    QList<TTabEntry*>  m_apColumnList;
     QList<TTableEntry*>  m_apTabEntryList;
 
 Q_SIGNALS:
