@@ -47,13 +47,7 @@ public:
     // установить поле values
     void           setParamList( QStringList  vlist, const std::string&  list, bool  set_to_node = false );
 
-    int            getTableEntryWidth() noexcept;
-    int            getTableEntryHeight() noexcept;
-
     void           EntryDelete();
-
-    void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет
-    void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
 
     QVBoxLayout   *m_vlayout;
     QHBoxLayout   *m_hlayout;
@@ -61,6 +55,7 @@ public:
     QList<TTableEntryValue*>  m_apValueList;
 
 Q_SIGNALS:
+    void           sendAdd( bool );
     void           sendName( QString&, int );
 
 public Q_SLOTS:
@@ -96,14 +91,6 @@ private:
     TTabDialog    *m_ptTabDialogName;
 
     TTable        *m_pAncestor;
-
-    int            m_width;     // ширина виджета
-    int            m_height;    // высота виджета
-
-    void           widget_parent_stretch( int width, int height, bool add_height = true ) noexcept;  // растягиваем виджет
-    void           widget_parent_shrink( int width, int height ) noexcept;   // сжимаем виджет
-
-    void           widget_size_reset() noexcept;  // сброс размера виджета
 
     bool           need_to_add; // необходимость создать новое значение в ямле
 };

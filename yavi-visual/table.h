@@ -40,7 +40,7 @@ public:
 
     void           setTableEntryValue( TTableEntry  *pEntry, QString&  value, int  index );
 
-    void           fixTableHeight( unsigned  row_count );
+    void           fixTableHeight( unsigned  row_count ) noexcept;
 
     void           resetRow() noexcept;
     void           resetColumn() noexcept;
@@ -65,23 +65,20 @@ Q_SIGNALS:
     void           sendChanged();
 
 private Q_SLOTS:
-    void           onBtnId();
-    void           onBtnName();
-    void           onBtnLink();
-    void           onBtnDec();
-    void           onBtnInc();
-    void           onBtnRowInc();
-    void           onBtnRowName( QString&, int );
-    void           onBtnRowValInc();
-    void           onBtnRowValName();
-    void           onBtnColumnInc();
-    void           onBtnColumnName( QString&, int );
-    void           onBtnColumnValInc();
-    void           onBtnColumnValName();
-    void           onSendCancel();
-    void           onSendValue( QString& );
-    void           onSendValues( TValues& );
-    void           onSendEntry( TValues& );
+    void           onBtnId();                        // нажали кнопку "id"
+    void           onBtnName();                      // нажали кнопку "name"
+    void           onBtnLink();                      // нажали кнопку "link"
+    void           onBtnDec();                       // аналог нажатия кнопки "-"
+    void           onBtnInc();                       // нажали кнопку "+" для таблицы
+    void           onBtnRowInc();                    // нажали кнопку "+" для столбца
+    void           onBtnRowName( QString&, int );    // нажали кнопку "name" для столбца
+    void           onBtnColumnInc();                 // нажали кнопку "+" для строки
+    void           onBtnColumnName( QString&, int ); // нажали кнопку "name" для строки
+    void           onSendAdd( bool );                // информация о добавлении/удалении значения
+    void           onSendCancel();                   // нажали Отмена в диалоге
+    void           onSendValue( QString& );          // нажали Ок в диалоге для редактирования таблицы
+    void           onSendValues( TValues& );         // нажали Ок в диалоге для добавления таблицы
+    void           onSendEntry( TValues& );          // нажали Ок в диалоге для значения
 
 private:
     void           clear() noexcept;

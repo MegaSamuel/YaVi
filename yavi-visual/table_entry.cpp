@@ -64,8 +64,6 @@ void  TTableEntry::onBtnDec()
 {
     //qDebug() << "TTableEntry" << __func__ << getEntryName();
 
-    //widget_shrink( getTableWidth(), getTableHeight() + m_grid->spacing() );
-
     EntryDelete();
 }
 
@@ -127,6 +125,9 @@ void  TTableEntry::onSendValue( QString& a_zValue )
     {
         // создаем новое значение
 
+        // шлем сигнал об добавлении
+        Q_EMIT sendAdd( true );
+
         if( 0 == value.length() )
         {
             // если имя пустое, то ставим дефолтное имя
@@ -166,8 +167,6 @@ void  TTableEntry::onSendValue( QString& a_zValue )
         else if( TValues::keTypeRow == getEntryType() )
         {
             m_hlayout->insertWidget( m_hlayout->count()-1, button, 0, Qt::AlignLeft );
-
-            widget_stretch( getTableEntryWidth() + button->minimumWidth() + m_hlayout->spacing(), 0 );
         }
     }
 
@@ -187,6 +186,9 @@ void  TTableEntry::onSendEntryValue( QString& a_zValue, int  a_nIndex )
     if( 0 == a_zValue.length() )
     {
         // если имя пустое, то удаляем запись
+
+        // шлем сигнал об удалении
+        Q_EMIT sendAdd( false );
 
         // удаляемся из списка детей
         m_apValueList.removeAt( a_nIndex );
@@ -425,83 +427,6 @@ void  TTableEntry::setEntryType( int  type ) noexcept
 int  TTableEntry::getEntryType() noexcept
 {
     return m_entry_type;
-}
-
-//------------------------------------------------------------------------------
-
-void  TTableEntry::widget_size_reset() noexcept
-{
-    m_width = 0;
-    m_height = 0;
-}
-
-void  TTableEntry::widget_stretch( int width, int height, bool add_height ) noexcept
-{
-    // ширину выбираем максимальную из элементов
-    if( width > m_width )
-        m_width = width;
-
-    //qDebug() << "stretch" << width << height;
-
-    // высоту увеличиваем на каждый элемент
-    m_height += height;
-
-    // ставим размер самого себя
-    setMinimumWidth( m_width );
-    setMinimumHeight( m_height );
-
-    widget_parent_stretch( width, height, add_height );
-}
-
-void  TTableEntry::widget_parent_stretch( int width, int height, bool add_height ) noexcept
-{
-    int  val = 0;
-
-    if( Q_NULLPTR != m_pAncestor )
-    {
-        if( add_height )
-        {
-//            val = m_pAncestor->m_vlayout->spacing();
-        }
-
-//        m_pAncestor->widget_stretch( width, height + val );
-    }
-}
-
-void  TTableEntry::widget_shrink( int width, int height ) noexcept
-{
-    Q_UNUSED( width );
-
-    //qDebug() << "shrink" << width << height;
-
-    m_height -= height;
-
-    if( m_height < 0 )
-        m_height = 0;
-
-    // ставим размер самого себя
-    setMinimumWidth( m_width );
-    setMinimumHeight( m_height );
-
-    widget_parent_shrink( width, height );
-}
-
-void  TTableEntry::widget_parent_shrink( int width, int height ) noexcept
-{
-    if( Q_NULLPTR != m_pAncestor )
-    {
-//        m_pAncestor->widget_shrink( width, height );
-    }
-}
-
-int TTableEntry::getTableEntryWidth() noexcept
-{
-    return minimumSize().width();
-}
-
-int TTableEntry::getTableEntryHeight() noexcept
-{
-    return minimumSize().height();
 }
 
 //------------------------------------------------------------------------------

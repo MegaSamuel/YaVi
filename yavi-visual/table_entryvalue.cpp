@@ -35,12 +35,12 @@ void  TTableEntryValue::clear() noexcept
 
 void  TTableEntryValue::onBtnDec()
 {
-    qDebug() << "TTableEntryValue" << __func__ << getEntryValue();
+    //qDebug() << "TTableEntryValue" << __func__ << getEntryValue();
 }
 
 void  TTableEntryValue::onBtnValue()
 {
-    qDebug() << "TTableEntryValue" << __func__ << getEntryValue();
+    //qDebug() << "TTableEntryValue" << __func__ << getEntryValue();
 
     // диалог с пустыми параметрами
     m_ptTabDialogValue->setDlgEmpty();
@@ -54,12 +54,12 @@ void  TTableEntryValue::onBtnValue()
 
 void  TTableEntryValue::onSendCancel()
 {
-    qDebug() << "TTableEntryValue" << __func__ << getEntryValue();
+    //qDebug() << "TTableEntryValue" << __func__ << getEntryValue();
 }
 
 void  TTableEntryValue::onSendValue( QString&  a_zValue )
 {
-    qDebug() << "TTableEntryValue" << __func__ << getEntryValue();
+    //qDebug() << "TTableEntryValue" << __func__ << getEntryValue();
 
     setEntryValue( a_zValue );
 
