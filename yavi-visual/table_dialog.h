@@ -18,7 +18,10 @@ class TTabDialog : public QDialog
     Q_OBJECT
 
 public :
+    // диалог для добавления новой таблицы и редактирования элементов таблицы
     explicit TTabDialog( bool fullsize = true, QString name = "Unknown", QWidget *parent = Q_NULLPTR, QString value = "" );
+    // диалог для добавления новой записи в таблицу
+    explicit TTabDialog( QString name = "Unknown", QWidget *parent = Q_NULLPTR );
     ~TTabDialog();
 
     void    setDlgId( const QString&  name );

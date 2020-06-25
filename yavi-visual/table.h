@@ -81,10 +81,11 @@ private Q_SLOTS:
     void           onSendCancel();
     void           onSendValue( QString& );
     void           onSendValues( TValues& );
+    void           onSendEntry( TValues& );
 
 private:
-    void           clear();
-    void           clear_edit();
+    void           clear() noexcept;
+    void           clear_edit() noexcept;
 
     void           clearNodeSequence();
 
@@ -118,6 +119,7 @@ private:
     TTabDialog    *m_ptTabDialogName;
     TTabDialog    *m_ptTabDialogLink;
     TTabDialog    *m_ptTabDialogAdd;
+    TTabDialog    *m_ptTabDialogAddEntry;
 
     TValues        m_tValues;
 
@@ -134,7 +136,8 @@ private:
 
     void           widget_size_reset() noexcept;  // сброс размера виджета
 
-    bool           need_to_add; // необходимость создать новый набор параметров в ямле
+    bool           need_to_add; // необходимость создать новую таблицу в ямле
+    bool           need_to_add_entry; // необходимость создать новую запись в ямле
 
     bool           edit_id;
     bool           edit_name;
