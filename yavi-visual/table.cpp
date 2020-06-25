@@ -113,7 +113,8 @@ void  TTable::clear() noexcept
     m_zLink.clear();
 
     need_to_add = false;
-    need_to_add_entry = false;
+    need_to_add_row = false;
+    need_to_add_column = false;
 
     clear_edit();
 }
@@ -189,10 +190,10 @@ void  TTable::onBtnInc()
 
 void  TTable::onBtnRowInc()
 {
-    qDebug() << __func__;
+    //qDebug() << __func__;
 
     // признак что хотим создать новую запись
-    need_to_add_entry = true;
+    need_to_add_row = true;
 
     // диалог с пустыми параметрами
     m_ptTabDialogAddEntry->setDlgEmpty();
@@ -204,12 +205,10 @@ void  TTable::onBtnRowInc()
 
 void  TTable::onBtnRowName( QString&  name, int  entry_index )
 {
-    qDebug() << __func__ << name;
+    //qDebug() << __func__ << name;
 
     if( 0 == name.length() )
     {
-        qDebug() << "need to delete";
-
         // удаляемся из layout-а
         m_vlayout->removeWidget( m_apTabEntryList.at(entry_index) );
 
@@ -245,10 +244,10 @@ void  TTable::onBtnRowValName()
 
 void  TTable::onBtnColumnInc()
 {
-    qDebug() << __func__;
+    //qDebug() << __func__;
 
     // признак что хотим создать новую запись
-    need_to_add_entry = true;
+    need_to_add_column = true;
 
     // диалог с пустыми параметрами
     m_ptTabDialogAddEntry->setDlgEmpty();
@@ -260,12 +259,10 @@ void  TTable::onBtnColumnInc()
 
 void  TTable::onBtnColumnName( QString&  name, int  entry_index )
 {
-    qDebug() << __func__ << name;
+    //qDebug() << __func__ << name;
 
     if( 0 == name.length() )
     {
-        qDebug() << "need to delete";
-
         // удаляемся из layout-а
         m_hlayout->removeWidget( m_apTabEntryList.at(entry_index) );
 
@@ -302,7 +299,8 @@ void  TTable::onBtnColumnValName()
 void  TTable::onSendCancel()
 {
     need_to_add = false;
-    need_to_add_entry = false;
+    need_to_add_row = false;
+    need_to_add_column = false;
 
     clear_edit();
 }
@@ -348,11 +346,6 @@ void  TTable::onSendValue( QString& a_zValue )
 void  TTable::onSendValues( TValues& a_tValues )
 {
     m_tValues = a_tValues;
-
-    if( false == need_to_add )
-    {
-        qDebug() << "it has gone wrong!";
-    }
 
     if( true == need_to_add )
     {
@@ -421,8 +414,6 @@ void  TTable::onSendValues( TValues& a_tValues )
         pTable->setNode( m_node_parent[index] );
         pTable->setNodeParent( m_node_parent );
         pTable->setNodeIndex( index );
-
-        qDebug() << pTable->getTableName() << "index" << index;
     }
 
     need_to_add = false;
@@ -432,86 +423,86 @@ void  TTable::onSendEntry( TValues& a_tValues )
 {
     m_tValues = a_tValues;
 
-    if( false == need_to_add_entry )
-    {
-        qDebug() << "it has gone wrong!";
-    }
-
-    if( true == need_to_add_entry )
+    if( true == need_to_add_row )
     {
         // создаем новую запись
-
-        qDebug() << "new entry";
 
         if( 0 == m_tValues.m_zName.length() )
         {
             // если имя пустое, то ставим дефолтное имя
             m_tValues.m_zName = "noname";
         }
-/*
-        // добавляем таблицу
-        TTable  *pTable;
-        pTable = new TTable( m_pAncestor );
 
-        // добавляемся к родителю
-        m_pAncestor->m_vlayout->addWidget( pTable );
-        m_pAncestor->m_apTableList.append(pTable);
+        int  index = m_apTabEntryList.size();
+        TTableEntry  *pEntry;
 
-        // ставим значения параметров
-        pTable->setTableId( m_tValues.m_zId.toStdString() );
-        pTable->setTableName( m_tValues.m_zName.toStdString() );
-        pTable->setTableType( m_tValues.m_uType );
+        // новая запись
+        pEntry = new TTableEntry( this );
+        pEntry->setNode( m_node[ GoodsTableRow ][index] );
+        pEntry->setNodeParent( m_node[ GoodsTableRow ] );
+        pEntry->setNodeIndex( index );
+        pEntry->setEntryType( TValues::keTypeRow );
 
-        // очищаем ямл
-        m_temporary_node.reset();
+        // добавляем запись в список
+        m_apTabEntryList.append( pEntry );
 
-        // пишем их в пустой ямл
-        __yaml_SetString( m_temporary_node, GoodsTableId, m_tValues.m_zId.toStdString() );
-        __yaml_SetString( m_temporary_node, GoodsTableName, m_tValues.m_zName.toStdString() );
+        // имя
+        std::string  row_name = m_tValues.m_zName.toStdString();
+        pEntry->setEntryName( row_name, true );
 
-        if( TValues::keTypeLink == m_tValues.m_uType )
-        {
-            __yaml_SetString( m_temporary_node, GoodsTableLink, "link" );
-        }
-        else if( TValues::keTypeColumn == m_tValues.m_uType )
-        {
-            // очищаем ямл
-            m_temporary_inner_node.reset();
+        // значение в виде строки
+        const std::string  row_val = "";
+        pEntry->setEntryValues( row_val, true );
 
-            // пустая запись столбца
-            __yaml_SetString( m_temporary_inner_node, GoodsTableName, "name" );
-            __yaml_SetString( m_temporary_inner_node, GoodsTableValue, "value" );
+        // значение в виде списока
+        QStringList  row_list;
+        row_list.clear();
 
-            // добавляем ямл к временному
-            m_temporary_node[ GoodsTableColumn ].push_back( m_temporary_inner_node );
-        }
-        else if( TValues::keTypeRow == m_tValues.m_uType )
-        {
-            // очищаем ямл
-            m_temporary_inner_node.reset();
-
-            // пустая запись строки
-            __yaml_SetString( m_temporary_inner_node, GoodsTableName, "name" );
-            __yaml_SetString( m_temporary_inner_node, GoodsTableValue, "value" );
-
-            // добавляем ямл к временному
-            m_temporary_node[ GoodsTableRow ].push_back( m_temporary_inner_node );
-        }
-
-        // добавляем ямл к основному
-        m_node_parent.push_back( m_temporary_node );
-
-        int index = static_cast<int>(m_node_parent.size()) - 1;
-
-        pTable->setNode( m_node_parent[index] );
-        pTable->setNodeParent( m_node_parent );
-        pTable->setNodeIndex( index );
-
-        qDebug() << pTable->getTableName() << "index" << index;
-*/
+        pEntry->setParamList( row_list, row_val );
+        setTableRow( row_name, row_list );
     }
 
-    need_to_add_entry = false;
+    if( true == need_to_add_column )
+    {
+        // создаем новую запись
+
+        if( 0 == m_tValues.m_zName.length() )
+        {
+            // если имя пустое, то ставим дефолтное имя
+            m_tValues.m_zName = "noname";
+        }
+
+        int  index = m_apTabEntryList.size();
+        TTableEntry  *pEntry;
+
+        // новая запись
+        pEntry = new TTableEntry( this );
+        pEntry->setNode( m_node[ GoodsTableColumn ][index] );
+        pEntry->setNodeParent( m_node[ GoodsTableColumn ] );
+        pEntry->setNodeIndex( index );
+        pEntry->setEntryType( TValues::keTypeColumn );
+
+        // добавляем запись в список
+        m_apTabEntryList.append( pEntry );
+
+        // имя
+        std::string  col_name = m_tValues.m_zName.toStdString();
+        pEntry->setEntryName( col_name, true );
+
+        // значение в виде строки
+        const std::string  col_val = "";
+        pEntry->setEntryValues( col_val, true );
+
+        // значение в виде списока
+        QStringList  col_list;
+        col_list.clear();
+
+        pEntry->setParamList( col_list, col_val );
+        setTableColumn( col_name, col_list );
+    }
+
+    need_to_add_row = false;
+    need_to_add_column = false;
 }
 
 //------------------------------------------------------------------------------
@@ -596,8 +587,6 @@ void  TTable::setTableType( unsigned type ) noexcept
 
     if( TValues::keTypeLink == m_uTableType )
     {
-        //qDebug() << "table type" << m_uTableType << "link";
-
         // диалог для ссылки
         m_ptTabDialogLink = new TTabDialog( false, "Table", this, "Link" );
 
@@ -616,8 +605,6 @@ void  TTable::setTableType( unsigned type ) noexcept
     }
     else if( TValues::keTypeColumn == m_uTableType )
     {
-        //qDebug() << "table type" << m_uTableType << "column";
-
         // диалог для новой записи
         m_ptTabDialogAddEntry = new TTabDialog( "Add column", this );
 
@@ -631,8 +618,6 @@ void  TTable::setTableType( unsigned type ) noexcept
     }
     else if( TValues::keTypeRow == m_uTableType )
     {
-        //qDebug() << "table type" << m_uTableType << "row";
-
         // диалог для новой записи
         m_ptTabDialogAddEntry = new TTabDialog( "Add row", this );
 
@@ -842,8 +827,11 @@ void TTable::setTableRow( const std::string&  name, QStringList& list )
 
     m_vlayout->addLayout( pEntry->m_hlayout );
 
+    int  width = ( 4 + i ) * ptBtnRowValInc->minimumSize().width() + ( 3 + i ) * m_grid->spacing();
+
     // подгоняем ширину
-    widget_stretch( m_grid->minimumSize().width() + i * m_grid->spacing(), 0 );
+    //widget_stretch( m_grid->minimumSize().width() + i * m_grid->spacing(), 0 );
+    widget_stretch( width, 0 );
 
     nextRow();
 }

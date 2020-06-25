@@ -32,6 +32,9 @@ public:
     void           setEntryName( const std::string&  name, bool  set_to_node = false );
     QString        getEntryName() noexcept;
 
+    void           setEntryValues( const std::string&  values, bool  set_to_node = false );
+    QString        getEntryValues() noexcept;
+
     void           setEntryType( int ) noexcept;
     int            getEntryType() noexcept;
 
@@ -84,6 +87,7 @@ private:
     int            m_entry_type;  //
 
     QString        m_zName;
+    QString        m_zValues;
 
     std::string    m_zList;
     QStringList    m_vList;

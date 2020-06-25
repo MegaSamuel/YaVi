@@ -137,7 +137,8 @@ private:
     void           widget_size_reset() noexcept;  // сброс размера виджета
 
     bool           need_to_add; // необходимость создать новую таблицу в ямле
-    bool           need_to_add_entry; // необходимость создать новую запись в ямле
+    bool           need_to_add_row; // необходимость создать новую запись в ямле
+    bool           need_to_add_column; // необходимость создать новую запись в ямле
 
     bool           edit_id;
     bool           edit_name;

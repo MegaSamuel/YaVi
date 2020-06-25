@@ -50,6 +50,7 @@ void  TTableEntry::clear() noexcept
     m_entry_type = 0;
 
     m_zName.clear();
+    m_zValues.clear();
 
     m_zList.clear();
     m_vList.clear();
@@ -126,8 +127,6 @@ void  TTableEntry::onSendValue( QString& a_zValue )
     {
         // создаем новое значение
 
-        qDebug() << "new value";
-
         if( 0 == value.length() )
         {
             // если имя пустое, то ставим дефолтное имя
@@ -167,6 +166,8 @@ void  TTableEntry::onSendValue( QString& a_zValue )
         else if( TValues::keTypeRow == getEntryType() )
         {
             m_hlayout->insertWidget( m_hlayout->count()-1, button, 0, Qt::AlignLeft );
+
+            widget_stretch( getTableEntryWidth() + button->minimumWidth() + m_hlayout->spacing(), 0 );
         }
     }
 
@@ -175,7 +176,7 @@ void  TTableEntry::onSendValue( QString& a_zValue )
 
 void  TTableEntry::onSendEntryValue( QString& a_zValue, int  a_nIndex )
 {
-    qDebug() << __func__ << getEntryName() << a_zValue << a_nIndex;
+    //qDebug() << __func__ << getEntryName() << a_zValue << a_nIndex;
 
     if( 0 != a_zValue.length() )
     {
@@ -399,6 +400,21 @@ void  TTableEntry::setEntryName( const std::string&  name, bool  set_to_node )
 QString  TTableEntry::getEntryName() noexcept
 {
     return m_zName;
+}
+
+void  TTableEntry::setEntryValues( const std::string&  values, bool  set_to_node )
+{
+    m_zValues = QString::fromStdString(values);
+
+    if( set_to_node )
+    {
+        __yaml_SetString( m_node, "values", values );
+    }
+}
+
+QString  TTableEntry::getEntryValues() noexcept
+{
+    return m_zValues;
 }
 
 void  TTableEntry::setEntryType( int  type ) noexcept

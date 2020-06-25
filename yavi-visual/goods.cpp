@@ -221,7 +221,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
                     // значение
                     const std::string  col_val = __yaml_GetString( config[ GoodsTableSection ][j][ GoodsTableColumn ][i], GoodsTableValue );
-                    //pEntry->setEntryValues( col_val );
+                    pEntry->setEntryValues( col_val );
 
                     QStringList  col_list;
                     col_list.clear();
@@ -261,7 +261,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
                     // значение
                     const std::string  row_val = __yaml_GetString( config[ GoodsTableSection ][j][ GoodsTableRow ][i], GoodsTableValue );
-                    //pEntry->setEntryValues( row_val );
+                    pEntry->setEntryValues( row_val );
 
                     QStringList  row_list;
                     row_list.clear();
