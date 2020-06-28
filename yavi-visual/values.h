@@ -38,6 +38,14 @@ public:
 
     }
 
+    enum ETableType
+    {
+        keTypeNone   = 0,
+        keTypeLink   = 1,
+        keTypeColumn = 2,
+        keTypeRow    = 3,
+    };
+
     // имена основных секций файла конфигурации
     #define  GoodsCategorySection    "category"
     #define  GoodsCategoryName       "name"

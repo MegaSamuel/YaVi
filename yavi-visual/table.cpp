@@ -46,6 +46,14 @@ TTable::TTable( TGoods  *pAncestor )
     m_grid->setAlignment( Qt::AlignLeft | Qt::AlignTop );
     m_grid->setMargin(0);
 
+    m_vlayout = new QVBoxLayout;
+    m_vlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    m_vlayout->setMargin( 0 );
+
+    m_hlayout = new QHBoxLayout;
+    m_hlayout->setAlignment( Qt::AlignLeft | Qt::AlignTop );
+    m_hlayout->setMargin( 0 );
+
     // кнопка с id
     m_ptBtnId = new QPushButton( "id" );
     m_ptBtnId->setToolTip( "ID таблицы" );
@@ -65,7 +73,7 @@ TTable::TTable( TGoods  *pAncestor )
     m_ptBtnInc->setToolTip( "Добавить таблицу" );
     m_ptBtnInc->setFixedWidth( 93 );
     connect( m_ptBtnInc, &QPushButton::clicked, this, &TTable::onBtnInc );
-    m_grid->addWidget( m_ptBtnInc, m_row+1, 0, Qt::AlignLeft );
+    m_grid->addWidget( m_ptBtnInc, m_row+1, 0, Qt::AlignLeft | Qt::AlignTop );
 
     // перевод строки и колонки в grid для следующих добавлений
     nextRow();
@@ -86,7 +94,7 @@ TTable::~TTable()
 
 }
 
-void  TTable::clear()
+void  TTable::clear() noexcept
 {
     resetRow();
     resetColumn();
@@ -98,18 +106,20 @@ void  TTable::clear()
     m_temporary_node = YAML::Node();
     m_temporary_inner_node = YAML::Node();
 
-    m_uTableType = keTypeNone;
+    m_uTableType = TValues::keTypeNone;
 
     m_zId.clear();
     m_zName.clear();
     m_zLink.clear();
 
     need_to_add = false;
+    need_to_add_row = false;
+    need_to_add_column = false;
 
     clear_edit();
 }
 
-void  TTable::clear_edit()
+void  TTable::clear_edit() noexcept
 {
     edit_id = false;
     edit_name = false;
@@ -166,7 +176,7 @@ void  TTable::onBtnDec()
 
 void  TTable::onBtnInc()
 {
-    // признак что хотим создать новый набор параметров
+    // признак что хотим создать новую таблицу
     need_to_add = true;
 
     // диалог с пустыми параметрами
@@ -180,47 +190,125 @@ void  TTable::onBtnInc()
 
 void  TTable::onBtnRowInc()
 {
-    qDebug() << __func__;
+    //qDebug() << __func__;
+
+    // признак что хотим создать новую запись
+    need_to_add_row = true;
+
+    // диалог с пустыми параметрами
+    m_ptTabDialogAddEntry->setDlgEmpty();
+
+    m_ptTabDialogAddEntry->setDlgName( "NewRow" );
+
+    m_ptTabDialogAddEntry->open();
 }
 
-void  TTable::onBtnRowName( QString&  name )
+void  TTable::onBtnRowName( QString&  name, int  entry_index )
 {
-    qDebug() << __func__ << name;
-}
+    //qDebug() << __func__ << name;
 
-void  TTable::onBtnRowValInc()
-{
-    qDebug() << __func__;
-}
+    if( 0 == name.length() )
+    {
+        // удаляемся из layout-а
+        m_vlayout->removeWidget( m_apTabEntryList.at(entry_index) );
 
-void  TTable::onBtnRowValName()
-{
-    qDebug() << __func__;
+        // удаляем себя из списка
+        m_apTabEntryList.removeAt(entry_index);
+
+        int  index;
+
+        // делаем переиндексацию оставшихся детей
+        for( int i = 0; i < m_apTabEntryList.count(); i++ )
+        {
+            index = m_apTabEntryList.at(i)->getNodeIndex();
+
+            if( index > entry_index )
+            {
+                index -= 1;
+
+                m_apTabEntryList.at(i)->setNodeIndex( index );
+            }
+        }
+    }
 }
 
 void  TTable::onBtnColumnInc()
 {
-    qDebug() << __func__;
+    //qDebug() << __func__;
+
+    // признак что хотим создать новую запись
+    need_to_add_column = true;
+
+    // диалог с пустыми параметрами
+    m_ptTabDialogAddEntry->setDlgEmpty();
+
+    m_ptTabDialogAddEntry->setDlgName( "NewColumn" );
+
+    m_ptTabDialogAddEntry->open();
 }
 
-void  TTable::onBtnColumnName( QString&  name )
+void  TTable::onBtnColumnName( QString&  name, int  entry_index )
 {
-    qDebug() << __func__ << name;
+    //qDebug() << __func__ << name;
+
+    if( 0 == name.length() )
+    {
+        // удаляемся из layout-а
+        m_hlayout->removeWidget( m_apTabEntryList.at(entry_index) );
+
+        // удаляем себя из списка
+        m_apTabEntryList.removeAt(entry_index);
+
+        int  index;
+
+        // делаем переиндексацию оставшихся детей
+        for( int i = 0; i < m_apTabEntryList.count(); i++ )
+        {
+            index = m_apTabEntryList.at(i)->getNodeIndex();
+
+            if( index > entry_index )
+            {
+                index -= 1;
+
+                m_apTabEntryList.at(i)->setNodeIndex( index );
+            }
+        }
+    }
 }
 
-void  TTable::onBtnColumnValInc()
+void  TTable::onSendAdd( bool  add )
 {
-    qDebug() << __func__;
-}
+    //qDebug() << __func__;
 
-void  TTable::onBtnColumnValName()
-{
-    qDebug() << __func__;
+    if( true == add )
+    {
+        if( TValues::keTypeRow == m_uTableType )
+        {
+            widget_stretch( getTableWidth() + m_ptBtnInc->minimumSize().width() + m_grid->spacing(), 0 );
+        }
+        else if( TValues::keTypeColumn == m_uTableType )
+        {
+            widget_stretch( 0, m_ptBtnInc->minimumSizeHint().height() + m_grid->spacing() );
+        }
+    }
+    else
+    {
+        if( TValues::keTypeRow == m_uTableType )
+        {
+            widget_shrink( 0, 0 );
+        }
+        else if( TValues::keTypeColumn == m_uTableType )
+        {
+            widget_shrink( 0, 0 );
+        }
+    }
 }
 
 void  TTable::onSendCancel()
 {
     need_to_add = false;
+    need_to_add_row = false;
+    need_to_add_column = false;
 
     clear_edit();
 }
@@ -267,11 +355,6 @@ void  TTable::onSendValues( TValues& a_tValues )
 {
     m_tValues = a_tValues;
 
-    if( false == need_to_add )
-    {
-        qDebug() << "it has gone wrong!";
-    }
-
     if( true == need_to_add )
     {
         // создаем новую таблицу
@@ -302,11 +385,11 @@ void  TTable::onSendValues( TValues& a_tValues )
         __yaml_SetString( m_temporary_node, GoodsTableId, m_tValues.m_zId.toStdString() );
         __yaml_SetString( m_temporary_node, GoodsTableName, m_tValues.m_zName.toStdString() );
 
-        if( keTypeLink == m_tValues.m_uType )
+        if( TValues::keTypeLink == m_tValues.m_uType )
         {
             __yaml_SetString( m_temporary_node, GoodsTableLink, "link" );
         }
-        else if( keTypeColumn == m_tValues.m_uType )
+        else if( TValues::keTypeColumn == m_tValues.m_uType )
         {
             // очищаем ямл
             m_temporary_inner_node.reset();
@@ -318,7 +401,7 @@ void  TTable::onSendValues( TValues& a_tValues )
             // добавляем ямл к временному
             m_temporary_node[ GoodsTableColumn ].push_back( m_temporary_inner_node );
         }
-        else if( keTypeRow == m_tValues.m_uType )
+        else if( TValues::keTypeRow == m_tValues.m_uType )
         {
             // очищаем ямл
             m_temporary_inner_node.reset();
@@ -339,11 +422,95 @@ void  TTable::onSendValues( TValues& a_tValues )
         pTable->setNode( m_node_parent[index] );
         pTable->setNodeParent( m_node_parent );
         pTable->setNodeIndex( index );
-
-        qDebug() << pTable->getTableName() << "index" << index;
     }
 
     need_to_add = false;
+}
+
+void  TTable::onSendEntry( TValues& a_tValues )
+{
+    m_tValues = a_tValues;
+
+    if( true == need_to_add_row )
+    {
+        // создаем новую запись
+
+        if( 0 == m_tValues.m_zName.length() )
+        {
+            // если имя пустое, то ставим дефолтное имя
+            m_tValues.m_zName = "noname";
+        }
+
+        int  index = m_apTabEntryList.size();
+        TTableEntry  *pEntry;
+
+        // новая запись
+        pEntry = new TTableEntry( this );
+        pEntry->setNode( m_node[ GoodsTableRow ][index] );
+        pEntry->setNodeParent( m_node[ GoodsTableRow ] );
+        pEntry->setNodeIndex( index );
+        pEntry->setEntryType( TValues::keTypeRow );
+
+        // добавляем запись в список
+        m_apTabEntryList.append( pEntry );
+
+        // имя
+        std::string  row_name = m_tValues.m_zName.toStdString();
+        pEntry->setEntryName( row_name, true );
+
+        // значение в виде строки
+        const std::string  row_val = "";
+        pEntry->setEntryValues( row_val, true );
+
+        // значение в виде списока
+        QStringList  row_list;
+        row_list.clear();
+
+        pEntry->setParamList( row_list, row_val );
+        setTableRow( row_name, row_list );
+    }
+
+    if( true == need_to_add_column )
+    {
+        // создаем новую запись
+
+        if( 0 == m_tValues.m_zName.length() )
+        {
+            // если имя пустое, то ставим дефолтное имя
+            m_tValues.m_zName = "noname";
+        }
+
+        int  index = m_apTabEntryList.size();
+        TTableEntry  *pEntry;
+
+        // новая запись
+        pEntry = new TTableEntry( this );
+        pEntry->setNode( m_node[ GoodsTableColumn ][index] );
+        pEntry->setNodeParent( m_node[ GoodsTableColumn ] );
+        pEntry->setNodeIndex( index );
+        pEntry->setEntryType( TValues::keTypeColumn );
+
+        // добавляем запись в список
+        m_apTabEntryList.append( pEntry );
+
+        // имя
+        std::string  col_name = m_tValues.m_zName.toStdString();
+        pEntry->setEntryName( col_name, true );
+
+        // значение в виде строки
+        const std::string  col_val = "";
+        pEntry->setEntryValues( col_val, true );
+
+        // значение в виде списока
+        QStringList  col_list;
+        col_list.clear();
+
+        pEntry->setParamList( col_list, col_val );
+        setTableColumn( col_name, col_list );
+    }
+
+    need_to_add_row = false;
+    need_to_add_column = false;
 }
 
 //------------------------------------------------------------------------------
@@ -426,10 +593,8 @@ void  TTable::setTableType( unsigned type ) noexcept
 {
     m_uTableType = type;
 
-    if( keTypeLink == m_uTableType )
+    if( TValues::keTypeLink == m_uTableType )
     {
-        //qDebug() << "table type" << m_uTableType << "link";
-
         // диалог для ссылки
         m_ptTabDialogLink = new TTabDialog( false, "Table", this, "Link" );
 
@@ -446,13 +611,31 @@ void  TTable::setTableType( unsigned type ) noexcept
         // эта кнопка на второй строке, высоту этой строки учли в конструкторе класса
         //widget_stretch( m_grid->minimumSize().width(), m_ptBtnLink->minimumSizeHint().height() );
     }
-    else if( keTypeColumn == m_uTableType )
+    else if( TValues::keTypeColumn == m_uTableType )
     {
-        //qDebug() << "table type" << m_uTableType << "column";
+        // диалог для новой записи
+        m_ptTabDialogAddEntry = new TTabDialog( "Add column", this );
+
+        // ловим сигнал от диалога об отмене
+        connect( m_ptTabDialogAddEntry, &TTabDialog::sendCancel, this, &TTable::onSendCancel );
+
+        // ловим сигнал от диалога с данными
+        connect( m_ptTabDialogAddEntry, &TTabDialog::sendValues, this, &TTable::onSendEntry );
+
+        m_grid->addLayout( m_hlayout, 1, 1, Qt::AlignLeft );
     }
-    else if( keTypeRow == m_uTableType )
+    else if( TValues::keTypeRow == m_uTableType )
     {
-        //qDebug() << "table type" << m_uTableType << "row";
+        // диалог для новой записи
+        m_ptTabDialogAddEntry = new TTabDialog( "Add row", this );
+
+        // ловим сигнал от диалога об отмене
+        connect( m_ptTabDialogAddEntry, &TTabDialog::sendCancel, this, &TTable::onSendCancel );
+
+        // ловим сигнал от диалога с данными
+        connect( m_ptTabDialogAddEntry, &TTabDialog::sendValues, this, &TTable::onSendEntry );
+
+        m_grid->addLayout( m_vlayout, 1, 1, Qt::AlignLeft );
     }
 }
 
@@ -582,16 +765,34 @@ const QString TTable::getTableLink()
 
 //------------------------------------------------------------------------------
 
+void TTable::setTableEntryValue( TTableEntry  *pEntry, QString&  value, int  index )
+{
+    TTableEntryValue  *pEntryValue;
+
+    // новая запись
+    pEntryValue = new TTableEntryValue( pEntry );
+    pEntryValue->setEntryValue( value );
+    pEntryValue->setValueIndex( index );
+
+    // ловим сигнал с данными значения
+    connect( pEntryValue, &TTableEntryValue::sendEntryValue, pEntry, &TTableEntry::onSendEntryValue );
+
+    // добавляем запись в список
+    pEntry->m_apValueList.append( pEntryValue );
+}
+
 void TTable::setTableRow( const std::string&  name, QStringList& list )
 {
+    TTableEntry  *pEntry = m_apTabEntryList.last();
     int column = 0;
 
     // кнопка плюс для добавления значения
     QPushButton *ptBtnRowValInc = new QPushButton( "+" );
     ptBtnRowValInc->setToolTip( "Добавить значение" );
     ptBtnRowValInc->setFixedWidth( 93 );
-    connect( ptBtnRowValInc, &QPushButton::clicked, this, &TTable::onBtnRowValInc );
-    m_grid->addWidget( ptBtnRowValInc, m_row, m_column + column, Qt::AlignLeft );
+    connect( pEntry, &TTableEntry::sendAdd, this, &TTable::onSendAdd );
+    connect( ptBtnRowValInc, &QPushButton::clicked, pEntry, &TTableEntry::onBtnInc );
+    pEntry->m_hlayout->addWidget( ptBtnRowValInc, 0, Qt::AlignLeft );
 
     column += 1;
 
@@ -599,25 +800,25 @@ void TTable::setTableRow( const std::string&  name, QStringList& list )
     QPushButton *ptBtnRowName = new QPushButton( QString::fromStdString(name) );
     ptBtnRowName->setToolTip( "Строка: " + QString::fromStdString(name) );
     ptBtnRowName->setFixedWidth( 93 );
-    connect( ptBtnRowName, &QPushButton::clicked, m_apRowList.last(), &TTabEntry::onBtnName );
-    //connect( m_apRowList.last(), &TTabEntry::sendName, this, &TTable::onBtnRowName );
-    connect( m_apRowList.last(), &TTabEntry::sendName, ptBtnRowName, &QPushButton::setText );
-    m_grid->addWidget( ptBtnRowName, m_row, m_column + column, Qt::AlignLeft );
+    connect( ptBtnRowName, &QPushButton::clicked, pEntry, &TTableEntry::onBtnName );
+    connect( pEntry, &TTableEntry::sendName, this, &TTable::onBtnRowName );
+    connect( pEntry, &TTableEntry::sendName, ptBtnRowName, &QPushButton::setText );
+    pEntry->m_hlayout->addWidget( ptBtnRowName, 0, Qt::AlignLeft );
 
     column += 1;
 
-    int  i = 0;
+    int i = 0;
 
-    for( auto& it : list )
+    for( i = 0; i < static_cast<int>(list.size()); i++ )
     {
-        i++;
-
         // кнопки со значениями
-        QPushButton  *button = new QPushButton( it );
-        button->setToolTip( "Значение: " + it );
+        QPushButton  *button = new QPushButton( list[i] );
+        button->setToolTip( "Значение: " + list[i] );
         button->setFixedWidth( 93 );
-        connect( button, &QPushButton::clicked, this, &TTable::onBtnRowValName );
-        m_grid->addWidget( button, m_row, m_column + column, Qt::AlignLeft );
+        setTableEntryValue( pEntry, list[i], i );
+        connect( button, &QPushButton::clicked, pEntry->m_apValueList.last(), &TTableEntryValue::onBtnValue );
+        connect( pEntry->m_apValueList.last(), &TTableEntryValue::sendEntryValue, button, &QPushButton::setText );
+        pEntry->m_hlayout->addWidget( button, 0, Qt::AlignLeft );
 
         column += 1;
     }
@@ -627,26 +828,33 @@ void TTable::setTableRow( const std::string&  name, QStringList& list )
     ptBtnRowInc->setToolTip( "Добавить строку" );
     ptBtnRowInc->setFixedWidth( 93 );
     connect( ptBtnRowInc, &QPushButton::clicked, this, &TTable::onBtnRowInc );
-    m_grid->addWidget( ptBtnRowInc, m_row, m_column + column, Qt::AlignLeft );
+    pEntry->m_hlayout->addWidget( ptBtnRowInc, 0, Qt::AlignLeft );
 
     column += 1;
 
+    m_vlayout->addLayout( pEntry->m_hlayout );
+
+    int  width = ( 4 + i ) * ptBtnRowValInc->minimumSize().width() + ( 3 + i ) * m_grid->spacing();
+
     // подгоняем ширину
-    widget_stretch( m_grid->minimumSize().width() + i * m_grid->spacing(), 0 );
+    //widget_stretch( m_grid->minimumSize().width() + i * m_grid->spacing(), 0 );
+    widget_stretch( width, 0 );
 
     nextRow();
 }
 
 void TTable::setTableColumn( const std::string&  name, QStringList& list )
 {
+    TTableEntry  *pEntry = m_apTabEntryList.last();
     int row = 0;
 
     // кнопка плюс для добавления значения
     QPushButton *ptBtnColumnValInc = new QPushButton( "+" );
     ptBtnColumnValInc->setToolTip( "Добавить значение" );
     ptBtnColumnValInc->setFixedWidth( 93 );
-    connect( ptBtnColumnValInc, &QPushButton::clicked, this, &TTable::onBtnColumnValInc );
-    m_grid->addWidget( ptBtnColumnValInc, m_row + row, m_column, Qt::AlignLeft );
+    connect( pEntry, &TTableEntry::sendAdd, this, &TTable::onSendAdd );
+    connect( ptBtnColumnValInc, &QPushButton::clicked, pEntry, &TTableEntry::onBtnInc );
+    pEntry->m_vlayout->addWidget( ptBtnColumnValInc, 0, Qt::AlignLeft );
 
     row += 1;
 
@@ -654,25 +862,23 @@ void TTable::setTableColumn( const std::string&  name, QStringList& list )
     QPushButton *ptBtnColumnName = new QPushButton( QString::fromStdString(name) );
     ptBtnColumnName->setToolTip( "Столбец: " + QString::fromStdString(name) );
     ptBtnColumnName->setFixedWidth( 93 );
-    connect( ptBtnColumnName, &QPushButton::clicked, m_apColumnList.last(), &TTabEntry::onBtnName );
-    //connect( m_apColumnList.last(), &TTabEntry::sendName, this, &TTable::onBtnColumnName );
-    connect( m_apColumnList.last(), &TTabEntry::sendName, ptBtnColumnName, &QPushButton::setText );
-    m_grid->addWidget( ptBtnColumnName, m_row + row, m_column, Qt::AlignLeft );
+    connect( ptBtnColumnName, &QPushButton::clicked, pEntry, &TTableEntry::onBtnName );
+    connect( pEntry, &TTableEntry::sendName, this, &TTable::onBtnColumnName );
+    connect( pEntry, &TTableEntry::sendName, ptBtnColumnName, &QPushButton::setText );
+    pEntry->m_vlayout->addWidget( ptBtnColumnName, 0, Qt::AlignLeft );
 
     row += 1;
 
-    int  i = 0;
-
-    for( auto& it : list )
+    for( int i = 0; i < static_cast<int>(list.size()); i++ )
     {
-        i++;
-
         // кнопки со значениями
-        QPushButton  *button = new QPushButton( it );
-        button->setToolTip( "Значение: " + it );
+        QPushButton  *button = new QPushButton( list[i] );
+        button->setToolTip( "Значение: " + list[i] );
         button->setFixedWidth( 93 );
-        connect( button, &QPushButton::clicked, this, &TTable::onBtnColumnValName );
-        m_grid->addWidget( button, m_row + row, m_column, Qt::AlignLeft );
+        setTableEntryValue( pEntry, list[i], i );
+        connect( button, &QPushButton::clicked, pEntry->m_apValueList.last(), &TTableEntryValue::onBtnValue );
+        connect( pEntry->m_apValueList.last(), &TTableEntryValue::sendEntryValue, button, &QPushButton::setText );
+        pEntry->m_vlayout->addWidget( button, 0, Qt::AlignLeft );
 
         row += 1;
     }
@@ -682,7 +888,9 @@ void TTable::setTableColumn( const std::string&  name, QStringList& list )
     ptBtnColumnInc->setToolTip( "Добавить столбец" );
     ptBtnColumnInc->setFixedWidth( 93 );
     connect( ptBtnColumnInc, &QPushButton::clicked, this, &TTable::onBtnColumnInc );
-    m_grid->addWidget( ptBtnColumnInc, m_row + row, m_column, Qt::AlignLeft );
+    pEntry->m_vlayout->addWidget( ptBtnColumnInc, 0, Qt::AlignLeft );
+
+    m_hlayout->addLayout( pEntry->m_vlayout );
 
     //widget_stretch( m_grid->minimumSize().width(), label->minimumSize().height() + m_grid->spacing() );
 
@@ -691,7 +899,7 @@ void TTable::setTableColumn( const std::string&  name, QStringList& list )
 
 //------------------------------------------------------------------------------
 
-void TTable::fixTableHeight( unsigned  row_count )
+void TTable::fixTableHeight( unsigned  row_count ) noexcept
 {
     widget_stretch( 0, static_cast<int>(row_count) * ( m_ptBtnInc->minimumSizeHint().height() + m_grid->spacing() ) );
 }

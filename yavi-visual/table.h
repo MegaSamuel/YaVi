@@ -3,8 +3,8 @@
 
 #include <QtWidgets>
 
-#include "tabentry.h"
-#include "tabdialog.h"
+#include "table_entry.h"
+#include "table_dialog.h"
 #include "values.h"
 
 //------------------------------------------------------------------------------
@@ -22,14 +22,6 @@ public:
     explicit TTable( TGoods  *pAncestor = Q_NULLPTR );
     ~TTable();
 
-    enum ETableType
-    {
-        keTypeNone   = 0,
-        keTypeLink   = 1,
-        keTypeColumn = 2,
-        keTypeRow    = 3,
-    };
-
     void           setTableType( unsigned  type ) noexcept;
 
     void           setNode( const YAML::Node&  node );
@@ -46,7 +38,9 @@ public:
     void           setTableRow( const std::string&  name, QStringList& list );
     void           setTableColumn( const std::string&  name, QStringList& list );
 
-    void           fixTableHeight( unsigned  row_count );
+    void           setTableEntryValue( TTableEntry  *pEntry, QString&  value, int  index );
+
+    void           fixTableHeight( unsigned  row_count ) noexcept;
 
     void           resetRow() noexcept;
     void           resetColumn() noexcept;
@@ -65,33 +59,30 @@ public:
     void           widget_stretch( int width, int height, bool add_height = true ) noexcept;         // растягиваем виджет
     void           widget_shrink( int width, int height ) noexcept;          // сжимаем виджет
 
-    QList<TTabEntry*>  m_apRowList;
-    QList<TTabEntry*>  m_apColumnList;
+    QList<TTableEntry*>  m_apTabEntryList;
 
 Q_SIGNALS:
     void           sendChanged();
 
 private Q_SLOTS:
-    void           onBtnId();
-    void           onBtnName();
-    void           onBtnLink();
-    void           onBtnDec();
-    void           onBtnInc();
-    void           onBtnRowInc();
-    void           onBtnRowName( QString& ); //??
-    void           onBtnRowValInc();
-    void           onBtnRowValName();
-    void           onBtnColumnInc();
-    void           onBtnColumnName( QString& ); //??
-    void           onBtnColumnValInc();
-    void           onBtnColumnValName();
-    void           onSendCancel();
-    void           onSendValue( QString& );
-    void           onSendValues( TValues& );
+    void           onBtnId();                        // нажали кнопку "id"
+    void           onBtnName();                      // нажали кнопку "name"
+    void           onBtnLink();                      // нажали кнопку "link"
+    void           onBtnDec();                       // аналог нажатия кнопки "-"
+    void           onBtnInc();                       // нажали кнопку "+" для таблицы
+    void           onBtnRowInc();                    // нажали кнопку "+" для столбца
+    void           onBtnRowName( QString&, int );    // нажали кнопку "name" для столбца
+    void           onBtnColumnInc();                 // нажали кнопку "+" для строки
+    void           onBtnColumnName( QString&, int ); // нажали кнопку "name" для строки
+    void           onSendAdd( bool );                // информация о добавлении/удалении значения
+    void           onSendCancel();                   // нажали Отмена в диалоге
+    void           onSendValue( QString& );          // нажали Ок в диалоге для редактирования таблицы
+    void           onSendValues( TValues& );         // нажали Ок в диалоге для добавления таблицы
+    void           onSendEntry( TValues& );          // нажали Ок в диалоге для значения
 
 private:
-    void           clear();
-    void           clear_edit();
+    void           clear() noexcept;
+    void           clear_edit() noexcept;
 
     void           clearNodeSequence();
 
@@ -102,7 +93,10 @@ private:
     YAML::Node     m_temporary_node;  // временный ямл для правки основного
     YAML::Node     m_temporary_inner_node;  // временный ямл для правки основного
 
-    QGridLayout   *m_grid;
+    QGridLayout   *m_grid;      // основная таблица
+
+    QVBoxLayout   *m_vlayout;   // вертикальный layout для строк
+    QHBoxLayout   *m_hlayout;   // горизонтальный layout для столбцов
 
     QPushButton   *m_ptBtnInc;
     QPushButton   *m_ptBtnId;
@@ -122,6 +116,7 @@ private:
     TTabDialog    *m_ptTabDialogName;
     TTabDialog    *m_ptTabDialogLink;
     TTabDialog    *m_ptTabDialogAdd;
+    TTabDialog    *m_ptTabDialogAddEntry;
 
     TValues        m_tValues;
 
@@ -138,7 +133,9 @@ private:
 
     void           widget_size_reset() noexcept;  // сброс размера виджета
 
-    bool           need_to_add; // необходимость создать новый набор параметров в ямле
+    bool           need_to_add; // необходимость создать новую таблицу в ямле
+    bool           need_to_add_row; // необходимость создать новую запись в ямле
+    bool           need_to_add_column; // необходимость создать новую запись в ямле
 
     bool           edit_id;
     bool           edit_name;
