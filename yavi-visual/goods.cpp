@@ -166,7 +166,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
         m_vlayout->addWidget( label, 0, Qt::AlignLeft );
 
         TTable  *pTable;
-        TTabEntry  *pEntry;
+        TTableEntry  *pEntry;
 
         // перебираем все таблицы
         for( int j = 0; j < static_cast<int>(config[ GoodsTableSection ].size()); j++ )
@@ -193,25 +193,27 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
 
             if( 0 != link.length() )
             {
-                pTable->setTableType( TTable::keTypeLink );
+                pTable->setTableType( TValues::keTypeLink );
 
                 pTable->setTableLink( link );
             }
             else if( __yaml_IsSequence( config[ GoodsTableSection ][j][GoodsTableColumn] ) )
             {
-                pTable->setTableType( TTable::keTypeColumn );
+                pTable->setTableType( TValues::keTypeColumn );
 
                 int  max_row_count = 0;
 
                 for( int i = 0; i < static_cast<int>(config[ GoodsTableSection ][j][ GoodsTableColumn ].size()); i++ )
                 {
                     // новая запись
-                    pEntry = new TTabEntry();
+                    pEntry = new TTableEntry( pTable );
                     pEntry->setNode( config[ GoodsTableSection ][j][ GoodsTableColumn ][i] );
+                    pEntry->setNodeParent( config[ GoodsTableSection ][j][ GoodsTableColumn ] );
                     pEntry->setNodeIndex( i );
+                    pEntry->setEntryType( TValues::keTypeColumn );
 
                     // добавляем запись в список
-                    pTable->m_apColumnList.append( pEntry );
+                    pTable->m_apTabEntryList.append( pEntry );
 
                     // имя
                     std::string  col_name = __yaml_GetString( config[ GoodsTableSection ][j][ GoodsTableColumn ][i], GoodsTableName );
@@ -224,6 +226,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     QStringList  col_list;
                     col_list.clear();
                     col_list = QString::fromStdString(col_val).split( '\n', QString::SkipEmptyParts );
+                    pEntry->setParamList( col_list, col_val );
                     pTable->setTableColumn( col_name, col_list );
 
                     if( col_list.size() > max_row_count )
@@ -236,19 +239,21 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             }
             else if( __yaml_IsSequence( config[ GoodsTableSection ][j][GoodsTableRow] ) )
             {
-                pTable->setTableType( TTable::keTypeRow );
+                pTable->setTableType( TValues::keTypeRow );
 
                 unsigned  row_count = 0;
 
                 for( int i = 0; i < static_cast<int>(config[ GoodsTableSection ][j][ GoodsTableRow ].size()); i++ )
                 {
                     // новая запись
-                    pEntry = new TTabEntry();
+                    pEntry = new TTableEntry( pTable );
                     pEntry->setNode( config[ GoodsTableSection ][j][ GoodsTableRow ][i] );
+                    pEntry->setNodeParent( config[ GoodsTableSection ][j][ GoodsTableRow ] );
                     pEntry->setNodeIndex( i );
+                    pEntry->setEntryType( TValues::keTypeRow );
 
                     // добавляем запись в список
-                    pTable->m_apRowList.append( pEntry );
+                    pTable->m_apTabEntryList.append( pEntry );
 
                     // имя
                     std::string  row_name = __yaml_GetString( config[ GoodsTableSection ][j][ GoodsTableRow ][i], GoodsTableName );
@@ -261,6 +266,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
                     QStringList  row_list;
                     row_list.clear();
                     row_list = QString::fromStdString(row_val).split( '\n', QString::SkipEmptyParts );
+                    pEntry->setParamList( row_list, row_val );
                     pTable->setTableRow( row_name, row_list );
 
                     row_count++;
@@ -273,7 +279,7 @@ bool TGoods::parse_yaml( const YAML::Node&  config )
             }
             else
             {
-                pTable->setTableType( TTable::keTypeNone );
+                pTable->setTableType( TValues::keTypeNone );
             }
 
             //widget_stretch( 0, m_vlayout->spacing() );
